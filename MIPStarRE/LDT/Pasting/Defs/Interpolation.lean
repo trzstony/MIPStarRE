@@ -27,9 +27,8 @@ def gHatTupleOutcomeTail {params : Parameters} {k : ℕ}
 
 /-- The distinguished global polynomial `h₀` used for the pasted completion outcome.
 
-It is also the default value on tuples that have already been filtered out of the
-actual interpolation path (for example nonglobal tuples after the
-`IsGloballyConsistent` restriction).  We take `h₀` to be the zero polynomial, which
+It is also the default value on tuples that are filtered out of the actual
+interpolation path.  We take `h₀` to be the zero polynomial, which
 trivially satisfies the low-individual-degree bound. -/
 noncomputable def fallbackInterpolatedPolynomial (params : Parameters) [FieldModel params.q] :
     Polynomial params.next where

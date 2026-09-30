@@ -7,11 +7,10 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.Core
 /-!
 # Section 6 — Answer-Valued Self-Improvement Slice Transport
 
-This file contains the answer-valued analogues of the Section 6 slice-transport
-constructors.  The ordinary construction, including `selfImprovementInInductionSection`,
-lives in `SelfImprovementAssembly.Core` and is imported here so that the
-answer-valued construction can reuse the same Section 9 self-improvement
-theorem.
+This file contains the slice-transport constructors for answer-valued
+strategies used by the main induction: each `x`-restricted strategy is
+extracted from an answer-valued strategy so that the Section 9
+self-improvement theorem can be applied slice by slice.
 
 ## References
 

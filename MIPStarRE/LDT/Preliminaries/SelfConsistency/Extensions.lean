@@ -2,15 +2,16 @@ import MIPStarRE.LDT.Preliminaries.SelfConsistency.Core
 import MIPStarRE.LDT.Test.StrategyFailures
 
 /-!
-# Self-consistency: strategy-level extensions
+# Self-consistency after evaluation
 
-Good-strategy characterization lemmas (`lem:good-strategy-characterization`)
-bundling the axis-parallel, self-consistency, and diagonal branches.
+`prop:two-notions-of-self-consistency-after-evaluation`: strong
+self-consistency of a sub-measurement passes to every post-processing of its
+outcomes, in the form of a state-dependent distance bound.
 
 ## References
 
-- `references/ldt-paper/preliminaries.tex`
-- `blueprint/src/chapter/ch03_preliminaries.tex`
+- `blueprint/src/low_degree_simplified.tex`,
+  `prop:two-notions-of-self-consistency-after-evaluation`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder

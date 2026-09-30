@@ -6,8 +6,8 @@ import MIPStarRE.LDT.Pasting.Core.DDistinct
 /-!
 # Line interpolation: H-B consistency error aggregation
 
-Fixed-`u` defect, `hBConsistencyError`, degree-ratio error bounds,
-and the final bad-mass aggregation lemma that drives `lem:h-b-consistency`.
+Fixed-`u` line-point defects and the degree-ratio error bounds used by the
+consistency estimate for the pasted measurement.
 
 ## References
 

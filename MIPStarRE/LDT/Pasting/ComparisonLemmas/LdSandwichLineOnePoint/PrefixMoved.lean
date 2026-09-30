@@ -48,7 +48,8 @@ noncomputable def ldSandwichLineOnePointPrefixMovedFamily
         (fun gs => (gs 0).isSome = true))
       (fun gs => Option.map (fun g : Polynomial params => g q.1) (gs 0))
 
-/-- Rotating the selected coordinate to the front reduces the prefix family to `ldGbcon`.
+/-- Rotating the selected coordinate to the front reduces the prefix family to the
+slice--vertical-line consistency relation `eq:ld-gbcon`.
 
 This is the prefix-completeness collapse and endpoint identification used after
 `references/ldt-paper/ld-pasting.tex:1011--1024`: once the selected coordinate is

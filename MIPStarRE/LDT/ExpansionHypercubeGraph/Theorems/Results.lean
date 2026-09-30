@@ -1,20 +1,19 @@
 import MIPStarRE.LDT.ExpansionHypercubeGraph.Theorems.Matrix
 
 /-!
-# Section 7 hypercube graph: local-to-global variance theorems
+# Section 7 hypercube graph: local-to-global variance
 
-This file assembles the public Section 7 results about the hypercube graph:
-the Laplacian edge-difference formula, the local and global variance rewrites,
-and the local-to-global inequality.  The proof route passes through the
-matrix-realization theorems and then exposes the statements in the
+This file proves the product Poincaré inequality `lem:local-to-global`: the
+global variance of a family of vectors indexed by `F_q^m` is at most `m` times
+its local variance along the edges of the hypercube graph.  The proof passes
+through the matrix-realization theorems and then states the result in the
 `QuantumState` and operator-family language used elsewhere in the LDT
 formalization.
 
 ## References
 
-- `references/ldt-paper/expansion.tex`, especially `prop:laplacian-rewrite`,
-  `lem:local-rewrite`, `lem:global-rewrite`, and `lem:local-to-global`
-- `blueprint/src/chapter/ch05_expansion.tex`
+- `blueprint/src/low_degree_simplified.tex`, `lem:local-to-global`.
+- `references/ldt-paper/expansion.tex`
 -/
 
 namespace MIPStarRE.LDT.ExpansionHypercubeGraph

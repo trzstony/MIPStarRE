@@ -9,7 +9,7 @@ The heavier endpoint and normalization lemmas are imported from
 `ScalarApproximation.PaperChain` so this final assembly can reuse cached proofs.
 
 **Proof strategy:** The proof follows the paper's exact route of ten approximation steps
-using `closenessOfIP`, `commutativityPoints`, `gCommStability_scalar`, and
+using `closenessOfIP`, `thm:commutativity-points`, `gCommStability_scalar`, and
 `gCommStabilityTwo_raw_scalar`.  Every `≈_{ε}` step in the paper corresponds to a
 named `hphase` block below, and the final error budget `48m(√γ + √ζ)` matches
 the paper's displayed computation at line 129.  The only presentation difference
@@ -26,8 +26,9 @@ The formerly monolithic file has been split into focused leaf modules:
   (`evaluatedSlicePhaseTwoStabilityDefect`, finite reindexing, subtraction algebra)
 - `ProcessedG.MainChain`: The main `evaluatedSlice_scalar_chain_bound` assembly
 
-This file provides the public statement of `commDataProcessedG`, the paper-facing
-scalar approximation theorem.
+This file provides `commDataProcessedG_of_commutativityPoints`, the scalar
+approximation theorem of `lem:comm-data-processed-g` from an established
+point-commutativity bound.
 -/
 
 namespace MIPStarRE.LDT.Commutativity
@@ -52,11 +53,11 @@ conceptually into the following four phases.
 Error: `2√ζ + √ζ`.
 
 **Phase 2** (eq:gcom9 → eq:gcom10): insert Bob's second measurement,
-swap via `commutativityPoints`, then apply the boundedness part of
+swap via `thm:commutativity-points`, then apply the boundedness part of
 `clm:g-comm-stability2` to remove trailing `G^x`.  The paper states
 `clm:g-comm-stability2` with an additional internal `6√(γ(m+1))` point-swap
 loss (the constant 6 comes from `Real.sqrt(32) ≤ 6` in
-`evaluatedSlice_phaseFour_pointSwap_right_bound`); the local `hphase5paper`
+`evaluatedSlice_phaseFour_pointSwap_right_bound_of_commutativityPoints`); the local `hphase5paper`
 step below keeps the paper's combined `√ζ + 6√(γ(m+1))` contribution explicit.
 Error: `2√ζ + 6√(γ(m+1)) + √ζ + 6√(γ(m+1))`.
 

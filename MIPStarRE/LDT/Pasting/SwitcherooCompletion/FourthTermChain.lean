@@ -3,7 +3,7 @@ import MIPStarRE.LDT.Pasting.SwitcherooCompletion.Expansion
 /-!
 # Section 12 pasting: fourth-term chain helpers
 
-Internal helpers by convention for the fourth-term chain in `commutativitySwitcheroo`.
+Internal helpers for the fourth-term chain in `lem:commutativity-switcheroo`.
 These were extracted from `SwitcherooCompletion` to keep that file under
 the 1000-line threshold.
 -/

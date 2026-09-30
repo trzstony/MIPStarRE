@@ -19,10 +19,8 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 `cor:commuting-with-G-complete`.
 
 **Source:** The proof in `references/ldt-paper/ld-pasting.tex:775-816`
-uses `cor:commuting-with-G-complete` internally.  The paper-facing theorem
-`commutingWithGIncomplete` below derives that complete-part commutation
-statement from the source hypotheses rather than exposing it as a public
-hypothesis. -/
+uses `cor:commuting-with-G-complete` internally; its complete-part
+commutation statement is the hypothesis of this form. -/
 theorem commutingWithGIncomplete_ofComplete
     (params : Parameters)
     [FieldModel params.q]

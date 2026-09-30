@@ -1,25 +1,17 @@
 import MIPStarRE.LDT.Basic.DistributionAvg
 
 /-!
-# Product rules for finite-support distribution averages
+# Product rule for operator-valued uniform averages
 
-This module contains product and marginalization rules for operator-valued
-uniform averages.  The scalar product rules, together with the common
-PMF-weighted finite-sum identities on which both scalar and operator rules
-depend, are in `MIPStarRE.LDT.Basic.DistributionUniformSums` and
+This module contains the product rule for operator-valued uniform averages
+along an equivalence with a product type.  The scalar product rules, together
+with the common PMF-weighted finite-sum identities on which both scalar and
+operator rules depend, are in `MIPStarRE.LDT.Basic.DistributionUniformSums` and
 `MIPStarRE.LDT.Basic.PMFAverages`.
 
-## Main definitions / statements
+## Main statements
 
-* `averageOperatorOverDistribution_uniform_prod`
-* `averageOperatorOverDistribution_uniform_comm`
-* `averageOperatorOverDistribution_uniform_prod_swap`
-* `averageOperatorOverDistribution_uniform_fst`
-* `averageOperatorOverDistribution_uniform_snd`
 * `averageOperatorOverDistribution_uniform_equiv_prod`
-* `averageOperatorOverDistribution_uniform_equiv_prod_swap`
-* `averageOperatorOverDistribution_uniform_equiv_fst`
-* `averageOperatorOverDistribution_uniform_equiv_snd`
 
 ## References
 

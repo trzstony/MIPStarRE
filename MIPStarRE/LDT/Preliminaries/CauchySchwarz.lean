@@ -5,7 +5,6 @@ import MIPStarRE.LDT.Preliminaries.SwitchSandwichPrep.InnerProduct
 
 Formalizes Cauchy–Schwarz-style propositions from Section 3
 (Preliminaries) of the LDT paper:
-- `easyApproxFromApproxDelta` — Proposition `prop:easy-approx-from-approx-delta`
 - `closenessOfIP` / `closenessOfIPAdjoint` — Proposition `prop:closeness-of-ip`
   (`eq:closeness3` / `eq:closeness4`)
 - `cabApproxDelta` — Proposition `prop:cab-approx-delta`

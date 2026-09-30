@@ -1,10 +1,11 @@
 import MIPStarRE.LDT.Commutativity.Defs.Core
 
 /-!
-# Section 11 commutativity: stability definitions
+# Section 11 commutativity: evaluated product families
 
-Reindexing and postprocessing infrastructure used in the full-slice and
-stability reductions, including the weighted reindex of raw operator families.
+The evaluated-slice product families `G^x_[g(u)=a] G^y_[h(v)=b]`, obtained from
+the full-slice products by postprocessing both polynomial outcomes with point
+evaluation.
 
 ## References
 

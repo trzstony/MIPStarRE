@@ -38,7 +38,7 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.Defs
 import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
 import MIPStarRE.LDT.MakingMeasurementsProjective.Projectivization
 import MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkFull
-import MIPStarRE.LDT.MakingMeasurementsProjective.LocalityPreservingRepair
+import MIPStarRE.LDT.MakingMeasurementsProjective.MarginalStates
 import MIPStarRE.LDT.ExpansionHypercubeGraph.Theorems.Results
 import MIPStarRE.LDT.GlobalVariance.Defs.Families
 import MIPStarRE.LDT.GlobalVariance.Theorems.MainTheorems

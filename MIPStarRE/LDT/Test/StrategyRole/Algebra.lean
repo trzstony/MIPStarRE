@@ -1,10 +1,11 @@
 import MIPStarRE.LDT.Test.StrategyRole.Core
 
 /-!
-# Role-register algebraic identities for the low individual degree test
+# Consistency defect of complete measurements
 
-Role-pair projection algebra, symmetrized measurement definitions, and expectation
-identities for the classical role-register symmetrized state.
+For complete measurements the bipartite consistency defect is one minus the
+diagonal matching mass; `qBipartiteConsDefect_of_measurements` records this
+identity, which the role-register point-consistency estimates use.
 -/
 
 namespace MIPStarRE.LDT

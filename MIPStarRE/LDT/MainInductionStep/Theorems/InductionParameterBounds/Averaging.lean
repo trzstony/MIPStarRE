@@ -2,17 +2,14 @@ import MIPStarRE.LDT.Basic.DistributionPMF
 import MIPStarRE.LDT.MainInductionStep.Theorems.InductionParameterBounds.Preliminaries
 
 /-!
-# Section 6 — Induction Parameter Averaging Bounds
+# Section 6 — Jensen estimate for averaged slice errors
 
-This file contains the uniform Jensen estimate used for averaged slice errors,
-together with the
-`sliceConditioningLoss` comparisons which replace the ambient factor `m` by
-`m + 1` in the induction step.
+This file contains the uniform Jensen estimate for fractional powers used to
+bound the average of the slice errors in the induction step.
 
 ## References
 
-- `blueprint/src/chapter/ch10_induction.tex`
-- `references/ldt-paper/inductive_step.tex`
+- `blueprint/src/low_degree_simplified.tex`, proof of `thm:main-induction`.
 -/
 
 namespace MIPStarRE.LDT.MainInductionStep

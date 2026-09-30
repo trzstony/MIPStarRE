@@ -68,6 +68,17 @@ theorem mainFormal
   · exact mainFormalConclusion_of_one_le params strategy hlarge
   · exact simplifiedMainFormal_smallError params strategy eps ⟨hpass⟩ hlarge
 
+/-- The error parameter of the sampling-parameter statement of `thm:main-formal`
+in the original paper,
+`100000 k² m⁴ (ε^(1/40000) + (d/q)^(1/40000) + exp(-k/(2560000 m²)))`.
+
+Paper origin: `references/ldt-paper/test_definition.tex:180-202`. -/
+noncomputable def mainFormalError (params : Parameters) (k : ℕ) (eps : Error) : Error :=
+  100000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) *
+    (Real.rpow eps (1 / (40000 : Error)) +
+      Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (40000 : Error)) +
+      Real.exp (-((k : Error) / (2560000 * ((params.m : Error) ^ (2 : ℕ))))))
+
 /-- In the nontrivial branch of the sampling-parameter theorem, the simplified
 error is at most the original error `mainFormalError`.
 

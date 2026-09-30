@@ -57,8 +57,8 @@ theorem eq_C_coeff_zero_of_degree_zero {params : Parameters} [FieldModel params.
 
 /-- A degree-zero axis-line answer has the same value at all line parameters.
 
-Lean-only helper for the degree-zero branch of `thm:ld-pasting`; this is the
-vertical-line analogue of `Polynomial.apply_eq_apply_of_degree_zero`. -/
+Lean-only helper for the degree-zero case of the main induction: a polynomial
+of individual degree zero is constant along every axis-parallel line. -/
 theorem apply_eq_apply_of_degree_zero {params : Parameters} [FieldModel params.q]
     (f : AxisLinePolynomial params) (hd : params.d = 0) (t s : Fq params) :
     f t = f s := by

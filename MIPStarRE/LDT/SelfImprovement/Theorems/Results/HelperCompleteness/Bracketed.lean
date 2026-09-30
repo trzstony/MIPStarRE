@@ -342,9 +342,8 @@ theorem helper_hhat_vs_z_of_self_consistency_and_complementary_slackness
 /-- Helper-stage completeness from the paper-shaped Cauchy--Schwarz estimates,
 complementary slackness, and input consistency.
 
-Compared with `helper_completeness_of_cauchy_schwarz_input_consistency`, this
-version names the expression before the first Cauchy--Schwarz move exactly as
-it appears in `eq:bracketize-the-expression`; the equality with the
+The expression before the first Cauchy--Schwarz move is named exactly as it
+appears in `eq:bracketize-the-expression`; the equality with the
 `Hhat`-mass is supplied internally by
 `helperBracketedCompletenessQuantity_eq_mass`. -/
 theorem helper_completeness_of_bracketed_cauchy_schwarz_input_consistency

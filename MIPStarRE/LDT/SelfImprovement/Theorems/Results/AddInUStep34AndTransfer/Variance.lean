@@ -504,10 +504,8 @@ lemma add_in_u_cs_chain_global_variance_steps_of_local_sum_bound
 /-- Local-variance-sum version of the combined Step 3/4 variance bridge using
 the factor estimates proved in this file.
 
-This is the closed local-sum form of
-`add_in_u_cs_chain_global_variance_steps_of_sum_bound_from_factor_bounds`: the
-only new input is the local-variance sum hypothesis, which is first transported
-to the global-variance sum bound. -/
+Its only input beyond the factor estimates is the local-variance sum
+hypothesis, which is first transported to the global-variance sum bound. -/
 lemma add_in_u_cs_chain_global_variance_steps_of_local_sum_bound_from_factor_bounds
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)

@@ -196,8 +196,7 @@ differs from
 `E_u Σ_a ⟨ψ, (T_[h(u)=a] A^u_a) ⊗ A^u_a ψ⟩`
 by at most `2 sqrt delta`.  The proof is the paper's
 `eq:yet-another-move-a`: `twoNotionsOfSelfConsistency` supplies the first
-square-root factor, while `helper_first_move_second_factor_le_one` supplies
-the second. -/
+square-root factor, and the second factor is at most one. -/
 theorem helper_first_move_abs_sub_bracketed_le_two_sqrt_delta
     (params : Parameters)
     [FieldModel params.q]

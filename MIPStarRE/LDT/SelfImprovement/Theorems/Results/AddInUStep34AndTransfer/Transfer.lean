@@ -258,15 +258,12 @@ lemma add_in_u_simplified_transfer_of_cs_chain_sqrt_form
 -- This lemma combines the two local-variance Cauchy--Schwarz replacements
 -- with the scalar add-in-u transfer inequality.
 
-/-- Specialization of `selfConsistencyDiagonalAddInU_of_transfer` to the
-projection-simplified scalar transfer hypothesis.
+/-- Diagonal add-in-`u` self-consistency from the projection-simplified scalar
+transfer hypothesis.
 
-Compared to `selfConsistencyDiagonalAddInU_of_transfer`, the hypothesis is
-stated against the cleaner right-hand side `E_u Σ_h ⟨ψ, H^u_h ⊗ T_h ψ⟩`
+The hypothesis is stated against the right-hand side `E_u Σ_h ⟨ψ, H^u_h ⊗ T_h ψ⟩`
 obtained after collapsing the outer projection factors of
-`eq:release-the-kraken` via `proj_outer_sandwich_eq`. The conclusion is
-identical and can therefore feed the same diagonal helper-SSC application;
-the simplification reduces the Cauchy--Schwarz/global-variance comparison
+`eq:release-the-kraken` via `proj_outer_sandwich_eq`; this reduces the Cauchy--Schwarz/global-variance comparison
 (`self_improvement.tex:247--343`) to a transfer in the simpler shape. -/
 lemma selfConsistencyDiagonalAddInU_of_simplifiedTransfer
     (params : Parameters) [FieldModel params.q]

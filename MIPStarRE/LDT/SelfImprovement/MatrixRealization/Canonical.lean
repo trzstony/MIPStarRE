@@ -227,9 +227,7 @@ theorem matrixSdpCanonicalStrictPrimalBlockMatrix_feasible
 /-- The canonical block objective evaluated on an arbitrary feasible canonical
 primal matrix is the paper primal objective of its extracted submeasurement.
 
-This is the converse objective identity to
-`matrixSdpCanonicalObjective_trace_primalBlockMatrix`: once a canonical feasible
-matrix `X` is given, reading the polynomial diagonal blocks as `T_g = X_{gg}`
+Once a canonical feasible matrix `X` is given, reading the polynomial diagonal blocks as `T_g = X_{gg}`
 preserves the SDP objective value. -/
 theorem matrixSdpCanonicalObjective_trace_extractedPrimalSubmeasurement
     (params : Parameters) [FieldModel params.q]

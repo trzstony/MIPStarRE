@@ -16,13 +16,9 @@ Support lemmas for the good-strategy self-consistency transport
 (`SelfConsistencyTransport`):
 
 * `ev_adjoint_sub_swap` — squared-distance invariance under swapping endpoints
-  (used by the reverse `generalize-b` step and by
-  `pointConditionedEventSelfConsistency_weighted_rightEdge`);
+  (used by the reverse `generalize-b` step);
 * `generalizeBReversePointwiseBound` — the reverse `lem:generalize-b` step at
-  `expansion.tex:309`;
-* `avgOver_rerandomizeCoord_fst` / `avgOver_rerandomizeCoord_snd` — both
-  marginals of the hypercube-edge sampling distribution are uniform
-  (`expansion.tex:300–302`).
+  `expansion.tex:309`.
 -/
 
 lemma ev_adjoint_sub_swap

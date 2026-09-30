@@ -7,8 +7,8 @@ import MIPStarRE.LDT.SelfImprovement.Defs
 
 Reusable arithmetic threshold lemmas that compare the *natural* paper sums of
 errors emitted by the helper-stage self-improvement constructions against the
-literal `selfImprovementHelperError` threshold used by the final-field
-statements (`SelfImprovementFinalFields` in `Statements.lean`).
+literal `selfImprovementHelperError` threshold of the helper statement
+(`SelfImprovementHelperStatement` in `Statements.lean`).
 
 The helper-stage absorptions formalize the displayed paper inequalities:
 
@@ -20,9 +20,6 @@ The helper-stage absorptions formalize the displayed paper inequalities:
   `3 √δ ≤ ζ̂`.
 * `references/ldt-paper/self_improvement.tex`, lines 614--624 — boundedness:
   `3 √δ + 4 √ζ_var ≤ ζ̂`.
-
-The final-stage comparisons with `selfImprovementError` are collected in
-`Thresholds.Final`.
 
 Blueprint mirrors:
 
@@ -195,8 +192,8 @@ theorem selfImprovementHelperError_eq
 
 /-- The helper-stage threshold is nonnegative.
 
-This is the basic positivity fact reused by the helper-stage absorption wrappers
-and by the final-stage comparison with `selfImprovementError`. -/
+This is the basic positivity fact reused by the helper-stage absorption
+wrappers. -/
 theorem selfImprovementHelperError_nonneg
     (params : Parameters) [FieldModel params.q]
     (eps delta : Error) :

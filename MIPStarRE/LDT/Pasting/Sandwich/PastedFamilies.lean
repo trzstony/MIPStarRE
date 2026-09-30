@@ -2,9 +2,13 @@ import MIPStarRE.LDT.CommutativityPoints.Approximation
 import MIPStarRE.LDT.Pasting.Sandwich.GHatSandwich
 
 /-!
-# Section 12 — Sandwich constructions: pasted families
+# Section 12 — vertical-line families
 
-Pasted interpolation families, recurrence weights, and final operator families.
+The vertical-line measurement family `B^u` of the strategy in the last
+coordinate, its lift to the answer type of the slice measurements, the
+restriction of a global polynomial to a vertical line, and the left and right
+families of the line one-point transport used by the pasting consistency
+estimate.
 -/
 
 namespace MIPStarRE.LDT.Pasting

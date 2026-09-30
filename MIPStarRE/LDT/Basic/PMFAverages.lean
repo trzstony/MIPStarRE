@@ -14,9 +14,6 @@ low individual degree test averaging layer.
 
 * `PMF.map_apply_toReal`
 * `PMF.realWeightedSum`
-* `PMF.realWeightedSumLinearMap`
-* `PMF.realWeightedSum_map`
-* `PMF.realWeightedSum_bind`
 * `PMF.map_sum_smul`
 * `PMF.bind_apply_toReal`
 * `PMF.bind_sum_smul`
@@ -25,11 +22,9 @@ low individual degree test averaging layer.
 * `PMF.totalVariationDistance`
 * `PMF.totalVariationDistance_eq_sum_max_sub`
 * `PMF.totalVariationDistance_uniformOfFintype_uniformOfFinset_eq`
-* `PMF.sum_le_sum_add_totalVariationDistance`
 * `PMF.sum_rpow_one_div_le_rpow_sum`
 * `PMF.realWeightedSum_rpow_one_div_le_rpow`
 * `PMF.uniformOfFintype_map_equiv`
-* `PMF.uniformOfFintype_prod_apply_toReal`
 * `PMF.uniformOfFintype_prod_eq_bind`
 * `PMF.uniformOfFintype_sum_equiv_smul`
 * `PMF.uniformOfFintype_prod_sum_smul`
@@ -37,7 +32,6 @@ low individual degree test averaging layer.
 * `PMF.uniformOfFintype_sum_equiv_snd_smul`
 * `PMF.uniformOfFintype_sum_factor_equiv_smul`
 * `PMF.uniformOfFintype_sum_factor_equiv_fst_smul`
-* `PMF.uniformOfFintype_sum_factor_equiv_snd_smul`
 
 ## References
 

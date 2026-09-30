@@ -1,11 +1,11 @@
 import MIPStarRE.LDT.Test.MainTheorem.Simplified.Statements
-import MIPStarRE.LDT.Test.MainTheorem.ScalarBounds.EnvelopeBounds
 
 /-!
 # Scalar regime for the simplified final theorem
 
 The nontrivial final-error branch bounds the two basic error parameters
-below one. The scale `K_{m,d}` dominates the dimension `m`.
+below one. The scale `K_{m,d}` dominates the dimension `m`, and on `[0, 1]`
+a power `x^(1/n)` increases with `n`.
 
 ## References
 
@@ -14,6 +14,15 @@ below one. The scale `K_{m,d}` dominates the dimension `m`.
 -/
 
 namespace MIPStarRE.LDT.Test
+
+/-- For `x ∈ [0, 1]`, enlarging the denominator in `x^(1/n)` makes the
+exponent smaller and therefore the value larger. -/
+theorem rpow_le_of_denom_le {x : Error} (hx : 0 ≤ x) (hx1 : x ≤ 1)
+    {n₁ n₂ : Error} (hn₁Pos : 0 < n₁) (hn : n₁ ≤ n₂) :
+    Real.rpow x (1 / n₁) ≤ Real.rpow x (1 / n₂) := by
+  have hn₂Pos : 0 < n₂ := lt_of_lt_of_le hn₁Pos hn
+  have hdiv : 1 / n₂ ≤ 1 / n₁ := one_div_le_one_div_of_le hn₁Pos hn
+  exact Real.rpow_le_rpow_of_exponent_ge' hx hx1 (show 0 ≤ 1 / n₂ by positivity) hdiv
 
 /-- The radius before multiplication by the final numerical constant. -/
 noncomputable def simplifiedFinalRadius (params : Parameters) (eps : Error) : Error :=

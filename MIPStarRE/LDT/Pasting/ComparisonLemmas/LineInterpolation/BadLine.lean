@@ -3,8 +3,9 @@ import MIPStarRE.LDT.Pasting.ComparisonLemmas.LineInterpolation.Core
 /-!
 # Line interpolation: bad-line event
 
-Definitions and lemmas for `tupleInterpolatedVerticalLine` and mismatch
-extraction in the line-interpolation argument.
+Mismatch extraction for the line-interpolation argument: if a vertical-line
+polynomial disagrees with an interpolated polynomial, it disagrees at one of
+the interpolation nodes.
 
 ## References
 

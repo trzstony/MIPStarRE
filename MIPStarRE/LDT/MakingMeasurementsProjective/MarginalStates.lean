@@ -1,39 +1,31 @@
-import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.PositiveGram.Sigma
+import MIPStarRE.LDT.MakingMeasurementsProjective.Projectivization
+import MIPStarRE.LDT.Preliminaries.CompletionTransfer
+import MIPStarRE.Quantum.FiniteHilbert
 
 /-!
-# Section 5 — Locality-preserving projectivization repair
+# Marginal states of a bipartite state
 
-This file proves the locality-preserving repair route for the late Section 5
-`Q/X/XHat/P` argument.
+For a normalized state `ψ` on `H_A ⊗ H_B`, this file constructs the marginal
+states on the two tensor factors: the left marginal `φ_A(X) = ⟨ψ| X ⊗ I |ψ⟩`
+and the right marginal `φ_B(Y) = ⟨ψ| I ⊗ Y |ψ⟩`, as normalized density
+matrices.  The state-dependent orthogonalization lemma is applied to these
+marginal states when rounding a measurement on one tensor factor.
 
-## Scope
+## Main definitions
 
-The **spectral-truncation stage** (the first part of the proof of rounding
-to projectors) is already proved by
-`spectralTruncationStatement_of_sourceAlmostProjective` in
-`MakingMeasurementsProjective/SpectralTruncation/ProjectiveNonMeasurement.lean`,
-which is fully proved via
-`projectiveNonMeasurement_of_sourceAlmostProjective_full`. Proofs that
-require the spectral truncation statement should call that declaration directly.
+* `leftMarginalState`, `rightMarginalState`: the two marginal states.
 
-The main result recorded here:
+## Main results
 
-- **`leftLiftedProjectivizationRepair`** — paper origin
-  `references/ldt-paper/orthonormalization.tex` lines 534–860 (rank
-  reduction and the `Q`/`√Q` completeness setup) and 862–1194 (the
-  `X`/`X̂`/`P` algebra producing the lifted projective sub-measurement,
-  including the final triangle-inequality assembly).  The formal proof below
-  follows that local `Q/X/XHat/P` route by passing to the left marginal state,
-  constructing the local projective family there, and transporting the final
-  estimate back to left lifts.
+* `leftMarginalState_isNormalized`, `rightMarginalState_isNormalized`:
+  marginals of normalized states are normalized.
+* `leftMarginal_ev_eq`: expectations of left-placed operators are computed by
+  the left marginal, and similarly on the right.
 
-The theorem proved here is the direct output of that route under a normalized
-bipartite state and the source almost-projective estimate for the left-lifted
-measurement. It is stated directly in terms of this estimate, rather than in
-terms of a separate repair-input assumption, and provides the unconditional
-repair step retained for the independent completion-route theorem. The public
-orthonormalization theorems now follow from the linear bound in
-`SimplifiedOrthogonalization`.
+## References
+
+* `blueprint/src/low_degree_simplified.tex`, proof of
+  `lem:orthonormalization-main-lemma`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder

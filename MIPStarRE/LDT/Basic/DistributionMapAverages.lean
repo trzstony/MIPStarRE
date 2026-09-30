@@ -12,11 +12,7 @@ equivalence.
 ## Main declarations
 
 * `avgOver_uniform_map_eq_uniform_of_factor_equiv`
-* `averageOperatorOverDistribution_uniform_map_eq_uniform_of_factor_equiv`
 * `avgOver_uniform_map_eq_uniform_fst_of_factor_equiv`
-* `avgOver_uniform_map_eq_uniform_snd_of_factor_equiv`
-* `averageOperatorOverDistribution_uniform_map_eq_uniform_fst_of_factor_equiv`
-* `averageOperatorOverDistribution_uniform_map_eq_uniform_snd_of_factor_equiv`
 
 ## References
 

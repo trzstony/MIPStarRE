@@ -205,9 +205,8 @@ private lemma gHatPairProduct_qSDDOp_decompose
 `cor:commuting-with-G-complete`, and `cor:commuting-with-G-incomplete`.
 
 **Source:** The proof in `references/ldt-paper/ld-pasting.tex:817-862`
-uses these four preceding Section 12 results internally.  The paper-facing
-theorem `gHatFacts` below derives them from the source hypotheses rather than
-exposing them as public hypotheses. -/
+uses these four preceding Section 12 results internally; they are the
+hypotheses of this form. -/
 theorem gHatFacts_ofSelfConsistencyAndCommutation
     (params : Parameters)
     [FieldModel params.q]

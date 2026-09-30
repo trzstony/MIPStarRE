@@ -6,18 +6,19 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.AddInUFullStatement
 import MIPStarRE.LDT.SelfImprovement.Simplified.VarianceCertificate
 
 /-!
-# Self-improvement theorem variants
+# Self-improvement helper
 
-The main `selfImprovementHelper` and the `selfImprovement` theorem corresponding
-to `thm:self-improvement` in the blueprint.
+The helper stage of self-improvement, `lem:self-improvement-helper`: from a
+complete polynomial measurement consistent with the point measurements, the
+Section 9 semidefinite program produces a filtered sub-measurement with the
+four helper conclusions.
 
 ## Contents
 
-- **selfImprovementHelper** — `lem:self-improvement-helper`, with the paper's
-  input consistency hypothesis and four helper conclusions.
-- **self_improvement_helper_with_slackness** — companion helper producing the
-  slackness-carrying helper conclusion from the Section 9 SDP statement.
-- **selfImprovement** — the statement corresponding to `thm:self-improvement`.
+- **self_improvement_helper_with_slackness** — the slackness-carrying helper
+  conclusion from the Section 9 SDP statement.
+- **self_improvement_helper_with_contraction** — the same conclusion together
+  with the certificate contraction `Z² ≤ H ≤ I` used by dilation.
 
 ## References
 
@@ -38,8 +39,7 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 /-- Conditional form of the helper lemma from a slackness-carrying SDP
 conclusion.
 
-This is the companion to `selfImprovementHelper` when the Section 9
-strong-duality conclusion has already been supplied as
+The Section 9 strong-duality conclusion is supplied as
 `SdpStatementWithSlackness`.  The helper output therefore carries the
 complementary-slackness equations needed by the helper-completeness chain. -/
 lemma self_improvement_helper_with_slackness_of_sdp_statement_with_slackness

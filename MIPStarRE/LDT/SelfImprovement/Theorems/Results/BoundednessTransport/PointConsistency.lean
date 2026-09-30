@@ -1,5 +1,7 @@
 import MIPStarRE.LDT.Test.Defs
-import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.PositiveGram.Sigma
+import MIPStarRE.LDT.MakingMeasurementsProjective.Projectivization
+import MIPStarRE.LDT.Preliminaries.CompletionTransfer
+import MIPStarRE.Quantum.FiniteHilbert
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport.Decomposition
 
 /-!

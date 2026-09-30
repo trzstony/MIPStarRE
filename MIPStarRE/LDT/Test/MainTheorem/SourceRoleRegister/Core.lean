@@ -4,10 +4,18 @@ import MIPStarRE.LDT.Preliminaries.ComparisonProjective
 import MIPStarRE.LDT.Test.StrategyBiProjUnsymmetrization
 
 /-!
-# Source-Boundary Role-Register Handoff: Core Reductions
+# Role-register reduction for the final theorem
 
-This module contains the main-induction handoff, unsymmetrization, and the first
-two-space projectivization outputs for the source route toward `thm:main-formal`.
+For a general two-space projective strategy, the role-register symmetrization
+produces a symmetric strategy on `{A, B} × (H_A ⊕ H_B)`.  This module
+unsymmetrizes a polynomial measurement consistent with the symmetrized point
+measurements into two point-consistency estimates on the original strategy, and
+derives the consistency of the two extracted polynomial measurements from these
+estimates by the Schwartz--Zippel bound.
+
+## References
+
+- `blueprint/src/low_degree_simplified.tex`, proof of `thm:main-formal`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder

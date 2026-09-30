@@ -19,13 +19,8 @@ The `witness` and `dominationTarget` fields store the per-slice PSD operator
 `Z^x` and per-slice, per-polynomial operator `E_u A^{u,x}_{g(u)}` appearing in
 the paper's boundedness hypothesis (`references/ldt-paper/commutativity-G.tex`,
 item `data-processed-boundedness`). We store these operators explicitly rather
-than hiding them behind ambient defaults, so each constructor must choose an
-honest witness/target pair.
-
-Callers without access to an ambient strategy can use `ofSliceMeas`, which takes
-`Z^x := ∑_g G^x_g` and `dominationTarget x g := G^x_g`. Callers with access to a
-symmetric strategy should prefer the constructor `ofSymStrat`,
-which derives both fields from the strategy itself. -/
+than hiding them behind ambient defaults, so each constructor must choose a
+witness/target pair. -/
 structure IdxPolyFamily (params : Parameters) [FieldModel params.q]
     (ι : Type*) [Fintype ι] [DecidableEq ι] where
   meas : IdxProjSubMeas (Fq params) (Polynomial params) ι

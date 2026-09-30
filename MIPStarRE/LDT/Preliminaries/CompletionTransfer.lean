@@ -1,9 +1,10 @@
 import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency.Completion
 
 /-!
-# Preliminary comparison theorems: completion and chain rules
+# Preliminary comparison theorems: chain rules
 
-Completion lemmas and final chain inequalities from the preliminaries chapter.
+Monotonicity and chain rules for the state-dependent distance of operator
+families, the multi-step form of `prop:triangle-inequality-for-approx_delta`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder

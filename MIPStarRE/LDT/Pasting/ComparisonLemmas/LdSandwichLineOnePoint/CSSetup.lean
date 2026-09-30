@@ -171,8 +171,7 @@ noncomputable def ldSandwichLineOnePoint_prefix_afterFirstCSOutcomeSum
 
 /-- The target expanded off-diagonal scalar after the two CS moves.
 
-This is the moved-prefix side.  The separate endpoint/prefix-completeness
-collapse to `ldGbcon` is the already-proved
+This is the moved-prefix side; the endpoint/prefix-completeness collapse is
 `ldSandwichLineOnePointPrefixMoved_eq_endpoint`, corresponding to
 `ld-pasting.tex:1011--1024`. -/
 noncomputable def ldSandwichLineOnePoint_prefix_movedOutcomeSum

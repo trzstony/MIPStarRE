@@ -197,9 +197,8 @@ private lemma secondSwitcherooError_le_commutingWithGCompleteError
 
 **Source:** The proof in `references/ldt-paper/ld-pasting.tex:721-774`
 uses `thm:com-main`, `lem:commutativity-switcheroo`, and
-`lem:g-complete-self-consistency` internally.  The paper-facing theorem
-`commutingWithGComplete` below derives the first and third inputs from the
-source hypotheses rather than exposing them as public hypotheses. -/
+`lem:g-complete-self-consistency` internally; the first and third are the
+hypotheses of this form. -/
 theorem commutingWithGComplete_ofComMainAndSelfConsistency
     (params : Parameters)
     [FieldModel params.q]

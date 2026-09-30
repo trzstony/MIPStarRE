@@ -9,10 +9,6 @@ This file provides the matrix-valued measurement layer used by the LDT formaliza
 
 * `Submeasurement` — a family of PSD matrices summing to at most the identity.
 * `Measurement` — a family of PSD matrices summing to exactly the identity.
-* `Submeasurement.postprocess` — data-processed submeasurements via answer relabeling.
-* `Measurement.postprocess` — the paper's postprocessing proposition for complete POVMs.
-* `inconsistency` — the off-diagonal mass `∑_{a ≠ b} τ(M_a N_b)`.
-* `diagOverlap` — the diagonal mass `∑_a τ(M_a N_a)`.
 
 ## References
 

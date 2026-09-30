@@ -4,27 +4,17 @@ import MIPStarRE.LDT.Test.Defs
 /-!
 # Section 5 — Statements
 
-Statements for Naimark dilation, one-measurement Naimark, the
-orthogonalization lemma, rounding to projectors, rank reduction, and completing
-to measurement.
+Statements for the one-measurement Naimark dilation, the product-extension
+state used by the tensor-product Naimark theorem, and the almost-projective
+conclusion obtained from a consistent measurement.
 
 ## Naimark dilation statements
 
 The **one-measurement Naimark lemma** (`OneMeasNaimarkLemma`) is the
 building block: any submeasurement can be dilated to a projective
-submeasurement on a space enlarged by one auxiliary register.
-
-The questionwise **Naimark interface** (`NaimarkStatement`) records the
-per-question one-measurement dilations and their single-outcome marginal
-preservation identities.  It is not the full tensor-product statement of
-`\label{thm:naimark}`.
-
-The source theorem form is recorded separately as
-`NaimarkTensorProductCorrelationStatement` and
-`naimarkTensorProductCorrelation`.  This statement contains the full
-bipartite auxiliary-state and correlation-preservation conclusion of
-`\label{thm:naimark}` in the projective-submeasurement form supplied by the
-paper's one-measurement helper.  The proof is the tensor-product assembly
+submeasurement on a space enlarged by one auxiliary register.  The
+product-extension state `ψ ⊗ aux` records the register order in which the
+dilated measurements of the two provers act; the tensor-product assembly is
 implemented in `NaimarkFull.lean`.
 -/
 

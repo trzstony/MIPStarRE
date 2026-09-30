@@ -1,5 +1,5 @@
 import MIPStarRE.LDT.MakingMeasurementsProjective.SimplifiedOrthogonalization.LinearOrthogonalization
-import MIPStarRE.LDT.MakingMeasurementsProjective.LocalityPreservingRepair
+import MIPStarRE.LDT.MakingMeasurementsProjective.MarginalStates
 
 /-!
 # Linear rounding of consistent measurements

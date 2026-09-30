@@ -12,7 +12,7 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-! # Collision expansion and Schwartz-Zippel bounds
 
-This module contains the `generalizeB` theorem wrappers, finite reparametrization
+This module contains the `lem:generalize-b` statement wrappers, finite reparametrization
 and distribution bookkeeping, and the Schwartz-Zippel collision expansion that
 bounds the line-collision residual.
 -/

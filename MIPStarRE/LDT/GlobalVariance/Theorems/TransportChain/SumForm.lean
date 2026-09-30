@@ -21,12 +21,12 @@ closes `eq:equivalent-local-variance`.
 
 ### Individual sum-form step bounds (all available)
 
-1. `pointConditionedEventSelfConsistency_weighted_leftEdge_sum` (2δ, Step 1)
+1. point self-consistency at the first edge endpoint (2δ, Step 1)
 2. `axisParallelPointLineConsistency_weighted_rightToLeftLineQuestion_sum` (2ε, Step 2)
 3. `generalizeBDeviationAtPolynomial_polysum_le_error` (md/q forward, Step 3)
 4. `generalizeBReversePointwiseBound_polysum_le_error` (md/q reverse, Step 4) — **below**
 5. `axisParallelPointLineConsistency_weighted_leftToRightLineQuestion_sum` (2ε, Step 5)
-6. `pointConditionedEventSelfConsistency_weighted_rightEdge_sum` (2δ, Step 6)
+6. point self-consistency at the second edge endpoint (2δ, Step 6)
 
 ### Six-step chain assembly
 

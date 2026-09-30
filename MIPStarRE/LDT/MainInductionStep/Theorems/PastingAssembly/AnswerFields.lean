@@ -29,8 +29,7 @@ intended proof must use the answer-valued diagonal verifier relation of
 The proof first establishes the Section 10 point-commutativity estimate from
 the answer-valued diagonal-line test, transfers that estimate to the
 point-equivalent carrier, and then invokes the Section 11 scalar chain in its
-form that assumes point commutativity rather than an ordinary diagonal
-`IsGood` field. -/
+form that assumes point commutativity. -/
 theorem answerComMainForCarrier_ofAnswerGood
     (params : Parameters)
     [FieldModel params.q]

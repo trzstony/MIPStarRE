@@ -4,16 +4,15 @@ import MIPStarRE.LDT.Test.StrategyPolynomialFamilies
 import MIPStarRE.LDT.Test.StrategyFailures
 
 /-!
-# Section 6 — Induction Parameter Bound Preliminaries
+# Section 6 — the one-dimensional base case
 
-This file is one leaf of `InductionParameterBounds`. It contains the elementary
-point-line reduction for the base case, the real-variable comparison lemmas used
-by the small-parameter estimates, and the bound `d/q ≤ 1`.
+In dimension `m = 1` the axis-parallel line through any point is the whole
+space `F_q`.  This file records the corresponding identification of lines,
+used for the base case of the main induction.
 
 ## References
 
-- `blueprint/src/chapter/ch10_induction.tex`
-- `references/ldt-paper/inductive_step.tex`
+- `blueprint/src/low_degree_simplified.tex`, proof of `thm:main-induction`.
 -/
 
 namespace MIPStarRE.LDT.MainInductionStep

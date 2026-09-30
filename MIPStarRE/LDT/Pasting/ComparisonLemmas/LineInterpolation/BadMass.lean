@@ -3,9 +3,8 @@ import MIPStarRE.LDT.Pasting.ComparisonLemmas.LineInterpolation.BadLine
 /-!
 # Line interpolation: bad-mass comparison
 
-Main bad-mass comparison lemmas: sandwich mismatch sums, `qBipartiteConsDefect`
-equality via single-outcome measurements, `hBConsistencyBadMass`, line-point
-defect bounds, and `pastedInterpolation_verticalLine_defect_le_badMass`.
+Bad-mass comparison lemmas: sandwich mismatch sums, `qBipartiteConsDefect`
+equality via single-outcome measurements, and line-point defect bounds.
 
 ## References
 

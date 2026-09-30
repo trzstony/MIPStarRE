@@ -58,10 +58,8 @@ noncomputable def gCommStabilityScalarDefect
 
 This is the Cauchy--Schwarz/`Z^y` part of
 `references/ldt-paper/commutativity-G.tex`, `clm:g-comm-stability` (lines
-135--179).  It is intentionally separate from the overlap-style
-`gCommStability_overlap` theorem: the overlap theorem bounds an internal
-`SDDOpRel` package, while this theorem uses `SliceBoundednessInput` to control
-the paper scalar defect after the finite marginalization/reindexing step. -/
+135--179).  It uses `SliceBoundednessInput` to control the paper scalar defect
+after the finite marginalization/reindexing step. -/
 theorem gCommStability_scalar
     (params : Parameters)
     [FieldModel params.q]

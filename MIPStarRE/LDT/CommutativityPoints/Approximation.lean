@@ -315,8 +315,7 @@ private lemma answer_sampledDiagonalLineApproximation
     IdxSubMeas.liftLeft, IdxSubMeas.liftRight] using
     happrox.leftRightSquaredDistanceBound
 
-/-- Answer-valued version of
-`sampledDiagonalLineApproximation_pointWithDiagonalLine`.
+/-- Point--diagonal-line approximation for answer-valued strategies.
 
 This is the Section 10 diagonal approximation needed by the answer-valued
 commutativity route: it uses the answer-valued diagonal verifier relation

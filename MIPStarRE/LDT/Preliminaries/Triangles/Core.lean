@@ -82,7 +82,7 @@ private lemma avgOver_abs_le_sqrt_of_pointwise_nonneg
         h𝒟
   simpa [abs_of_nonneg havg_nonneg] using havg_abs
 
-/-! ### Right-register variant of `triangleSub` -/
+/-! ### Right-register variant of `prop:triangle-sub` -/
 
 private lemma right_match_gap_abs_le_sqrt_qSDD
     {Outcome : Type*} {ι : Type*}

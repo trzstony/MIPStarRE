@@ -50,7 +50,8 @@ lemma sddOpRel_swap_questions
     _ ≤ δ := hAB
 
 /-- Reinterpret the point-with-complete-part commutation bound as a relation on the
-`Polynomial × Unit` outcome type expected by `commutativitySwitcheroo`. -/
+`Polynomial × Unit` outcome type expected by
+`commutativitySwitcheroo_ofCompleteSelfConsistency`. -/
 lemma pointWithCompletePart_as_switcheroo_input
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))

@@ -1,10 +1,10 @@
 import MIPStarRE.LDT.Preliminaries.Triangles.Core
 
 /-!
-# Triangle Inequalities for State-Dependent Distance: Simultaneous Equivalence
+# Triangle inequality for consistency
 
-This module contains the simultaneous-equivalence triangle inequalities and the
-final approximate-delta triangle estimate.
+The triangle inequality `prop:simeq-triangle-inequality` for consistency
+relations on a bipartite state `ψ ∈ H_A ⊗ H_B`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder

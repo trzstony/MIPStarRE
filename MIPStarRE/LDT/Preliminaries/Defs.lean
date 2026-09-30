@@ -12,10 +12,8 @@ consistency, sandwich, and completion statements in a form used by later files.
 
 - `BipartiteSDDRel`: the paper-style left/right state-dependent distance
   relation.
-- `ConsAgreement`: the measurement reformulation of consistency.
-- `ConsSubMeasStmt`, `SwitchSandwichStmt`, `CompTransferStmt`, and
-  `CompletingToMeasStmt`: conclusion statements for the main preliminary
-  propositions.
+- `ConsSubMeasStmt` and `SwitchSandwichStmt`: conclusion statements for
+  `prop:cons-sub-meas` and `prop:switch-sandwich`.
 - `completeAtOutcome`: completion of a submeasurement at a distinguished
   outcome.
 
@@ -91,9 +89,7 @@ private theorem totalSandwichFamily_total_le_one {Question Outcome : Type*}
 
 /-- `A_a ⊗ B_a`, the diagonal bipartite family from `prop:cons-sub-meas`.
 
-This same-space version is the specialization used by the existing
-main-theorem path.  The paper-facing two-space version is
-`heterogeneousDiagonalSandwichFamily`. -/
+It is stated for a bipartite state on `H ⊗ H`. -/
 noncomputable def diagonalSandwichFamily {Question Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
@@ -116,9 +112,7 @@ noncomputable def diagonalSandwichFamily {Question Outcome : Type*}
 
 /-- `A ⊗ B_a`, the total bipartite family from `prop:cons-sub-meas`.
 
-This same-space version is the specialization used by the existing
-main-theorem path.  The paper-facing two-space version is
-`heterogeneousTotalSandwichFamily`. -/
+It is stated for a bipartite state on `H ⊗ H`. -/
 noncomputable def totalSandwichFamily {Question Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
@@ -139,10 +133,7 @@ noncomputable def totalSandwichFamily {Question Outcome : Type*}
     total_le_one := totalSandwichFamily_total_le_one A B q
   }
 
-/-- Same-space output statement for `prop:cons-sub-meas`.
-
-The paper-facing two-space output statement is
-`ConsSubMeasHeterogeneousStmt`. -/
+/-- Output statement for `prop:cons-sub-meas` on a bipartite state on `H ⊗ H`. -/
 structure ConsSubMeasStmt {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)

@@ -431,8 +431,8 @@ theorem sddError_self {Question Outcome : Type*} {ι : Type*} [Fintype ι] [Deci
 `qConsDefect ψ (postprocess A f) (postprocess B f) ≤ qConsDefect ψ A B`
 is false for arbitrary submeasurements: without opposite-side / commuting
 hypotheses, the extra cross terms created by postprocessing need not be
-nonnegative. The paper's data-processing proposition is therefore recorded in
-the bipartite form `Preliminaries.simeqDataProcessing`, not as a generic fact
-about `qConsDefect`. -/
+nonnegative. The paper's data-processing proposition is therefore a statement
+about the bipartite consistency defect, not a generic fact about
+`qConsDefect`. -/
 
 end MIPStarRE.LDT

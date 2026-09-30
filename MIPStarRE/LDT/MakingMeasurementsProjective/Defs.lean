@@ -242,15 +242,6 @@ theorem OneMeasNaimarkData.lifted_pos {α : Type*} [Fintype α] [DecidableEq α]
     0 ≤ data.liftedEffect a :=
   (data.lifted_isProj a).nonneg
 
-/-! ### Questionwise Naimark data
-
-The current Lean data applies one-measurement Naimark independently to each
-question on each side. -/
-
--- NOTE: no global `Inhabited` instance for `NaimarkData`:
--- constructing defaults for projective measurements is mathematically non-canonical
--- and would require additional assumptions on outcome types.
-
 /-! ### Error functions for orthonormalization -/
 
 /-- The almost-projective error extracted from a consistency hypothesis. -/

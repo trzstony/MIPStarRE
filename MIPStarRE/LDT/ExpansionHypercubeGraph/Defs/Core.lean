@@ -173,10 +173,9 @@ def pointHilbertSpace (params : Parameters) : FiniteHilbertSpace where
   instNonempty := inferInstance
 
 /-- The paper's normalized adjacency weight for an ordered pair of vertices.
-This update-sum is equivalent to the older case-split via
-`coordinateDisagreementCount`: when `u ≠ v`, each differing coordinate
-contributes the unique update sending `u i` to `v i`, while when `u = v`
-the `q` self-loop updates contribute once for each coordinate. -/
+When `u ≠ v`, a coordinate update contributes exactly when it sends `u` to
+`v`, while when `u = v` the `q` self-loop updates contribute once for each
+coordinate. -/
 noncomputable def hypercubeAdjacencyWeight (params : Parameters)
     (u v : Point params) : ℂ :=
   (((params.m : ℂ) * (params.q : ℂ) * (hypercubeVertexCount params : ℂ))⁻¹) *
@@ -199,8 +198,7 @@ noncomputable def matrixLaplacianOperator (params : Parameters) :
 
 Defined entrywise via the `rerandomizeCoordWeight` distribution on ordered
 vertex pairs: at index `(a, b)` the projector `|u⟩⟨v|` becomes the
-indicator `[a = u][v = b]`.  The equality with `laplacian` is proved in
-`MIPStarRE.LDT.ExpansionHypercubeGraph.laplacian_eq_edgeDifferenceForm`. -/
+indicator `[a = u][v = b]`. -/
 noncomputable def laplacianDifferenceForm (params : Parameters) :
     MIPStarRE.Quantum.Op (Point params) :=
   fun a b => (1/2 : ℂ) *

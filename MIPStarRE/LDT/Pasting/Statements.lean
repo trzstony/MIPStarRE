@@ -5,9 +5,11 @@ import MIPStarRE.LDT.Pasting.Sandwich.PastedFamilies
 /-!
 # Section 12 — Statements
 
-This file records the Section 12 pasting conclusions as reusable proposition-valued
-structures. It gives the displayed error formulas and the statement structures for the
-switcheroo, completed-family, half-sandwich, recurrence, Chernoff, and final pasting steps.
+This file records the Section 12 pasting conclusions used by the commutativity
+estimates for the slice measurements as proposition-valued structures, together
+with their displayed error formulas: complete-part self-consistency, the
+switcheroo estimate, commutation with the complete and incomplete parts of
+`G`, and the combined facts about the completed slice measurements.
 
 ## References
 

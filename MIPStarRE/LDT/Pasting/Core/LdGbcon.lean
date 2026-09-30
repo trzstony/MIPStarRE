@@ -5,7 +5,7 @@ import MIPStarRE.LDT.Preliminaries.Triangles.SimEq
 /-!
 # Section 12 pasting: vertical-line consistency transfer
 
-The `ldGbcon` transfer compares the slice family `G^x` with the vertical-line
+The transfer `eq:ld-gbcon` compares the slice family `G^x` with the vertical-line
 answers `B^u`.  It combines the conditioned axis-parallel consistency estimate
 with the point-to-vertical-line state-dependent-distance bound.
 -/

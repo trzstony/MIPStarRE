@@ -8,16 +8,9 @@ import Mathlib.Algebra.Polynomial.Roots
 # Polynomial agreement bound (Step 5 hammer)
 
 Public packaging of Schwartz-Zippel for the project's `Polynomial params`
-class. This is the building block invoked at:
-
-* paper `references/ldt-paper/inductive_step.tex`, lines 119–133 — the
-  `md/q` term in the `mainFormal` self-consistency cascade,
-* paper `references/ldt-paper/commutativity-G.tex`, the analogous step in
-  `comMain` (issue #297).
-
-The earlier private form of this lemma lived in
-`MIPStarRE.LDT.Commutativity.Scaffold.Symmetry`. Promoting it lets both `comMain`
-and `mainFormal` Step 5 (#425) share one proof.
+class. This is the building block for the `md/q` terms in the polynomial
+self-consistency step of the proof of `thm:main-formal` and in the proof of
+`thm:com-main`.
 
 ## References
 
@@ -90,13 +83,8 @@ lemma polynomialAgreement_avg_eq_scalarDomain
 /-- Schwartz-Zippel bound for the pointwise agreement indicator of two distinct
 full polynomial outcomes.
 
-Packages the `md/q` loss term that appears at:
-- `references/ldt-paper/inductive_step.tex` lines 119–133 (the `mainFormal`
-  Step 5 self-consistency cascade, issue #425),
-- `references/ldt-paper/commutativity-G.tex` (the `comMain` step, issue #297).
-
-Both call sites previously held a private duplicate of this proof; this is the
-shared, reusable form. -/
+Packages the `md/q` loss term in the polynomial self-consistency step of the
+proof of `thm:main-formal` and in the proof of `thm:com-main`. -/
 lemma polynomialAgreement_avg_le_mdq
     (params : Parameters) [FieldModel params.q]
     (g g' : Polynomial params) (hneq : g ≠ g') :

@@ -3,23 +3,14 @@ import MIPStarRE.LDT.Basic.DistributionUniformSums
 /-!
 # PMF expectations associated to project distributions
 
-This module relates the project `Distribution` averaging notation to the finite
-expectation `PMF.realWeightedSum` on Mathlib probability mass functions.  The
-statements keep the project-facing averages available while allowing later
-probability arguments to cite the associated Mathlib `PMF` object directly.
-The module-valued finite-sum algebra for uniform project distributions lives in
-`MIPStarRE.LDT.Basic.DistributionUniformSums`; this file records the additional
-comparison with `PMF.realWeightedSum`.
+This module relates the uniform project `Distribution` average to the finite
+expectation `PMF.realWeightedSum` on the Mathlib uniform probability mass
+function.  The module-valued finite-sum algebra for uniform project
+distributions lives in `MIPStarRE.LDT.Basic.DistributionUniformSums`.
 
 ## Main declarations
 
-* `avgOver_eq_toPMF_realWeightedSum`
-* `averageOperatorOverDistribution_eq_toPMF_realWeightedSum`
-* `Distribution.weightedSumLinearMap_eq_toPMF_realWeightedSum`
-* `Distribution.weightedSumLinearMap_eq_toPMF_realWeightedSumLinearMap`
-* `uniformDistribution_sum_smul_eq_pmf_realWeightedSum`
 * `avgOver_uniform_eq_pmf_realWeightedSum`
-* `averageOperatorOverDistribution_uniform_eq_pmf_realWeightedSum`
 
 ## References
 

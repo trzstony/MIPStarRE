@@ -378,16 +378,15 @@ The line-measurement fields are bundled as transport-covariant wrappers:
 rebasing the question index is required to agree with transporting the
 projective measurement along the corresponding answer reparametrization
 equivalence. This is stronger than the older evaluation-level formulas
-at `zeroCoord`, but those formulas remain available as derived lemmas via
-`AxisParallelCovariantMeasurement.reparamInvariant` and
-`DiagonalCovariantMeasurement.reparamInvariant`.
+at `zeroCoord`; for axis-parallel lines those formulas remain available as
+the derived lemma `AxisParallelCovariantMeasurement.reparamInvariant`.
 
 The `isNormalized` field records that the bipartite state's density
 operator has normalized trace `1`. For pure states, this coincides
 with the usual unit-vector condition (`⟨ψ|ψ⟩ = 1`) used in the paper.
 Bundling normalization with the strategy avoids threading a
 `state.IsNormalized` hypothesis through every downstream consumer
-(pasting cascade, `triangleSub` users, self-improvement helpers). -/
+(pasting, triangle inequalities, self-improvement helpers). -/
 structure SymStrat (params : Parameters) [FieldModel params.q]
     (ι : Type*) [Fintype ι] [DecidableEq ι] where
   state : QuantumState (ι × ι)  -- bipartite state on ℋ ⊗ ℋ

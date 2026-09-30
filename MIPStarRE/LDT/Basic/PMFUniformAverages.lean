@@ -17,11 +17,6 @@ be carried out directly in the probability-mass-function language.
 * `PMF.realWeightedSum_uniformOfFintype_equiv_prod_swap`
 * `PMF.realWeightedSum_uniformOfFintype_equiv_fst`
 * `PMF.realWeightedSum_uniformOfFintype_equiv_snd`
-* `PMF.realWeightedSum_uniformOfFintype_fst`
-* `PMF.realWeightedSum_uniformOfFintype_snd`
-* `PMF.realWeightedSum_map_uniformOfFintype_factor_equiv`
-* `PMF.realWeightedSum_map_uniformOfFintype_factor_equiv_fst`
-* `PMF.realWeightedSum_map_uniformOfFintype_factor_equiv_snd`
 
 ## References
 

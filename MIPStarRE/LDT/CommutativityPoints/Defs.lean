@@ -6,7 +6,7 @@ import MIPStarRE.LDT.Test.StrategyCore
 
 Auxiliary definitions for the commutativity-at-points argument from Section 10 of the
 low individual degree paper. This file packages the sampled diagonal-line questions,
-point/line bridge families, and the error terms used by `commutativityPoints`.
+point/line bridge families, and the error terms used by `thm:commutativity-points`.
 
 ## References
 

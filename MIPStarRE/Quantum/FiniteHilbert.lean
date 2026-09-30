@@ -4,19 +4,13 @@ import Mathlib.Analysis.InnerProductSpace.PiL2
 /-!
 # Finite-dimensional Hilbert spaces
 
-This file contains small reusable lemmas about finite-dimensional Hilbert
-spaces which are independent of the low individual degree test.  The first
-ingredient is the elementary fact that a Hilbert space embeds linearly and
-isometrically into any finite-dimensional Hilbert space of at least the same
-dimension.  The second translates this dimension-controlled isometry into a
-rectangular matrix with orthonormal rows.
+Small reusable facts about matrices acting on finite-dimensional Hilbert
+spaces, independent of the low individual degree test.
 
-## References
+## Main results
 
-The construction is the standard one: choose orthonormal bases in the two
-spaces and send the first basis into the corresponding initial segment of the
-second basis.  The resulting matrix statement is the finite-dimensional
-coisometry identity used in the paper's rectangular `Xhat` construction.
+* `Matrix.toEuclideanLin_conjTranspose_mul_self`: the Euclidean linear map of
+  `Aᴴ * A` is the adjoint composition of the linear map of `A` with itself.
 -/
 
 open Module
@@ -34,25 +28,5 @@ theorem toEuclideanLin_conjTranspose_mul_self
   classical
   rw [Matrix.toEuclideanLin, Matrix.toLpLin_mul_same (p := (2 : ENNReal)),
     Matrix.toEuclideanLin_conjTranspose_eq_adjoint]
-
-/-- A matrix whose rows form an orthonormal family is a coisometry. -/
-theorem mul_conjTranspose_eq_one_of_orthonormal_rows
-    {𝕜 : Type*} [RCLike 𝕜]
-    {m n : Type*} [DecidableEq m] [Fintype n]
-    (row : m → EuclideanSpace 𝕜 n)
-    (hrow : Orthonormal 𝕜 row) :
-    (Matrix.of fun i j => row i j) * (Matrix.of fun i j => row i j)ᴴ =
-      (1 : Matrix m m 𝕜) := by
-  classical
-  ext i j
-  have horth := orthonormal_iff_ite.mp hrow j i
-  simp only [Matrix.mul_apply, Matrix.conjTranspose_apply, Matrix.of_apply,
-    Matrix.one_apply]
-  calc
-    ∑ k, row i k * star (row j k) = inner 𝕜 (row j) (row i) := by
-      simp [EuclideanSpace.inner_eq_star_dotProduct, dotProduct]
-    _ = if j = i then (1 : 𝕜) else 0 := horth
-    _ = if i = j then (1 : 𝕜) else 0 := by
-      by_cases hij : i = j <;> simp [hij, eq_comm]
 
 end Matrix

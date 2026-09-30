@@ -302,9 +302,7 @@ private lemma consSubMeas_sandwichControl
         IdxSubMeas.placeRight, leftPlacedSubMeas, rightPlacedSubMeas,
         IdxMeas.toIdxSubMeas] using hcons
 
-/-- Same-space specialization of `prop:cons-sub-meas`.
-
-The paper-facing two-space theorem is `consSubMeas_heterogeneous`. -/
+/-- `prop:cons-sub-meas` on a bipartite state `ψ ∈ H ⊗ H`. -/
 theorem consSubMeas {Question Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]

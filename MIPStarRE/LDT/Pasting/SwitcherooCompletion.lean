@@ -64,9 +64,8 @@ private lemma switcherooCompletePartCenter_eq_target
 `lem:g-complete-self-consistency`.
 
 **Source:** The proof in `references/ldt-paper/ld-pasting.tex:560-706` uses
-the complete-part self-consistency conclusion internally.  The paper-facing
-theorem `commutativitySwitcheroo` below derives it from the source strong
-self-consistency hypothesis rather than exposing it as a public hypothesis. -/
+the complete-part self-consistency conclusion internally; it is the
+hypothesis of this form. -/
 lemma commutativitySwitcheroo_ofCompleteSelfConsistency
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]

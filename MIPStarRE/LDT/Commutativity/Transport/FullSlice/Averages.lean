@@ -207,8 +207,7 @@ noncomputable def fullSliceBABAtensorAvg
             rightTensor (ι₁ := ι)
               ((family.meas xy.1).toSubMeas.outcome gh.1)))
 
-/-- Evaluated-slice `ABA ⊗ B` tensor average (evaluated-side analogue of
-`fullSliceABABtensorAvg`):
+/-- Evaluated-slice `ABA ⊗ B` tensor average:
 `E_{u,v,x,y} ∑_{a,b} ⟨ψ|
    G^x_[g(u)=a] G^y_[h(v)=b] G^x_[g(u)=a]
      ⊗ G^y_[h(v)=b] |ψ⟩`.
