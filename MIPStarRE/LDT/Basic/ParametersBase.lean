@@ -120,6 +120,36 @@ instance {params : Parameters} : Inhabited (Fin params.m) :=
 instance {params : Parameters} : Inhabited (Fq params) :=
   ⟨⟨0, params.hq⟩⟩
 
+/-- Prime-power metadata extracted from `params.hqPrimePower`, exposing the
+honest finite-field carrier `GaloisField p n` underlying the paper's notation
+`F_q`. -/
+structure PrimePowerFieldSpec (params : Parameters) where
+  p : ℕ
+  n : ℕ
+  pPrime : Nat.Prime p
+  nPos : 0 < n
+  cardEq : params.q = p ^ n
+
+/-- Recover the prime-power specification bundled inside `Parameters`. -/
+noncomputable def Parameters.primePowerFieldSpec
+    (params : Parameters) : PrimePowerFieldSpec params :=
+  have : Nonempty (PrimePowerFieldSpec params) := by
+    obtain ⟨p, n, hp, hn, hq⟩ := params.hqPrimePower
+    exact ⟨{
+      p := p
+      n := n
+      pPrime := hp
+      nPos := hn
+      cardEq := hq
+    }⟩
+  this.some
+
+/-- An honest finite field of order `q`, obtained from the prime-power
+witness bundled in `Parameters`. -/
+noncomputable abbrev HonestFq (params : Parameters) (spec : PrimePowerFieldSpec params) :=
+  letI : Fact spec.p.Prime := ⟨spec.pPrime⟩
+  GaloisField spec.p spec.n
+
 /-- A bundled field model for the paper's `F_q`, together with a coding equivalence
 to the repository's finite carrier `Fin q`. -/
 class FieldModel (q : ℕ) where
@@ -141,6 +171,34 @@ paper's finite-field convention `|F_q| = q` (`preliminaries.tex`, lines 17--19).
   simpa using Fintype.card_congr (FieldModel.equiv (q := q))
 
 end FieldModel
+
+/-- Build the honest field model from prime-power data. -/
+@[reducible] noncomputable def PrimePowerFieldSpec.toFieldModel (params : Parameters)
+    (spec : PrimePowerFieldSpec params) : FieldModel params.q := by
+  classical
+  letI : Fact spec.p.Prime := ⟨spec.pPrime⟩
+  let K := HonestFq params spec
+  letI : Fintype K := Fintype.ofFinite K
+  have hcard : Fintype.card K = params.q := by
+    rw [← Nat.card_eq_fintype_card, spec.cardEq]
+    simpa [K, HonestFq] using (GaloisField.card (p := spec.p) (n := spec.n) spec.nPos.ne')
+  exact
+    { K := K
+      instField := inferInstance
+      instFintype := inferInstance
+      instDecidableEq := inferInstance
+      equiv := Fintype.equivFinOfCardEq hcard }
+
+/-- The canonical field model associated to the paper-faithful prime-power data
+stored in `params`. Lean prefers larger numeric priorities, so this fallback
+uses `100` while the `params.next` transport below uses `200`; that lets
+instance search reuse an already chosen model when one is available. This
+instance is noncomputable because the coding equivalence to `Fin q` is obtained
+from finite cardinality data, so declarations that discover it through
+typeclass search may also need to be marked `noncomputable` when they reduce
+the model. -/
+noncomputable instance (priority := 100) (params : Parameters) : FieldModel params.q :=
+  PrimePowerFieldSpec.toFieldModel params (Parameters.primePowerFieldSpec params)
 
 /-- Reuse an already chosen field model for successor parameters. Since Lean
 prefers larger numeric priorities, this transport uses `200` so it is tried

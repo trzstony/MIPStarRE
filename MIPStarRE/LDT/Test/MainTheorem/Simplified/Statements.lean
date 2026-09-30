@@ -32,7 +32,10 @@ noncomputable def simplifiedMainFormalError
       Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (64 : Error)))
 
 /-- The three consistency conclusions of `thm:main-formal` at error `ν`,
-preserving the heterogeneous local spaces of `ProjStrat`. -/
+preserving the heterogeneous local spaces of `ProjStrat`.
+
+Paper origin: `references/ldt-paper/test_definition.tex:180-202`
+(`\label{thm:main-formal}`). -/
 def MainFormalConclusion
     (params : Parameters) [FieldModel params.q]
     {ιA ιB : Type*}

@@ -263,8 +263,9 @@ transfer hypothesis.
 
 The hypothesis is stated against the right-hand side `E_u Σ_h ⟨ψ, H^u_h ⊗ T_h ψ⟩`
 obtained after collapsing the outer projection factors of
-`eq:release-the-kraken` via `proj_outer_sandwich_eq`; this reduces the Cauchy--Schwarz/global-variance comparison
-(`self_improvement.tex:247--343`) to a transfer in the simpler shape. -/
+`eq:release-the-kraken` via `proj_outer_sandwich_eq`; this reduces the
+Cauchy--Schwarz/global-variance comparison (`self_improvement.tex:247--343`)
+to a transfer in the simpler shape. -/
 lemma selfConsistencyDiagonalAddInU_of_simplifiedTransfer
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)

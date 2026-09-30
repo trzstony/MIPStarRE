@@ -57,7 +57,10 @@ noncomputable def simplifiedMainInductionError (params : Parameters)
 This is a Lean-only simultaneous-induction strengthening of the source
 statement. It has the same point-consistency conclusion and error as the
 ordinary strategy theorem, but allows all functions as diagonal-line answers
-so that slice restriction remains a complete measurement. -/
+so that slice restriction remains a complete measurement.
+
+Paper origin: `blueprint/src/low_degree_simplified.tex`
+(`\label{thm:main-induction}`). -/
 def SimplifiedAnswerInductionConclusion (params : Parameters)
     [FieldModel params.q]
     (strategy : AnswerSymStrat params ι)
@@ -69,7 +72,10 @@ def SimplifiedAnswerInductionConclusion (params : Parameters)
       (simplifiedMainInductionError params eps delta gamma)
 
 /-- The universe-polymorphic predecessor hypothesis used for answer-valued
-restricted slices. The pasting length is chosen inside the successor proof. -/
+restricted slices. The pasting length is chosen inside the successor proof.
+
+Paper origin: `blueprint/src/low_degree_simplified.tex`
+(`\label{thm:main-induction}`), the hypothesis of the induction on `m`. -/
 def SimplifiedAnswerInductionHypothesis.{uF, vι} (params : Parameters)
     [FieldModel.{uF} params.q] : Prop :=
   ∀ (ι : Type vι) [Fintype ι] [DecidableEq ι],

@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Pasting.Statements
+import MIPStarRE.LDT.Commutativity.Scaffold.Core
+import MIPStarRE.LDT.MainInductionStep.Defs
+import MIPStarRE.LDT.Pasting.Sandwich.PastedFamilies
 import MIPStarRE.LDT.Preliminaries.SelfConsistency.Extensions
 
 /-!
@@ -193,40 +195,24 @@ lemma qSDD_completePart_le_slice
   rw [hcomplete, horig]
   nlinarith
 
-/-- `lem:g-complete-self-consistency`.
-This is exactly the slice strong self-consistency hypothesis, stated under
-the Section 12 statement name. -/
-lemma gCompleteSelfConsistency
+/-- Self-consistency of the incomplete parts `I - G^x`
+(`cor:g-bot-self-consistency`).
+
+For projective slices the mirror difference of `I - G^x` is the negative of
+that of `G^x`, and the latter is dominated by the slice self-consistency. -/
+theorem incompletePart_selfConsistency
     (params : Parameters)
     [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι)
     (zeta : Error)
-    (_hperm : PermInvState ψbi)
     (hself : family.StronglySelfConsistent ψbi zeta) :
-    GCompleteSelfConsistencyStatement params ψbi family zeta := by
-  exact ⟨hself.sliceSelfConsistency⟩
-
-/-- Internal form of `cor:g-bot-self-consistency` after applying
-`lem:g-complete-self-consistency`.
-
-**Source:** The proof in `references/ldt-paper/ld-pasting.tex:537-558`
-uses `lem:g-complete-self-consistency` internally.  The paper-facing theorem
-`gBotSelfConsistency` below derives that input from strong self-consistency
-rather than exposing it as a public hypothesis. -/
-theorem gBotSelfConsistency_ofCompleteSelfConsistency
-    (params : Parameters)
-    [FieldModel params.q]
-    (ψbi : QuantumState (ι × ι))
-    (family : IdxPolyFamily params ι)
-    (zeta : Error)
-    (_hperm : PermInvState ψbi)
-    (hcomplete : GCompleteSelfConsistencyStatement params ψbi family zeta) :
-    GBotSelfConsistencyStatement params ψbi family zeta := by
-  refine {
-    incompletePartSelfConsistency := ?_
-  }
-  rcases hcomplete.completePartSelfConsistency with ⟨hcomplete_bound⟩
+    SDDRel ψbi
+      (uniformDistribution (SliceQuestion params))
+      (incompletePartLeftFamily params family)
+      (incompletePartRightFamily params family)
+      zeta := by
+  rcases hself.sliceSelfConsistency with ⟨hcomplete_bound⟩
   have hcomplete_total :
       sddError ψbi
           (uniformDistribution (SliceQuestion params))
@@ -318,17 +304,61 @@ theorem gBotSelfConsistency_ofCompleteSelfConsistency
                             (family.meas x).sum_eq_total]
     _ ≤ zeta := hcomplete_total
 
-/-- `cor:g-bot-self-consistency`, source-facing form. -/
-theorem gBotSelfConsistency
+/-- Self-consistency of the completed slice measurements `\widehat G^x`
+(`lem:pasting-completion`): the slice outcomes and the incomplete part each
+contribute at most `ζ`. -/
+theorem gHatSelfConsistency_of_stronglySelfConsistent
     (params : Parameters)
     [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
     (family : IdxPolyFamily params ι)
     (zeta : Error)
-    (hperm : PermInvState ψbi)
     (hself : family.StronglySelfConsistent ψbi zeta) :
-    GBotSelfConsistencyStatement params ψbi family zeta :=
-  gBotSelfConsistency_ofCompleteSelfConsistency params ψbi family zeta hperm
-    (gCompleteSelfConsistency params ψbi family zeta hperm hself)
+    SDDRel ψbi
+      (uniformDistribution (SliceQuestion params))
+      (gHatSelfConsistencyLeftFamily params family)
+      (gHatSelfConsistencyRightFamily params family)
+      (2 * zeta) := by
+  rcases hself.sliceSelfConsistency with ⟨hcomplete_bound⟩
+  rcases incompletePart_selfConsistency params ψbi family zeta hself with
+    ⟨hincomplete_bound⟩
+  refine ⟨?_⟩
+  calc
+    sddError ψbi
+        (uniformDistribution (SliceQuestion params))
+        (gHatSelfConsistencyLeftFamily params family)
+        (gHatSelfConsistencyRightFamily params family)
+      =
+        avgOver (uniformDistribution (SliceQuestion params))
+          (fun x =>
+            qSDD ψbi
+                ((IdxSubMeas.liftLeft (IdxProjSubMeas.toIdxSubMeas family.meas)) x)
+                ((IdxSubMeas.liftRight (IdxProjSubMeas.toIdxSubMeas family.meas)) x) +
+              qSDD ψbi
+                ((incompletePartLeftFamily params family) x)
+                ((incompletePartRightFamily params family) x)) := by
+          unfold sddError
+          apply avgOver_congr
+          intro x
+          unfold qSDD qSDDCore
+          rw [Fintype.sum_option]
+          simp [gHatSelfConsistencyLeftFamily, gHatSelfConsistencyRightFamily,
+            gHatIdxMeas, completeSubMeas, incompletePartLeftFamily,
+            incompletePartRightFamily, incompletePartSubMeas, leftPlacedSubMeas,
+            rightPlacedSubMeas,
+            IdxSubMeas.liftLeft, IdxSubMeas.liftRight, IdxProjSubMeas.toIdxSubMeas,
+            add_comm]
+    _ =
+        sddError ψbi
+          (uniformDistribution (SliceQuestion params))
+          (IdxSubMeas.liftLeft (IdxProjSubMeas.toIdxSubMeas family.meas))
+          (IdxSubMeas.liftRight (IdxProjSubMeas.toIdxSubMeas family.meas)) +
+        sddError ψbi
+          (uniformDistribution (SliceQuestion params))
+          (incompletePartLeftFamily params family)
+          (incompletePartRightFamily params family) := by
+            rw [sddError, sddError, avgOver_add]
+    _ ≤ zeta + zeta := add_le_add hcomplete_bound hincomplete_bound
+    _ = 2 * zeta := by ring
 
 end MIPStarRE.LDT.Pasting

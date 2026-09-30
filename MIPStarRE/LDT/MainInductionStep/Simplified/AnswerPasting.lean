@@ -62,17 +62,15 @@ theorem answerLdPastingSimplified
     (by simpa [carrier, answerSelfImprovementCarrier] using hcomplete)
   by_cases hregime : eps ≤ 1 ∧ delta ≤ 1 ∧ gamma ≤ 1 ∧
       zeta ≤ 1 ∧ params.d ≤ params.q
-  · rcases hregime with ⟨heps1, hdelta1, hgamma1, hzeta1, hdq⟩
+  · rcases hregime with ⟨heps1, hdelta1, -, hzeta1, hdq⟩
     have hcom := answerComMainForCarrier_ofAnswerGood
       params strategy eps delta gamma zeta hgood hgamma0
       family hcons hself hbound
-    have hfacts := gHatFacts_ofComMainAndSelfConsistency
-      params carrier family gamma zeta
-      hgamma0 hgamma1 hzeta0 hzeta1 hdq hcom hself
     have hsc : SDDRel carrier.state (uniformDistribution (Fq params))
         (gHatSelfConsistencyLeftFamily params family)
-        (gHatSelfConsistencyRightFamily params family) (2 * zeta) := by
-      simpa [gHatSelfConsistencyError] using hfacts.completedSelfConsistency
+        (gHatSelfConsistencyRightFamily params family) (2 * zeta) :=
+      gHatSelfConsistency_of_stronglySelfConsistent
+        params carrier.state family zeta hself
     have haxis : carrier.axisParallelFailureProbability ≤ eps := by
       simpa [carrier, answerSelfImprovementCarrier,
         SymStrat.axisParallelFailureProbability,

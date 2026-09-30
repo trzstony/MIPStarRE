@@ -331,14 +331,4 @@ lemma stateDependentDistanceOpRel_mono
   intro ⟨h⟩
   exact ⟨le_trans h hle⟩
 
-/-- Symmetry of the operator-family state-dependent distance relation. -/
-lemma sddOpRel_symm
-    {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι] [Fintype Outcome]
-    (ψ : QuantumState ι) (𝒟 : Distribution Question)
-    (A B : IdxOpFamily Question Outcome ι) (δ : Error) :
-    SDDOpRel ψ 𝒟 A B δ → SDDOpRel ψ 𝒟 B A δ := by
-  intro ⟨h⟩
-  constructor
-  simpa [sddErrorOp, qSDDOp_symm] using h
-
 end MIPStarRE.LDT.Preliminaries

@@ -2,9 +2,9 @@ import MIPStarRE.LDT.Test.Defs
 import MIPStarRE.LDT.Preliminaries.PolynomialAgreement
 
 /-!
-# `mainFormal` Step 5 — Schwartz--Zippel self-consistency handoff
+# `mainFormal` Step 5 — Schwartz--Zippel self-consistency
 
-This file isolates the paper's Step 5 bridge in
+This file isolates the paper's Step 5 in
 `references/ldt-paper/inductive_step.tex`, lines 119--133.  The algebraic
 expansion/reindexing from evaluated consistency to the full-polynomial
 consistency defect is proved here, and the genuinely Schwartz--Zippel part is

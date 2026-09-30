@@ -54,12 +54,11 @@ import MIPStarRE.LDT.CommutativityPoints.AnswerTheorems
 import MIPStarRE.LDT.Commutativity.Defs.Normalization
 import MIPStarRE.LDT.Commutativity.Main.Results
 import MIPStarRE.LDT.Pasting.Defs.Families
-import MIPStarRE.LDT.Pasting.Statements
+import MIPStarRE.LDT.Commutativity.Scaffold.Core
+import MIPStarRE.LDT.MainInductionStep.Defs
+import MIPStarRE.LDT.Pasting.Sandwich.PastedFamilies
 import MIPStarRE.LDT.Pasting.Core.LdGbcon
 import MIPStarRE.LDT.Pasting.Core.CompletePart
-import MIPStarRE.LDT.Pasting.SwitcherooCompletion
-import MIPStarRE.LDT.Pasting.CommutingWithG.Incomplete
-import MIPStarRE.LDT.Pasting.GHatFacts
 import MIPStarRE.LDT.Preliminaries.Polynomials
 import MIPStarRE.LDT.Preliminaries.PolynomialAgreement
 

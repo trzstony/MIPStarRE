@@ -81,9 +81,6 @@ abbrev GHatOutcome (params : Parameters) [FieldModel params.q] := Option (Polyno
 /-- The question type for a single slice height. -/
 abbrev SliceQuestion (params : Parameters) := Fq params
 
-/-- The question type for an ordered pair of slice heights. -/
-abbrev SlicePairQuestion (params : Parameters) := Fq params × Fq params
-
 /-- The outcome type of a `k`-tuple of completed-slice answers. -/
 abbrev GHatTupleOutcome (params : Parameters) [FieldModel params.q] (k : ℕ) :=
   Fin k → GHatOutcome params
@@ -94,20 +91,6 @@ abbrev SandwichedLineQuestion (params : Parameters) (k : ℕ) :=
 
 /-- The question type for vertical lines, identified with their base point. -/
 abbrev VerticalLineQuestion (params : Parameters) := Point params
-
-/-- Multiply each outcome operator by a total operator on the right. -/
-noncomputable def multiplyByTotalOnRight {α β : Type*} [Fintype α] [Fintype β]
-    (A : SubMeas α ι) (B : SubMeas β ι) :
-    OpFamily α ι where
-  outcome := fun a => A.outcome a * B.total
-  total := A.total * B.total
-
-/-- Multiply each outcome operator by a total operator on the left. -/
-noncomputable def multiplyByTotalOnLeft {α β : Type*} [Fintype α] [Fintype β]
-    (A : SubMeas α ι) (B : SubMeas β ι) :
-    OpFamily β ι where
-  outcome := fun b => A.total * B.outcome b
-  total := A.total * B.total
 
 /-- The support of a completed-slice tuple, i.e. the indices whose outcomes are
 genuine polynomials rather than `⊥`. This matches the paper's support of the type

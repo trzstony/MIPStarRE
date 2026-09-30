@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Pasting.Statements
+import MIPStarRE.LDT.Commutativity.Scaffold.Core
+import MIPStarRE.LDT.MainInductionStep.Defs
+import MIPStarRE.LDT.Pasting.Sandwich.PastedFamilies
 import MIPStarRE.LDT.Preliminaries.SelfConsistency.Extensions
 import MIPStarRE.LDT.Preliminaries.Triangles.SimEq
 

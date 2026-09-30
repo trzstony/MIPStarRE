@@ -183,7 +183,10 @@ theorem selfImprovementDilationError_eq_two_helper
 
 /-- The four conclusions of self-improvement with dilation. The
 ancilla and the projective polynomial submeasurement are concrete:
-the ancilla is indexed by `Option (Polynomial params)`. -/
+the ancilla is indexed by `Option (Polynomial params)`.
+
+Paper origin: `blueprint/src/low_degree_simplified.tex`
+(`\label{thm:self-improvement-in-induction-section}`). -/
 structure DilationSelfImprovementConclusion
     (params : Parameters) [FieldModel params.q]
     {ι : Type u} [Fintype ι] [DecidableEq ι]

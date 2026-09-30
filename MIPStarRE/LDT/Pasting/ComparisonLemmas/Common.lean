@@ -1,4 +1,5 @@
-import MIPStarRE.LDT.Pasting.GHatFacts
+import MIPStarRE.LDT.Commutativity.Main.Results
+import MIPStarRE.LDT.Pasting.Core.CompletePart
 
 /-!
 # Section 12 pasting: comparison common helpers

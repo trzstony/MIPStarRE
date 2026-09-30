@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Pasting.Sandwich.Switcheroo
+import MIPStarRE.LDT.Pasting.Sandwich.GHatFamilies
 
 /-!
 # Section 12 — Sandwich constructions: `GHat` sandwich families

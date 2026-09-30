@@ -13,16 +13,6 @@ namespace MIPStarRE.LDT.Preliminaries
 
 open MIPStarRE.LDT
 
-/-- Monotonicity for `SDDOpRel`. -/
-lemma sddOpRel_mono
-    {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (ψ : QuantumState ι) (𝒟 : Distribution Question)
-    (A B : IdxOpFamily Question Outcome ι) (δ δ' : Error) :
-    SDDOpRel ψ 𝒟 A B δ → δ ≤ δ' → SDDOpRel ψ 𝒟 A B δ' := by
-  intro h hle
-  exact stateDependentDistanceOpRel_mono ψ 𝒟 A B δ δ' hle h
-
 /-- Questionwise n-step chain bound: the squared distance between the
 first and last operator family telescopes and is bounded by
 `n * ∑ individual squared distances` via `ev_sum_conjTranspose_mul_sum_le`. -/

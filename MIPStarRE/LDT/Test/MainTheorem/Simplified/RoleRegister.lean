@@ -2,11 +2,11 @@ import MIPStarRE.LDT.MainInductionStep.Simplified.Main
 import MIPStarRE.LDT.Test.MainTheorem.SourceRoleRegister.Core
 
 /-!
-# Role-register handoff for simplified soundness
+# Role-register step for simplified soundness
 
-The existing heterogeneous role-register construction and block-extraction
-lemmas apply unchanged to the simplified main induction. This module replaces
-only their old induction call and retains the factor-two unsymmetrization.
+The heterogeneous role-register construction and block-extraction lemmas
+apply the simplified main induction to a two-space strategy, with the
+factor-two loss from unsymmetrization.
 
 ## References
 
@@ -51,9 +51,9 @@ theorem simplifiedRoleRegisterPointConsistency
     sourceRoleRegisterPointConsistency_ofSymConsistency
       params strategy G _ hG⟩
 
-/-- The unchanged heterogeneous Step 5 converts both point estimates into
+/-- The heterogeneous Step 5 converts both point estimates into
 consistency of the complete polynomial measurements. Its intermediate error
-is weaker than the simplified blueprint's projective-bridge estimate, but
+is weaker than the simplified blueprint's projective comparison estimate, but
 still gives the requested final `1/64` exponent. -/
 theorem simplifiedRoleRegisterPolynomialConsistency
     (params : Parameters) [FieldModel params.q]
