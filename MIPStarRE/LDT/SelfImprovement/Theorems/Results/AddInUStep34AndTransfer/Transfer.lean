@@ -14,7 +14,6 @@ helper strong self-consistency argument.
 - `blueprint/src/chapter/ch07_self_improvement.tex`
 -/
 
-
 namespace MIPStarRE.LDT.SelfImprovement
 
 open MIPStarRE.LDT
@@ -258,72 +257,6 @@ lemma add_in_u_simplified_transfer_of_cs_chain_sqrt_form
 
 -- This lemma combines the two local-variance Cauchy--Schwarz replacements
 -- with the scalar add-in-u transfer inequality.
-/-- Projection-simplified add-in-`u` transfer with the Step 3/4 variance bounds
-supplied by the local-variance sum hypothesis.
-
-After the factor estimates in this file, the remaining scalar hypotheses are
-only the two self-consistency moves `Q₀ → Q₁` and `Q₁ → Q₂`, together with the
-local-variance sum bound from the GlobalVariance theorem. -/
-lemma add_in_u_simplified_transfer_of_cs_chain_local_variance_form
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (eps delta : Error)
-    (heps : 0 ≤ eps) (hdelta : 0 ≤ delta)
-    (T : SubMeas (Polynomial params) ι)
-    (hlocal :
-      (∑ g : Polynomial params,
-        localVarianceDeviationAtPolynomial params strategy strategy.state T g) ≤
-        localVarianceOfPointsError params eps delta)
-    (h01 :
-      |addInUCSChainQ0 params strategy T - addInUCSChainQ1 params strategy T| ≤
-        Real.sqrt (2 * delta))
-    (h12 :
-      |addInUCSChainQ1 params strategy T - addInUCSChainQ2 params strategy T| ≤
-        Real.sqrt (2 * delta)) :
-    |qBipartiteMatchMass strategy.state
-        (averagedSandwichedPolynomialSubMeas params strategy T)
-        (averagedSandwichedPolynomialSubMeas params strategy T) -
-      avgOver (uniformDistribution (Point params)) (fun u =>
-        ∑ h : Polynomial params,
-          ev strategy.state
-            (opTensor ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h)
-              (T.outcome h)))| ≤ addInUError params eps delta := by
-  have hsteps :=
-    add_in_u_cs_chain_global_variance_steps_of_local_sum_bound_from_factor_bounds
-      params strategy eps delta T hlocal
-  exact add_in_u_simplified_transfer_of_cs_chain_sqrt_form
-    params strategy eps delta heps hdelta T h01 h12 hsteps.1 hsteps.2
-
-/-- Projection-simplified add-in-`u` transfer from point self-consistency and
-the local-variance sum bound.
-
-This closes all four scalar moves in the add-in-`u` chain: Step 1 and Step 2
-come from point-measurement self-consistency, while Step 3 and Step 4 are
-supplied by the local-variance form above. -/
-lemma add_in_u_simplified_transfer_of_cs_chain_selfConsistency_local_variance_form
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (eps delta : Error)
-    (heps : 0 ≤ eps) (hdelta : 0 ≤ delta)
-    (T : SubMeas (Polynomial params) ι)
-    (hssc : BipartiteSSCRel strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) delta)
-    (hlocal :
-      (∑ g : Polynomial params,
-        localVarianceDeviationAtPolynomial params strategy strategy.state T g) ≤
-        localVarianceOfPointsError params eps delta) :
-    |qBipartiteMatchMass strategy.state
-        (averagedSandwichedPolynomialSubMeas params strategy T)
-        (averagedSandwichedPolynomialSubMeas params strategy T) -
-      avgOver (uniformDistribution (Point params)) (fun u =>
-        ∑ h : Polynomial params,
-          ev strategy.state
-            (opTensor ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h)
-              (T.outcome h)))| ≤ addInUError params eps delta :=
-  add_in_u_simplified_transfer_of_cs_chain_local_variance_form
-    params strategy eps delta heps hdelta T hlocal
-    (addInU_cs_chain_step1_abs_le_sqrt_two_delta params strategy T delta hssc)
-    (addInU_cs_chain_step2_abs_le_sqrt_two_delta params strategy T delta hssc)
 
 /-- Specialization of `selfConsistencyDiagonalAddInU_of_transfer` to the
 projection-simplified scalar transfer hypothesis.

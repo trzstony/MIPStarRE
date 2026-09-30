@@ -1,5 +1,4 @@
 import MIPStarRE.LDT.Pasting.Simplified.RandomWordEnergy
-import MIPStarRE.LDT.Pasting.Sandwich.PastedFamilies
 import MIPStarRE.LDT.Pasting.ComparisonLemmas.LineInterpolation.Core
 import Mathlib.Data.List.Lex
 
@@ -53,23 +52,6 @@ theorem hasDistinctSuccessSupport_of_injective
     HasDistinctSuccessSupport params xs gs := by
   obtain ⟨σ, hσ, hcard⟩ := Finset.exists_subset_card_eq hcount
   exact ⟨σ, hσ, hcard, fun _ _ _ _ hij => hxs hij⟩
-
-/-- In degree zero, one successful slice suffices, regardless of repeated
-question heights elsewhere in the word. -/
-theorem hasDistinctSuccessSupport_of_degree_zero
-    (params : Parameters) [FieldModel params.q]
-    {k : ℕ} (xs : PointTuple params k) (gs : GHatTupleOutcome params k)
-    (hd : params.d = 0)
-    (hcount : 1 ≤ (gHatTupleSupport gs).card) :
-    HasDistinctSuccessSupport params xs gs := by
-  obtain ⟨i, hi⟩ := Finset.card_pos.mp (Nat.lt_of_lt_of_le (by omega) hcount)
-  refine ⟨{i}, ?_, ?_, ?_⟩
-  · simpa using hi
-  · simp [hd]
-  · intro a ha b hb _
-    have hai : a = i := by simpa using ha
-    have hbi : b = i := by simpa using hb
-    exact hai.trans hbi.symm
 
 /-- Distinct-success eligibility implies the original cardinality-only
 eligibility condition. -/

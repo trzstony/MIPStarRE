@@ -1,7 +1,6 @@
 import MIPStarRE.LDT.MainInductionStep.Simplified.AnswerFamily
 import MIPStarRE.LDT.MainInductionStep.Simplified.AnswerPasting
 import MIPStarRE.LDT.MainInductionStep.Simplified.AnswerCompression
-import MIPStarRE.LDT.MainInductionStep.Simplified.SuccessorPasting
 
 /-!
 # Simplified pasting for the answer-valued successor

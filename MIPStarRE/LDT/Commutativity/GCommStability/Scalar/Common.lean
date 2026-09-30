@@ -1,6 +1,4 @@
-import MIPStarRE.LDT.Basic.QuantumState
-import MIPStarRE.LDT.Basic.SubMeasurementFamilies
-import MIPStarRE.LDT.Commutativity.GCommStability.OverlapOne
+import MIPStarRE.LDT.Commutativity.ScalarApproximation.Pointwise
 import MIPStarRE.LDT.Preliminaries.CauchySchwarz
 
 /-!

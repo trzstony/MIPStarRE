@@ -182,69 +182,6 @@ theorem randomWordCommutatorEnergy_le_energy_roots
     simpa only [pow_two] using mul_le_mul hsum hsum hleft0 hright0
   exact htri.trans hsq
 
-/-- Sharp random-word commutation bound from the simplified pasting proof. -/
-theorem randomWordCommutatorEnergy_le_sharp
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι) (gamma zeta : Error) (k : ℕ)
-    (hcom : ComMainConclusion params strategy family gamma zeta)
-    (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hsc : SDDRel strategy.state (uniformDistribution (Fq params))
-      (gHatSelfConsistencyLeftFamily params family)
-      (gHatSelfConsistencyRightFamily params family)
-      (2 * zeta)) :
-    randomWordCommutatorEnergy params family strategy.state k ≤
-      (2 * (k : Error)) *
-        (Real.sqrt (comMainError params gamma zeta) +
-          2 * Real.sqrt zeta) ^ 2 := by
-  let β := ev strategy.state (meanFineSliceEnergy params family)
-  let χ := comMainError params gamma zeta
-  have hβ : β ≤ (Real.sqrt χ + Real.sqrt zeta) ^ 2 :=
-    ev_meanFineSliceEnergy_le_root_errors params strategy family gamma zeta
-      hcom hself
-  have hβroot : Real.sqrt β ≤ Real.sqrt χ + Real.sqrt zeta := by
-    have h := Real.sqrt_le_sqrt hβ
-    have hnonneg : 0 ≤ Real.sqrt χ + Real.sqrt zeta :=
-      add_nonneg (Real.sqrt_nonneg _) (Real.sqrt_nonneg _)
-    simpa [Real.sqrt_sq_eq_abs, abs_of_nonneg hnonneg] using h
-  have hbase := randomWordCommutatorEnergy_le_energy_roots
-    params family strategy.state zeta k hsc
-  have hk0 : 0 ≤ (2 : Error) * (k : Error) := by positivity
-  have hscalar :
-      (Real.sqrt ((k : Error) * (2 * zeta)) +
-        Real.sqrt ((k : Error) * (β + β))) ^ 2 =
-        (2 * (k : Error)) * (Real.sqrt zeta + Real.sqrt β) ^ 2 := by
-    have hζeq : (k : Error) * (2 * zeta) =
-        (2 * (k : Error)) * zeta := by ring
-    have hβeq : (k : Error) * (β + β) =
-        (2 * (k : Error)) * β := by ring
-    rw [hζeq, hβeq, Real.sqrt_mul hk0, Real.sqrt_mul hk0]
-    calc
-      (Real.sqrt (2 * (k : Error)) * Real.sqrt zeta +
-          Real.sqrt (2 * (k : Error)) * Real.sqrt β) ^ 2 =
-        (Real.sqrt (2 * (k : Error))) ^ 2 *
-          (Real.sqrt zeta + Real.sqrt β) ^ 2 := by ring
-      _ = (2 * (k : Error)) * (Real.sqrt zeta + Real.sqrt β) ^ 2 := by
-        rw [Real.sq_sqrt hk0]
-  have hsum : Real.sqrt zeta + Real.sqrt β ≤
-      Real.sqrt χ + 2 * Real.sqrt zeta := by linarith
-  have hleft0 : 0 ≤ Real.sqrt zeta + Real.sqrt β :=
-    add_nonneg (Real.sqrt_nonneg _) (Real.sqrt_nonneg _)
-  have hright0 : 0 ≤ Real.sqrt χ + 2 * Real.sqrt zeta := by
-    exact add_nonneg (Real.sqrt_nonneg _)
-      (mul_nonneg (by norm_num) (Real.sqrt_nonneg _))
-  have hsquare : (Real.sqrt zeta + Real.sqrt β) ^ 2 ≤
-      (Real.sqrt χ + 2 * Real.sqrt zeta) ^ 2 := by
-    simpa only [pow_two] using mul_le_mul hsum hsum hleft0 hright0
-  calc
-    randomWordCommutatorEnergy params family strategy.state k ≤
-        (Real.sqrt ((k : Error) * (2 * zeta)) +
-          Real.sqrt ((k : Error) * (β + β))) ^ 2 := hbase
-    _ = (2 * (k : Error)) * (Real.sqrt zeta + Real.sqrt β) ^ 2 := hscalar
-    _ ≤ (2 * (k : Error)) *
-          (Real.sqrt χ + 2 * Real.sqrt zeta) ^ 2 :=
-            mul_le_mul_of_nonneg_left hsquare hk0
-
 /-- Extract the common word-length factor from the two root-energy
 budgets. -/
 theorem randomWord_root_budget_factor (k : ℕ) (zeta beta : Error) :

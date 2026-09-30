@@ -21,22 +21,6 @@ noncomputable def evaluateAt {ι : Type*} [Fintype ι] [DecidableEq ι]
     (G : SubMeas (Polynomial params) ι) : SubMeas (Fq params) ι :=
   postprocess G (fun g => g u)
 
-/-- Evaluation after adjoining an unused coordinate agrees with evaluation before
-adjoining that coordinate. -/
-@[simp] theorem evaluateAt_postprocess_appendAtHeight_appendPoint
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (params : Parameters) [FieldModel params.q]
-    (G : SubMeas (Polynomial params) ι)
-    (x : Fq params) (u : Point params) (y : Fq params) :
-    evaluateAt params.next (appendPoint params u y)
-        (postprocess G (fun g => Polynomial.appendAtHeight params g x)) =
-      evaluateAt params u G := by
-  unfold evaluateAt
-  rw [SubMeas.postprocess_comp]
-  congr
-  funext g
-  exact Polynomial.appendAtHeight_apply_appendPoint params g x u y
-
 /-- View a global polynomial submeasurement as a point-indexed answer family. -/
 noncomputable def polynomialEvaluationFamily {ι : Type*} [Fintype ι] [DecidableEq ι]
     (params : Parameters) [FieldModel params.q]
@@ -157,20 +141,6 @@ noncomputable def subMeasMass {Outcome : Type*} {ι : Type*}
     [Fintype Outcome] [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (A : SubMeas Outcome ι) : Error :=
   ev ψ A.total
-
-/-- Averaged total mass of an indexed submeasurement. -/
-noncomputable def idxSubMeasMass {Question Outcome : Type*} {ι : Type*}
-    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState ι) (𝒟 : Distribution Question)
-    (A : IdxSubMeas Question Outcome ι) : Error :=
-  avgOver 𝒟 (fun q => subMeasMass ψ (A q))
-
-/-- Defect in domination by an operator witness, measured at the expectation-value level. -/
-noncomputable def bndError {Outcome : Type*} {ι : Type*}
-    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState ι) (A : SubMeas Outcome ι)
-    (Z : MIPStarRE.Quantum.Op ι) : Error :=
-  max 0 (subMeasMass ψ A - ev ψ Z)
 
 /-- Bipartite matching mass `∑_a ⟨ψ, (A_a ⊗ B_a) ψ⟩`, with `A` on the left
 register and `B` on the right register of a tensor-product state. -/
@@ -306,14 +276,6 @@ structure CompletenessAtLeast {Outcome : Type*} {ι : Type*}
     [Fintype Outcome] [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (A : SubMeas Outcome ι) (r : Error) : Prop where
   lowerBound : subMeasMass ψ A ≥ r
-
-/-- Boundedness statement witnessed by an operator. -/
-structure BoundedByOperator {Outcome : Type*} {ι : Type*}
-    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState ι) (A : SubMeas Outcome ι)
-    (Z : MIPStarRE.Quantum.Op ι) (δ : Error) : Prop where
-  witnessOpPSD : 0 ≤ Z
-  upperBound : bndError ψ A Z ≤ δ
 
 /-! ### Nonnegativity lemmas for defect measures -/
 

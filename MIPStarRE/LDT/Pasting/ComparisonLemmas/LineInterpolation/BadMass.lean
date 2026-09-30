@@ -22,49 +22,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-lemma interpolationEligibleSandwich_mismatch_sum_mono
-    (params : Parameters) [FieldModel params.q]
-    (family : IdxPolyFamily params ι)
-    {k : ℕ}
-    (u : Point params)
-    (xs : PointTuple params k)
-    (hxs : Function.Injective xs)
-    (f : AxisLinePolynomial params.next) :
-    ∑ gs : GHatTupleOutcome params k,
-        (if IsGloballyConsistent params xs gs
-            ∧ tupleInterpolatedVerticalLine params u xs gs ≠ f then
-          (interpolationEligibleSandwichFamily params family k xs).outcome gs
-        else 0)
-      ≤
-      ∑ gs : GHatTupleOutcome params k,
-        (if ∃ i : Fin k, ∃ hiSome : (gs i).isSome = true,
-            ((gs i).get hiSome) u ≠ f (xs i) then
-          (interpolationEligibleSandwichFamily params family k xs).outcome gs
-        else 0) := by
-  refine Finset.sum_le_sum ?_
-  intro gs _
-  by_cases hglob : IsGloballyConsistent params xs gs
-  · by_cases hneq : tupleInterpolatedVerticalLine params u xs gs ≠ f
-    · by_cases hEligible : InterpolationEligible params gs
-      · rcases tupleInterpolatedVerticalLine_ne_gives_exists_some_eval_mismatch
-          params u xs hxs gs hEligible hglob f hneq with ⟨i, hiSome, hm⟩
-        have hright :
-            ∃ i : Fin k, ∃ hiSome : (gs i).isSome = true, ((gs i).get hiSome) u ≠ f (xs i) :=
-          ⟨i, hiSome, hm⟩
-        simp [hglob, hneq, hright]
-      · simp [interpolationEligibleSandwichFamily, restrictSubMeas, hEligible, hglob, hneq]
-    · by_cases hright : ∃ i : Fin k, ∃ hiSome : (gs i).isSome = true,
-        ((gs i).get hiSome) u ≠ f (xs i)
-      · have hnonneg : 0 ≤ (interpolationEligibleSandwichFamily params family k xs).outcome gs :=
-          (interpolationEligibleSandwichFamily params family k xs).outcome_pos gs
-        simp [hglob, hneq, hright, hnonneg]
-      · simp [hglob, hneq, hright]
-  · by_cases hright : ∃ i : Fin k, ∃ hiSome : (gs i).isSome = true, ((gs i).get hiSome) u ≠ f (xs i)
-    · have hnonneg : 0 ≤ (interpolationEligibleSandwichFamily params family k xs).outcome gs :=
-        (interpolationEligibleSandwichFamily params family k xs).outcome_pos gs
-      simp [hglob, hright, hnonneg]
-    · simp [hglob, hright]
-
 lemma interpolationEligibleSandwich_exists_mismatch_sum_le_sum
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι)
@@ -137,24 +94,6 @@ lemma interpolationEligibleSandwich_exists_mismatch_sum_le_sum
               (interpolationEligibleSandwichFamily params family k xs).outcome gs
             else 0 := by
             rw [Finset.sum_comm]
-
-lemma pastedInterpolation_verticalLine_singleOutcome_postprocess
-    (params : Parameters) [FieldModel params.q]
-    (family : IdxPolyFamily params ι)
-    (k : ℕ)
-    (u : Point params)
-    (xs : PointTuple params k)
-    (f : AxisLinePolynomial params.next) :
-    postprocess
-      (hRestrictionToVerticalLine params (pastedInterpolationFamily params family k xs) u)
-      (fun h => decide (h = f)) =
-    postprocess
-      (restrictSubMeas (interpolationEligibleSandwichFamily params family k xs)
-        (IsGloballyConsistent params xs))
-      (fun gs => decide (tupleInterpolatedVerticalLine params u xs gs = f)) := by
-  rw [pastedInterpolationFamily, hRestrictionToVerticalLine]
-  rw [postprocess_postprocess, postprocess_postprocess]
-  congr 1
 
 noncomputable def singleOutcomeRightSubMeas
     {Outcome : Type*} [Fintype Outcome]
@@ -633,83 +572,6 @@ lemma hBConsistencyBadMass_le_linePointDefectSum
             intro i _
             exact hBConsistencyCoordMass_le_linePointDefect params strategy family u xs i
 
-lemma hBConsistencyBadMass_nonneg
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι)
-    {k : ℕ} (u : Point params) (xs : PointTuple params k) :
-    0 ≤ hBConsistencyBadMass params strategy family u xs := by
-  unfold hBConsistencyBadMass
-  refine Finset.sum_nonneg ?_
-  intro f _
-  apply ev_nonneg_of_psd strategy.state _
-  exact opTensor_nonneg
-    (by
-      refine Finset.sum_nonneg ?_
-      intro gs _
-      by_cases hbad : ∃ i : Fin k, ∃ hiSome : (gs i).isSome = true, ((gs i).get hiSome) u ≠ f (xs i)
-      · simp [hbad, (interpolationEligibleSandwichFamily params family k xs).outcome_pos gs]
-      · simp [hbad])
-    ((verticalLineMeasurementFamily params strategy u).outcome_pos f)
-
-lemma hBConsistencyBadMass_le_one
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι)
-    {k : ℕ} (u : Point params) (xs : PointTuple params k) :
-    hBConsistencyBadMass params strategy family u xs ≤ 1 := by
-  let T : MIPStarRE.Quantum.Op ι := (interpolationEligibleSandwichFamily params family k xs).total
-  let L : AxisLinePolynomial params.next → MIPStarRE.Quantum.Op ι := fun f =>
-    ∑ gs : GHatTupleOutcome params k,
-      if ∃ i : Fin k, ∃ hiSome : (gs i).isSome = true, ((gs i).get hiSome) u ≠ f (xs i) then
-        (interpolationEligibleSandwichFamily params family k xs).outcome gs
-      else 0
-  have hLle : ∀ f : AxisLinePolynomial params.next, L f ≤ T := by
-    intro f
-    calc
-      L f ≤ ∑ gs : GHatTupleOutcome params k,
-          (interpolationEligibleSandwichFamily params family k xs).outcome gs := by
-            unfold L
-            refine Finset.sum_le_sum ?_
-            intro gs _
-            by_cases hbad : ∃ i : Fin k, ∃ hiSome : (gs i).isSome = true,
-                ((gs i).get hiSome) u ≠ f (xs i)
-            · simp [hbad]
-            · simp [hbad, (interpolationEligibleSandwichFamily params family k xs).outcome_pos gs]
-      _ = T := by
-            simpa [T] using (interpolationEligibleSandwichFamily params family k xs).sum_eq_total
-  have hsum_le :
-      hBConsistencyBadMass params strategy family u xs ≤
-        ∑ f : AxisLinePolynomial params.next,
-          ev strategy.state (opTensor T (
-              (verticalLineMeasurementFamily params strategy u).outcome f)) := by
-    unfold hBConsistencyBadMass
-    refine Finset.sum_le_sum ?_
-    intro f _
-    exact ev_mono strategy.state _ _ <|
-      opTensor_mono_left (hLle f) ((verticalLineMeasurementFamily params strategy u).outcome_pos f)
-  have htotal_eq_one : (verticalLineMeasurementFamily params strategy u).total = 1 := by
-    let ℓ : AxisParallelLine params.next :=
-      { base := appendPoint params u zeroCoord
-        direction := lastCoord params }
-    simpa [verticalLineMeasurementFamily, ℓ] using (strategy.axisParallelMeasurement ℓ).total_eq_one
-  calc
-    hBConsistencyBadMass params strategy family u xs
-      ≤ ∑ f : AxisLinePolynomial params.next,
-          ev strategy.state (opTensor T (
-              (verticalLineMeasurementFamily params strategy u).outcome f)) := hsum_le
-    _ = ev strategy.state (opTensor T (verticalLineMeasurementFamily params strategy u).total) := by
-          rw [← ev_finset_sum, ← opTensor_sum_right_finset]
-          rw [(verticalLineMeasurementFamily params strategy u).sum_eq_total]
-    _ = ev strategy.state (opTensor T (1 : MIPStarRE.Quantum.Op ι)) := by rw [htotal_eq_one]
-    _ ≤ 1 := by
-          have hTle : T ≤ 1 := by simpa [T] using (
-              interpolationEligibleSandwichFamily params family k xs).total_le_one
-          have hop : opTensor T (1 : MIPStarRE.Quantum.Op ι) ≤ 1 := by
-            simpa [opTensor, leftTensor] using leftTensor_le_one (ι₂ := ι) (A := T) hTle
-          simpa [ev_one_of_isNormalized strategy.state strategy.isNormalized] using
-            (ev_mono strategy.state _ _ hop)
-
 lemma postprocess_restrictSubMeas_outcome
     {α β : Type*} [Fintype α] [Fintype β] [DecidableEq β]
     (A : SubMeas α ι) (p : α → Prop) [DecidablePred p]
@@ -723,72 +585,5 @@ lemma postprocess_restrictSubMeas_outcome
   intro c _
   by_cases hf : f c = b <;> by_cases hp : p c <;>
     simp [hf, hp]
-
-lemma pastedInterpolation_verticalLine_defect_le_badMass
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι)
-    {k : ℕ}
-    (u : Point params)
-    (xs : PointTuple params k)
-    (hxs : Function.Injective xs) :
-    qBipartiteConsDefect strategy.state
-      (hRestrictionToVerticalLine params (pastedInterpolationFamily params family k xs) u)
-      (verticalLineMeasurementFamily params strategy u)
-      ≤ hBConsistencyBadMass params strategy family u xs := by
-  let ℓ : AxisParallelLine params.next :=
-    { base := appendPoint params u zeroCoord
-      direction := lastCoord params }
-  let Bm : Measurement (AxisLinePolynomial params.next) ι :=
-    (strategy.axisParallelMeasurement ℓ).toMeasurement
-  have hB : Bm.toSubMeas = verticalLineMeasurementFamily params strategy u := by
-    simp [Bm, ℓ, verticalLineMeasurementFamily]
-  rw [← hB, qBipartiteConsDefect_eq_sum_singleOutcome (B := Bm)]
-  exact Finset.sum_le_sum (fun f _ => by
-    calc
-      qBipartiteConsDefect strategy.state
-          (postprocess (hRestrictionToVerticalLine params (
-              pastedInterpolationFamily params family k xs) u)
-            (fun h => decide (h = f)))
-          (singleOutcomeRightSubMeas Bm.toSubMeas f)
-        = ev strategy.state
-            (opTensor
-              ((postprocess (hRestrictionToVerticalLine params (
-                  pastedInterpolationFamily params family k xs) u)
-                (fun h => decide (h = f))).outcome false)
-              (Bm.outcome f)) := by
-                rw [qBipartiteConsDefect_postprocess_eq_singleOutcome]
-      _ = ev strategy.state
-            (opTensor
-              (∑ gs : GHatTupleOutcome params k,
-                if IsGloballyConsistent params xs gs
-                    ∧ tupleInterpolatedVerticalLine params u xs gs ≠ f then
-                  (interpolationEligibleSandwichFamily params family k xs).outcome gs
-                else 0)
-              (Bm.outcome f)) := by
-                rw [pastedInterpolation_verticalLine_singleOutcome_postprocess,
-                  postprocess_restrictSubMeas_outcome]
-                simp [decide_eq_false_iff_not]
-      _ ≤ ev strategy.state
-            (opTensor
-              (∑ gs : GHatTupleOutcome params k,
-                if ∃ i : Fin k, ∃ hiSome : (gs i).isSome = true,
-                    ((gs i).get hiSome) u ≠ f (xs i) then
-                  (interpolationEligibleSandwichFamily params family k xs).outcome gs
-                else 0)
-              (Bm.outcome f)) := by
-                apply ev_mono strategy.state _ _
-                exact opTensor_mono_left
-                  (interpolationEligibleSandwich_mismatch_sum_mono params family u xs hxs f)
-                  (Bm.outcome_pos f)
-      _ = ev strategy.state
-            (opTensor
-              (∑ gs : GHatTupleOutcome params k,
-                if ∃ i : Fin k, ∃ hiSome : (gs i).isSome = true,
-                    ((gs i).get hiSome) u ≠ f (xs i) then
-                  (interpolationEligibleSandwichFamily params family k xs).outcome gs
-                else 0)
-              ((verticalLineMeasurementFamily params strategy u).outcome f)) := by
-                simp [hB])
 
 end MIPStarRE.LDT.Pasting

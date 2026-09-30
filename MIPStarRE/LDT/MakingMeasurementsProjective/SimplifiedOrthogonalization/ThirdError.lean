@@ -1,6 +1,3 @@
-import MIPStarRE.LDT.MakingMeasurementsProjective.Defs
-import MIPStarRE.LDT.Basic.OperatorExpectations
-import MIPStarRE.Quantum.FiniteMatrix.Order
 import MIPStarRE.LDT.MakingMeasurementsProjective.SimplifiedOrthogonalization.SelectedProjectors
 
 /-!

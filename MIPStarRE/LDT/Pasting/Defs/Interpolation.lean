@@ -73,40 +73,6 @@ instance interpolationEligible_decidablePred (params : Parameters) [FieldModel p
   unfold InterpolationEligible gHatTupleHammingWeight gHatTupleSupport
   infer_instance
 
-/-- Paper origin: `references/ldt-paper/ld-pasting.tex:473-482`
-(interpolation step of the second construction, requiring `|w| \geq d+1`
-genuine outcomes).
-
-A `d+1`-element interpolation support together with the proof fields that show it
-lies inside the genuine completed-slice support. The support is chosen from the
-finite-set existence theorem `Finset.exists_subset_card_eq`. -/
-structure InterpolationSupportWitness (params : Parameters) [FieldModel params.q]
-    {k : ℕ} (gs : GHatTupleOutcome params k) where
-  support : Finset (Fin k)
-  subset_support : support ⊆ gHatTupleSupport gs
-  card_eq : support.card = params.d + 1
-
-/-- Paper origin: `references/ldt-paper/ld-pasting.tex:473-482`
-(interpolation step of the second construction, requiring `|w| \geq d+1`
-genuine outcomes).
-
-Construct a `d+1`-point interpolation support inside the genuine support of an
-interpolation-eligible tuple.
-
-**Source:** This is the source-faithful finite-support selection required by the
-interpolation step cited above; the paper assumes such a support after the
-cardinality lower bound is known. -/
-noncomputable def interpolationSupportWitness {params : Parameters} {k : ℕ}
-    [FieldModel params.q] (gs : GHatTupleOutcome params k)
-    (hEligible : InterpolationEligible params gs) :
-    InterpolationSupportWitness params gs :=
-  let hs := Finset.exists_subset_card_eq (s := gHatTupleSupport gs)
-    (n := params.d + 1) (by
-      simpa [InterpolationEligible, gHatTupleHammingWeight] using hEligible)
-  { support := Classical.choose hs
-    subset_support := (Classical.choose_spec hs).1
-    card_eq := (Classical.choose_spec hs).2 }
-
 /-- The Lagrange interpolation expression has individual degree at most `d`. -/
 private theorem interpolateCompletedSlicesFromSupport_degree
     (params : Parameters) [FieldModel params.q] {k : ℕ} (xs : PointTuple params k)

@@ -1,5 +1,4 @@
 import MIPStarRE.LDT.MainInductionStep.Simplified.DegreeZeroPairConsistency
-import MIPStarRE.LDT.Pasting.ComparisonLemmas.LineInterpolation.Averaging
 
 /-!
 # Degree-zero averaged measurement consistency

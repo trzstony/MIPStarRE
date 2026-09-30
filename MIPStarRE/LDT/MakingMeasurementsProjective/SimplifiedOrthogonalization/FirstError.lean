@@ -1,5 +1,4 @@
 import MIPStarRE.LDT.MakingMeasurementsProjective.SimplifiedOrthogonalization.SelectedProjectors
-import MIPStarRE.Quantum.FiniteMatrix.Order
 
 /-!
 # The first error family in linear orthogonalization

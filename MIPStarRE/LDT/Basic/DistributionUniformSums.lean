@@ -1,4 +1,3 @@
-import MIPStarRE.LDT.Basic.Distribution
 import MIPStarRE.LDT.Basic.PMFUniformAverages
 
 /-!
@@ -90,15 +89,6 @@ theorem uniformOnFinset_sum_smul_eq_pmf_sum {α M : Type*}
     (Distribution.uniformOnFinset s)
     (Distribution.uniformOnFinset_isProbability s hs)]
   rw [Distribution.uniformOnFinset_support, Distribution.uniformOnFinset_toPMF]
-
-/-- A constant family has uniform module-valued average equal to that constant.
-This is the project-distribution form of `PMF.sum_const_smul`. -/
-theorem uniformDistribution_sum_smul_const {α M : Type*}
-    [Fintype α] [DecidableEq α] [Nonempty α]
-    [AddCommMonoid M] [Module Error M] (x : M) :
-    ∑ a ∈ (uniformDistribution α).support, (uniformDistribution α).weight a • x = x := by
-  rw [uniformDistribution_sum_smul_eq_pmf_sum]
-  exact PMF.sum_const_smul (PMF.uniformOfFintype α) x
 
 /-- Reindex a uniform module-valued average along an equivalence. -/
 theorem uniformDistribution_sum_smul_equiv {α β M : Type*}
@@ -274,24 +264,6 @@ theorem uniformDistribution_sum_smul_factor_equiv_fst {α β γ δ M : Type*}
     PMF.realWeightedSum_uniformOfFintype_factor_equiv_fst
       (m := m) (g := g) (e := e) (h := h) (f := f)
 
-/-- A uniformly sampled seed has the second-coordinate uniform module-valued
-marginal when the observed coordinate factors through a product equivalence. -/
-theorem uniformDistribution_sum_smul_factor_equiv_snd {α β γ δ M : Type*}
-    [Fintype α] [DecidableEq α] [Nonempty α]
-    [Finite γ] [Nonempty γ]
-    [Fintype δ] [DecidableEq δ] [Nonempty δ]
-    [AddCommMonoid M] [Module Error M]
-    (m : α → β) (g : β → δ) (e : α ≃ γ × δ)
-    (h : ∀ a, g (m a) = (e a).2) (f : δ → M) :
-    ∑ a ∈ (uniformDistribution α).support,
-        (uniformDistribution α).weight a • f (g (m a)) =
-      ∑ d ∈ (uniformDistribution δ).support, (uniformDistribution δ).weight d • f d := by
-  rw [uniformDistribution_sum_smul_eq_pmf_sum (α := α)]
-  rw [uniformDistribution_sum_smul_eq_pmf_sum (α := δ)]
-  simpa [PMF.realWeightedSum] using
-    PMF.realWeightedSum_uniformOfFintype_factor_equiv_snd
-      (m := m) (g := g) (e := e) (h := h) (f := f)
-
 /-- A uniform push-forward has the uniform module-valued average induced by an
 equivalent observed coordinate. -/
 theorem uniformDistribution_map_sum_smul_eq_uniform_of_factor_equiv
@@ -327,24 +299,6 @@ theorem uniformDistribution_map_sum_smul_eq_uniform_fst_of_factor_equiv
   exact uniformDistribution_sum_smul_factor_equiv_fst
     (m := m) (g := g) (e := e) (h := h) (f := f)
 
-/-- A uniform push-forward has the second-coordinate uniform module-valued
-marginal when the observed coordinate factors through a product equivalence. -/
-theorem uniformDistribution_map_sum_smul_eq_uniform_snd_of_factor_equiv
-    {α β γ δ M : Type*}
-    [Fintype α] [DecidableEq α] [Nonempty α]
-    [DecidableEq β]
-    [Finite γ] [Nonempty γ]
-    [Fintype δ] [DecidableEq δ] [Nonempty δ]
-    [AddCommMonoid M] [Module Error M]
-    (m : α → β) (g : β → δ) (e : α ≃ γ × δ)
-    (h : ∀ a, g (m a) = (e a).2) (f : δ → M) :
-    ∑ b ∈ ((uniformDistribution α).map m).support,
-        ((uniformDistribution α).map m).weight b • f (g b) =
-      ∑ d ∈ (uniformDistribution δ).support, (uniformDistribution δ).weight d • f d := by
-  rw [Distribution.map_sum_smul]
-  exact uniformDistribution_sum_smul_factor_equiv_snd
-    (m := m) (g := g) (e := e) (h := h) (f := f)
-
 /-- A finite-support uniform module-valued average is the corresponding uniform
 average over the support subtype. -/
 theorem uniformOnFinset_sum_smul_eq_subtype {α M : Type*} [DecidableEq α]
@@ -374,31 +328,6 @@ theorem uniformOnFinset_sum_smul_eq_subtype {α M : Type*} [DecidableEq α]
           exact (Finset.sum_attach s (fun x : α => (s.card : Error)⁻¹ • f x)).symm
     _ = ∑ x : {x : α // x ∈ s}, (s.card : Error)⁻¹ • f x.1 := by
           rw [Finset.attach_eq_univ]
-
-/-- A finite-support uniform module-valued average may be reindexed by any
-finite type equivalent to the support subtype. -/
-theorem uniformOnFinset_sum_smul_equiv {α β M : Type*}
-    [Fintype β] [DecidableEq β] [Nonempty β]
-    [AddCommMonoid M] [Module Error M]
-    (s : Finset α) (e : β ≃ {a : α // a ∈ s}) (f : α → M) :
-    ∑ a ∈ (Distribution.uniformOnFinset s).support,
-        (Distribution.uniformOnFinset s).weight a • f a =
-      ∑ b ∈ (uniformDistribution β).support,
-        (uniformDistribution β).weight b • f (e b).1 := by
-  classical
-  haveI : Nonempty {a : α // a ∈ s} :=
-    ⟨e (Classical.choice (inferInstance : Nonempty β))⟩
-  calc
-    ∑ a ∈ (Distribution.uniformOnFinset s).support,
-        (Distribution.uniformOnFinset s).weight a • f a =
-        ∑ a ∈ (uniformDistribution {a : α // a ∈ s}).support,
-          (uniformDistribution {a : α // a ∈ s}).weight a • f a.1 := by
-          exact uniformOnFinset_sum_smul_eq_subtype s f
-    _ = ∑ b ∈ (uniformDistribution β).support,
-          (uniformDistribution β).weight b • f (e b).1 := by
-          simpa using
-            (uniformDistribution_sum_smul_equiv (e := e.symm)
-              (f := fun a : {a : α // a ∈ s} => f a.1))
 
 /-- A uniform module-valued average over a filtered finite support is the uniform
 average over the finite subtype satisfying the predicate. -/

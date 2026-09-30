@@ -53,10 +53,6 @@ noncomputable def pureDensity {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : ι → ℂ) : MIPStarRE.Quantum.Op ι :=
   (Fintype.card ι : ℂ) • Matrix.vecMulVec ψ (star ψ)
 
-/-- Swap the two tensor coordinates of a bipartite state vector. -/
-def swapVector {ι : Type*} (ψ : ι × ι → ℂ) : ι × ι → ℂ :=
-  fun ij => ψ (ij.2, ij.1)
-
 /-- A pure-state witness as a unit vector in the ambient finite Hilbert space.
 
 The associated density matrix is `pureDensity ψ.vector = dim · |ψ⟩⟨ψ|`, so that
@@ -121,66 +117,12 @@ theorem toQuantumState_isNormalized {ι : Type*} [Fintype ι] [DecidableEq ι] [
     (ψ : QuantumState ι).IsNormalized := by
   simpa [QuantumState.IsNormalized] using ψ.normalizedTrace_density
 
-theorem normalizedTrace_density_mul {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
-    (ψ : PureState ι) (X : MIPStarRE.Quantum.Op ι) :
-    MIPStarRE.Quantum.normalizedTrace ((ψ : QuantumState ι).density * X) =
-      star ψ.vector ⬝ᵥ (X *ᵥ ψ.vector) := by
-  have hcard : (Fintype.card ι : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Fintype.card_ne_zero
-  calc
-    MIPStarRE.Quantum.normalizedTrace ((ψ : QuantumState ι).density * X)
-      = MIPStarRE.Quantum.normalizedTrace (X * (ψ : QuantumState ι).density) := by
-          rw [MIPStarRE.Quantum.normalizedTrace_mul_comm]
-    _ = MIPStarRE.Quantum.normalizedTrace (X * ψ.density) := by rfl
-    _ = MIPStarRE.Quantum.normalizedTrace
-          ((Fintype.card ι : ℂ) • (X * Matrix.vecMulVec ψ.vector (star ψ.vector))) := by
-          simp [density, pureDensity]
-    _ = (Fintype.card ι : ℂ) *
-          MIPStarRE.Quantum.normalizedTrace (X * Matrix.vecMulVec ψ.vector (star ψ.vector)) := by
-          rw [MIPStarRE.Quantum.normalizedTrace_smul]
-    _ = (Fintype.card ι : ℂ) *
-          (((X * Matrix.vecMulVec ψ.vector (star ψ.vector)).trace) /
-            (Fintype.card ι : ℂ)) := by
-          simp [MIPStarRE.Quantum.normalizedTrace]
-    _ = (Fintype.card ι : ℂ) *
-          (((Matrix.vecMulVec (X *ᵥ ψ.vector) (star ψ.vector)).trace) /
-            (Fintype.card ι : ℂ)) := by
-          rw [Matrix.mul_vecMulVec]
-    _ = (Fintype.card ι : ℂ) *
-          (((X *ᵥ ψ.vector) ⬝ᵥ star ψ.vector) / (Fintype.card ι : ℂ)) := by
-          rw [Matrix.trace_vecMulVec]
-    _ = (X *ᵥ ψ.vector) ⬝ᵥ star ψ.vector := by
-          field_simp [hcard]
-    _ = star ψ.vector ⬝ᵥ (X *ᵥ ψ.vector) := by
-          rw [dotProduct_comm]
-
-/-- Vector-level SWAP invariance for a bipartite pure-state witness.
-
-This is stronger than density-level SWAP invariance: it records the paper's
-honest vector symmetry and rules out antisymmetric vectors, even though those
-vectors define SWAP-invariant density matrices. -/
-def IsSwapInvariant {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
-    (ψ : PureState (ι × ι)) : Prop :=
-  swapVector ψ.vector = ψ.vector
-
 end PureState
-
-@[simp] theorem swapVector_swapVector {ι : Type*} (ψ : ι × ι → ℂ) :
-    swapVector (swapVector ψ) = ψ := by
-  funext ij
-  rcases ij with ⟨i, j⟩
-  rfl
 
 /-- The expectation `Re τ(ψ X)`. Dimensions match by construction. -/
 noncomputable def ev {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (X : MIPStarRE.Quantum.Op ι) : Error :=
   Complex.re <| MIPStarRE.Quantum.normalizedTrace (ψ.density * X)
-
-theorem PureState.ev_eq_re_inner {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
-    (ψ : PureState ι) (X : MIPStarRE.Quantum.Op ι) :
-    ev (ψ : QuantumState ι) X =
-      Complex.re (star ψ.vector ⬝ᵥ (X *ᵥ ψ.vector)) := by
-  unfold ev
-  rw [ψ.normalizedTrace_density_mul]
 
 /-- Tensor product of two operators via Kronecker product. -/
 abbrev opTensor {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
@@ -317,14 +259,6 @@ theorem opTensor_mono_right
   rw [opTensor, opTensor, MIPStarRE.Quantum.kronecker_sub_right]
   exact hpsd
 
-/-- Right tensor placement is monotone. -/
-theorem rightTensor_mono
-    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
-    {B₁ B₂ : MIPStarRE.Quantum.Op ι₂} (hB : B₁ ≤ B₂) :
-    rightTensor (ι₁ := ι₁) B₁ ≤ rightTensor (ι₁ := ι₁) B₂ := by
-  exact opTensor_mono_right Matrix.PosSemidef.one.nonneg hB
-
-
 /-- `rightTensor B * leftTensor A = opTensor A B`. -/
 theorem rightTensor_mul_leftTensor_eq_opTensor
     {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
@@ -361,42 +295,6 @@ theorem leftTensor_mul_opTensor
           rw [leftTensor_mul_leftTensor]
     _ = opTensor (A * B) C := by
           rw [leftTensor_mul_rightTensor_eq_opTensor]
-
-/-- Multiplying a full tensor by a left tensor only affects the left factor. -/
-theorem opTensor_mul_leftTensor
-    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
-    (A B : MIPStarRE.Quantum.Op ι₁) (C : MIPStarRE.Quantum.Op ι₂) :
-    opTensor A C * leftTensor (ι₂ := ι₂) B = opTensor (A * B) C := by
-  calc
-    opTensor A C * leftTensor (ι₂ := ι₂) B
-        = (leftTensor (ι₂ := ι₂) A * rightTensor (ι₁ := ι₁) C) *
-            leftTensor (ι₂ := ι₂) B := by
-          rw [leftTensor_mul_rightTensor_eq_opTensor]
-    _ = leftTensor (ι₂ := ι₂) A *
-          (rightTensor (ι₁ := ι₁) C * leftTensor (ι₂ := ι₂) B) := by
-          rw [Matrix.mul_assoc]
-    _ = leftTensor (ι₂ := ι₂) A * opTensor B C := by
-          rw [rightTensor_mul_leftTensor_eq_opTensor]
-    _ = opTensor (A * B) C := leftTensor_mul_opTensor A B C
-
-/-- Scalar multiplication commutes with left tensor placement. -/
-theorem leftTensor_smul
-    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
-    (c : ℂ) (A : MIPStarRE.Quantum.Op ι₁) :
-    c • leftTensor (ι₂ := ι₂) A = leftTensor (ι₂ := ι₂) (c • A) := by
-  ext x y
-  simp [leftTensor]
-  ring
-
-/-- Powers commute with left tensor placement. -/
-theorem leftTensor_pow
-    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
-    (A : MIPStarRE.Quantum.Op ι₁) (n : ℕ) :
-    (leftTensor (ι₂ := ι₂) A) ^ n = leftTensor (ι₂ := ι₂) (A ^ n) := by
-  induction n with
-  | zero => simpa using (leftTensor_one (ι₁ := ι₁) (ι₂ := ι₂)).symm
-  | succ n ih =>
-      rw [pow_succ, pow_succ, ih, leftTensor_mul_leftTensor]
 
 /-- `rightTensor A * rightTensor B = rightTensor (A * B)`. -/
 theorem rightTensor_mul_rightTensor
@@ -567,6 +465,5 @@ theorem opTensor_sum_right_univ
     opTensor A (∑ a : α, f a) = ∑ a : α, opTensor A (f a) := by
   classical
   simpa using opTensor_sum_right_finset (A := A) (s := (Finset.univ : Finset α)) (f := f)
-
 
 end MIPStarRE.LDT

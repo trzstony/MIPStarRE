@@ -113,39 +113,4 @@ lemma commDataProcessedG_of_commutativityPoints
     params strategy gamma zeta
     hnorm hcomm hgamma_nonneg family G hG hcons hself hbound hpostSSC
 
-/-- Paper origin: `references/ldt-paper/commutativity-G.tex`
-(`\label{lem:comm-data-processed-g}`).
-
-The paper statement is formulated directly for the family `family.meas`; the
-auxiliary family used by the scalar chain is introduced inside the proof. -/
-lemma commDataProcessedG
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma zeta : Error)
-    (hnorm : strategy.state.IsNormalized)
-    (hgood : strategy.IsGood eps delta gamma)
-    (family : IdxPolyFamily params ι)
-    (hcons : family.ConsistentWithPoints strategy zeta)
-    (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
-    CommDataProcessedGConclusion params strategy family gamma zeta := by
-  have hcomm :
-      SDDOpRel strategy.state
-        (uniformDistribution (MIPStarRE.LDT.GlobalVariance.PointPairQuestion params.next))
-        (pointMeasurementProductLeft params.next strategy)
-        (pointMeasurementProductRight params.next strategy)
-        (commutativityPointsError params.next gamma) :=
-    commutativityPoints (params := params.next) strategy eps delta gamma hgood
-  have hgamma_nonneg : 0 ≤ gamma := by
-    have hdfp : 0 ≤ strategy.diagonalFailureProbability := by
-      unfold SymStrat.diagonalFailureProbability
-      exact mul_nonneg (by positivity)
-        (Finset.sum_nonneg fun j _ =>
-          bipartiteConsError_nonneg strategy.state _ _ _)
-    exact le_trans hdfp hgood.diagonalLineTest
-  exact
-    commDataProcessedG_of_commutativityPoints
-      params strategy gamma zeta hnorm hcomm hgamma_nonneg family hcons hself hbound
-
 end MIPStarRE.LDT.Commutativity

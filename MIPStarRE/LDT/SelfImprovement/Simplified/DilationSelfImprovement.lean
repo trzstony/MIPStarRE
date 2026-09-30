@@ -1,5 +1,4 @@
 import MIPStarRE.LDT.SelfImprovement.Simplified.Residual
-import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency.Core
 
 /-!
 # Simplified self-improvement through simultaneous dilation

@@ -106,19 +106,4 @@ theorem distinctSuccessPastedMass_ge_first_moment
   exact completedWord_eligible_probability_ge_first_moment
     params family k ψ hψ hdk
 
-/-- Degree-zero pasted mass requires no collision deduction. -/
-theorem distinctSuccessPastedMass_degree_zero
-    (params : Parameters) [FieldModel params.q]
-    (family : IdxPolyFamily params ι) (k : ℕ)
-    (ψ : QuantumState (ι × ι)) (hψ : ψ.IsNormalized)
-    (hd : params.d = 0) (hk : 0 < k) :
-    avgOver (completedWordOutcomeDistribution params family k ψ)
-        (fun p => (completedWordSuccessCount params p : Error)) /
-          (k : Error) ≤
-      ev ψ (leftTensor (ι₂ := ι)
-        (distinctSuccessPastedSubMeas params family k).total) := by
-  rw [distinctSuccessPastedMass_eq_eligible_probability]
-  exact completedWord_eligible_probability_degree_zero
-    params family k ψ hψ hd hk
-
 end MIPStarRE.LDT.Pasting

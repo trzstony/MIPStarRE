@@ -2,8 +2,6 @@ import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Bridges.Closeness
 import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Bridges.ClosenessXEval
 import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Bridges.QSDD
 import MIPStarRE.LDT.Commutativity.Transport.FullSlice.ZeroBounds
-import MIPStarRE.LDT.Commutativity.Transport.EvaluationSpecialization
-import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation.Averages
 
 /-!
 # Section 11 commutativity: hEval/closenessOfIP transport
@@ -349,36 +347,5 @@ lemma fullSlice_closenessOfIP_CAB_hEval_sqrt
     _ ≤ Real.sqrt δ := hd_le_sqrt
     _ = Real.sqrt (commDataProcessedGError params gamma zeta) := by
           rfl
-
-/-- Combined `closenessOfIP` chain on the evaluated side
-(`commutativity-G.tex` lines 301, 334, 359-360, 394, 396), stated with the
-paper's displayed `6√ζ + √ν` envelope. -/
-lemma fullSlice_closenessOfIP_CAB_hEval
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
-    (gamma zeta : Error)
-    (hnorm : strategy.state.IsNormalized)
-    (hEval :
-      SDDOpRel strategy.state
-        (uniformDistribution (EvaluatedSliceQuestion params))
-        (evaluatedFromFullSliceProductLeft params strategy family)
-        (evaluatedFromFullSliceProductRight params strategy family)
-        (commDataProcessedGError params gamma zeta)) :
-    |evaluatedSliceABAAvg params strategy family -
-        evaluatedSliceABABAvg params strategy family| ≤
-      6 * Real.sqrt zeta +
-        Real.sqrt (commDataProcessedGError params gamma zeta) := by
-  have h :=
-    fullSlice_closenessOfIP_CAB_hEval_sqrt params strategy family gamma zeta
-      hnorm hEval
-  calc
-    |evaluatedSliceABAAvg params strategy family -
-        evaluatedSliceABABAvg params strategy family|
-      ≤ Real.sqrt (commDataProcessedGError params gamma zeta) := h
-    _ ≤ 6 * Real.sqrt zeta +
-          Real.sqrt (commDataProcessedGError params gamma zeta) := by
-          have hz : 0 ≤ 6 * Real.sqrt zeta := by positivity
-          linarith
-
 
 end MIPStarRE.LDT.Commutativity

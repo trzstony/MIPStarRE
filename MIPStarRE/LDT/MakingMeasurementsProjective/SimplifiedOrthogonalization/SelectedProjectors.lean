@@ -29,12 +29,6 @@ noncomputable def selectedDiagonal {Outcome ι : Type*}
     (L : Finset (Outcome × ι)) (a : Outcome) : MIPStarRE.Quantum.Op ι :=
   Matrix.diagonal (fun j => if (a, j) ∈ L then 1 else 0)
 
-/-- Indices selected in the spectral basis of outcome `a`. -/
-def selectedFiber {Outcome ι : Type*}
-    [Fintype Outcome] [DecidableEq Outcome] [Fintype ι] [DecidableEq ι]
-    (L : Finset (Outcome × ι)) (a : Outcome) : Finset ι :=
-  Finset.univ.filter (fun j => (a, j) ∈ L)
-
 /-- The spectral projector `Qₐ` onto selected eigenvectors of `Mₐ`. -/
 noncomputable def selectedProjector {Outcome ι : Type*}
     [Fintype Outcome] [DecidableEq Outcome] [Fintype ι] [DecidableEq ι]
@@ -134,44 +128,6 @@ theorem selectedEffectSum_nonneg_le_one {Outcome ι : Type*}
         Finset.sum_le_sum (fun a _ => (selectedProjector_mul_effect_nonneg_le M L a).2)
       _ = 1 := by rw [M.sum_eq_total, M.total_eq_one]
 
-/-- The rank of `Qₐ` is the number of eigenvectors selected for outcome `a`. -/
-theorem selectedProjector_rank {Outcome ι : Type*}
-    [Fintype Outcome] [DecidableEq Outcome] [Fintype ι] [DecidableEq ι]
-    (M : Measurement Outcome ι) (L : Finset (Outcome × ι)) (a : Outcome) :
-    (selectedProjector M L a).rank = (selectedFiber L a).card := by
-  classical
-  let hM : (M.outcome a).IsHermitian := M.outcome_hermitian a
-  change (Unitary.conjStarAlgAut ℂ (MIPStarRE.Quantum.Op ι)
-    hM.eigenvectorUnitary (selectedDiagonal L a)).rank = (selectedFiber L a).card
-  rw [Unitary.conjStarAlgAut_apply, ← Unitary.coe_star]
-  simp [selectedDiagonal, selectedFiber, Matrix.rank_diagonal, Fintype.card_subtype,
-    -isUnit_iff_ne_zero, -Unitary.coe_star]
-
-/-- The selected projectors have total rank equal to the size of the global
-selection.  When `L` is supplied by rank allocation, this is `dim H`. -/
-theorem sum_selectedProjector_rank_eq_card {Outcome ι : Type*}
-    [Fintype Outcome] [DecidableEq Outcome] [Fintype ι] [DecidableEq ι]
-    (M : Measurement Outcome ι) (L : Finset (Outcome × ι)) :
-    (∑ a : Outcome, (selectedProjector M L a).rank) = L.card := by
-  classical
-  have hfiber (a : Outcome) :
-      (selectedFiber L a).card =
-        ∑ j : ι, if (a, j) ∈ L then 1 else 0 := by
-    simp [selectedFiber]
-  calc
-    (∑ a : Outcome, (selectedProjector M L a).rank) =
-        ∑ a : Outcome, (selectedFiber L a).card := by
-          apply Finset.sum_congr rfl
-          intro a _
-          exact selectedProjector_rank M L a
-    _ = ∑ a : Outcome, ∑ j : ι, if (a, j) ∈ L then 1 else 0 := by
-          apply Finset.sum_congr rfl
-          intro a _
-          exact hfiber a
-    _ = ∑ p : Outcome × ι, if p ∈ L then 1 else 0 := by
-          rw [Fintype.sum_prod_type]
-    _ = L.card := by simp
-
 /-- Conjugating a diagonal matrix in the eigenbasis of `Mₐ` gives the
 corresponding weighted sum of rank-one eigenprojectors.  The coefficients
 may depend on the eigenvector index, as they do for the global selection. -/
@@ -251,24 +207,5 @@ theorem sum_ev_selectedProjector_mul_effect {Outcome ι : Type*}
           else 0 := by rw [Fintype.sum_prod_type]
     _ = ∑ p ∈ L, measurementEigenvalue M p.1 p.2 *
           ev ψ (measurementEigenProjector M p.1 p.2) := by simp
-
-/-- Global rank allocation produces commuting local projectors with total
-rank `dim H` and selected overlap at least `1 − Δ`. -/
-theorem exists_selected_projectors {Outcome ι : Type*}
-    [Fintype Outcome] [DecidableEq Outcome] [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState ι) (hψ : ψ.IsNormalized) (M : Measurement Outcome ι) :
-    ∃ L : Finset (Outcome × ι),
-      (∀ a, MIPStarRE.Quantum.IsProj (selectedProjector M L a)) ∧
-      (∀ a, selectedProjector M L a * M.outcome a =
-        M.outcome a * selectedProjector M L a) ∧
-      (∑ a, (selectedProjector M L a).rank) = Fintype.card ι ∧
-      1 - idempotenceDefect ψ M ≤
-        ∑ a, ev ψ (selectedProjector M L a * M.outcome a) := by
-  classical
-  obtain ⟨L, hcard, hoverlap⟩ := exists_selected_overlap_ge_one_sub_defect ψ hψ M
-  refine ⟨L, (selectedProjector_isProj M L),
-    (selectedProjector_commutes M L), ?_, ?_⟩
-  · rw [sum_selectedProjector_rank_eq_card, hcard]
-  · rwa [sum_ev_selectedProjector_mul_effect]
 
 end MIPStarRE.LDT.MakingMeasurementsProjective.SimplifiedOrthogonalization

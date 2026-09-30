@@ -1,5 +1,4 @@
 import MIPStarRE.LDT.MainInductionStep.Simplified.DimensionOne
-import MIPStarRE.LDT.ExpansionHypercubeGraph.Theorems.Results
 
 /-!
 # Averaged point measurement in degree zero

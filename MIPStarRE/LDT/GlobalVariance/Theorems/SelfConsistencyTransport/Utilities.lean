@@ -109,59 +109,6 @@ lemma generalizeBReversePointwiseBound
           exact ev_adjoint_sub_swap ψbi X Y
     _ ≤ generalizeBError params := hgen.pointwiseNormBound g
 
-/-- The first marginal of the rerandomized hypercube-edge distribution is uniform.
-This is the finite-distribution form of the sampling statement in
-`expansion.tex`, lines 300--302. -/
-lemma avgOver_rerandomizeCoord_fst
-    (params : Parameters) [FieldModel params.q]
-    (f : Point params → Error) :
-    avgOver (rerandomizeCoord params) (fun uv => f uv.1) =
-      avgOver (uniformDistribution (Point params)) f := by
-  rw [avgOver_rerandomizeCoord_eq_uniform_sample]
-  calc
-    avgOver (uniformDistribution (RerandomizeCoordSample params))
-        (fun sample => f (rerandomizeCoordSampleToPair params sample).1)
-      = avgOver (uniformDistribution (Point params × Fin params.m))
-          (fun ui => f ui.1) := by
-          exact avgOver_uniform_fst
-            (α := Point params × Fin params.m) (β := Fq params)
-            (fun ui => f ui.1)
-    _ = avgOver (uniformDistribution (Point params)) f := by
-          exact avgOver_uniform_fst (α := Point params) (β := Fin params.m) f
-
-/-- The second marginal of the rerandomized hypercube-edge distribution is uniform.
-This is the symmetric endpoint form of the sampling statement in `expansion.tex`,
-lines 300--302. -/
-lemma avgOver_rerandomizeCoord_snd
-    (params : Parameters) [FieldModel params.q]
-    (f : Point params → Error) :
-    avgOver (rerandomizeCoord params) (fun uv => f uv.2) =
-      avgOver (uniformDistribution (Point params)) f := by
-  classical
-  rw [avgOver_rerandomizeCoord_eq_weight_sum]
-  rw [Fintype.sum_prod_type]
-  calc
-    (∑ u : Point params, ∑ v : Point params,
-        rerandomizeCoordWeight params u v * f v) =
-        ∑ v : Point params, ∑ u : Point params,
-          rerandomizeCoordWeight params u v * f v := by
-          rw [Finset.sum_comm]
-    _ = ∑ v : Point params, (∑ u : Point params, rerandomizeCoordWeight params u v) * f v := by
-          refine Finset.sum_congr rfl ?_
-          intro v _
-          simpa using
-            (Finset.sum_mul
-              (s := (Finset.univ : Finset (Point params)))
-              (f := fun u : Point params => rerandomizeCoordWeight params u v)
-              (a := f v)).symm
-    _ = ∑ v : Point params, (hypercubeVertexCount params : Error)⁻¹ * f v := by
-          refine Finset.sum_congr rfl ?_
-          intro v _
-          simp [rerandomizeCoordWeight_colSum]
-    _ = avgOver (uniformDistribution (Point params)) f := by
-          rw [avgOver_uniform_eq_pmf_sum]
-          simp [hypercubeVertexCount, PMF.uniformOfFintype_apply]
-
 /-- The right tensor of the square-root polynomial weight is a contraction.
 
 The square of `(G_g)^{1/2}` is the submeasurement outcome `G_g`, and every

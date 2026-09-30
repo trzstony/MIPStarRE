@@ -1,5 +1,4 @@
 import MIPStarRE.LDT.MainInductionStep.Simplified.DegreeZeroGlobalDistance
-import MIPStarRE.LDT.Pasting.ComparisonLemmas.LineInterpolation.BadLine
 
 /-!
 # Evaluation of the averaged constant-polynomial measurement

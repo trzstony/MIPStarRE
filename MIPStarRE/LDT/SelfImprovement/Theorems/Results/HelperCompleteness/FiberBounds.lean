@@ -1,8 +1,3 @@
-import MIPStarRE.LDT.Basic.SubMeasurementFamilies
-import MIPStarRE.LDT.Basic.ParametersFiniteAnswers
-import MIPStarRE.LDT.Preliminaries.SelfConsistency.DataProcessing
-import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds.Final
-import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.CommonHelpers
 
 /-!
@@ -319,32 +314,6 @@ theorem helper_first_move_second_factor_operator_le_one
         rw [leftTensor_finset_sum, (strategy.pointMeasurement u).toSubMeas.sum_eq_total]
     _ = 1 := by
         rw [(strategy.pointMeasurement u).total_eq_one, leftTensor_one]
-
-/-- The second Cauchy--Schwarz factor in the first helper-completeness move is
-bounded by the identity contribution.
-
-This is the Lean form of the paper's assertion, following
-`eq:yet-another-move-a`, that
-`E_u Σ_a ⟨ψ, (A^u_a T_[h(u)=a]^2 A^u_a) ⊗ I ψ⟩ ≤ 1`. -/
-theorem helper_first_move_second_factor_le_one
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (T : SubMeas (Polynomial params) ι) :
-    avgOver (uniformDistribution (Point params)) (fun u =>
-      ∑ a : Fq params,
-        let Au := (strategy.pointMeasurement u).outcome a
-        let Tfiber := helperFiberOperator params T u a
-        ev strategy.state (leftTensor (ι₂ := ι) (Au * (Tfiber * Tfiber) * Au))) ≤
-      1 := by
-  refine Distribution.IsProbability.avgOver_le_of_forall_le_on_support
-    (𝒟 := uniformDistribution (Point params))
-    (uniformDistribution_isProbability (Point params)) _ 1 ?_
-  intro u _
-  have hop := helper_first_move_second_factor_operator_le_one params strategy T u
-  have hev := ev_mono strategy.state _ _ hop
-  rw [ev_sum] at hev
-  simpa [ev_one_of_isNormalized strategy.state strategy.isNormalized] using hev
 
 /-- The scalar expression after the first Cauchy--Schwarz move in helper
 completeness.

@@ -52,24 +52,6 @@ private lemma generalizeB_of_pointwise
           (fun g => generalizeBDeviationAtPolynomial params strategy ψbi G g)
           (generalizeBError params) hpoint }
 
-/-- `lem:generalize-b`. -/
-lemma generalizeB
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (_eps _delta _gamma : Error)
-    (_hgood : strategy.IsGood _eps _delta _gamma)
-    (G : SubMeas (Polynomial params) ι)
-    (ψbi : QuantumState (ι × ι))
-    (hpoint :
-      ∀ g : Polynomial params,
-        generalizeBDeviationAtPolynomial params strategy ψbi G g ≤ generalizeBError params) :
-    GeneralizeBStatement params strategy ψbi G := by
-  -- The analytic pointwise estimate is an explicit input here. In the
-  -- self-improvement pipeline it is supplied as an explicit theorem
-  -- hypothesis.
-  exact generalizeB_of_pointwise params strategy G ψbi hpoint
-
 /-- The finite reparametrization of incident axis-parallel line questions by a
 line `ℓ` and affine parameter `t`, sending `(ℓ,t)` to `(ℓ, ℓ(t))`. -/
 private noncomputable def axisParallelLineQuestionParameterEquiv (params : Parameters)

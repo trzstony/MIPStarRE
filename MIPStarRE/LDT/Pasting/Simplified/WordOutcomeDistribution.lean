@@ -312,37 +312,4 @@ theorem completedWord_eligible_probability_ge_first_moment
         uniformQuestionCollision_le params k
   linarith
 
-/-- Degree-zero interpolation has no distinct-height collision cost. -/
-theorem completedWord_eligible_probability_degree_zero
-    (params : Parameters) [FieldModel params.q]
-    (family : IdxPolyFamily params ι) (k : ℕ)
-    (ψ : QuantumState (ι × ι)) (hψ : ψ.IsNormalized)
-    (hd : params.d = 0) (hk : 0 < k) :
-    avgOver (completedWordOutcomeDistribution params family k ψ)
-        (fun p => (completedWordSuccessCount params p : Error)) /
-          (k : Error) ≤
-      avgOver (completedWordOutcomeDistribution params family k ψ)
-        (fun p => if HasDistinctSuccessSupport params p.1 p.2 then
-          (1 : Error) else 0) := by
-  classical
-  have hfirst := threshold_probability_ge_first_moment
-    (completedWordOutcomeDistribution params family k ψ)
-    (completedWordOutcomeDistribution_isProbability params family k ψ hψ)
-    (completedWordSuccessCount params) k 0
-    (completedWordSuccessCount_le params k) hk
-  have hmono := avgOver_mono
-    (completedWordOutcomeDistribution params family k ψ)
-    (fun p => if 1 ≤ completedWordSuccessCount params p then
-      (1 : Error) else 0)
-    (fun p => if HasDistinctSuccessSupport params p.1 p.2 then
-      (1 : Error) else 0) (by
-        intro p
-        by_cases hcount : 1 ≤ completedWordSuccessCount params p
-        · have helig := hasDistinctSuccessSupport_of_degree_zero
-            params p.1 p.2 hd hcount
-          simp [hcount, helig]
-        · simp [hcount]
-          split_ifs <;> norm_num)
-  simpa [hd] using hfirst.trans hmono
-
 end MIPStarRE.LDT.Pasting

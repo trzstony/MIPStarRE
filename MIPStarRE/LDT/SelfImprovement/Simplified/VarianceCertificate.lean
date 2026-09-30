@@ -194,31 +194,4 @@ theorem helper_filtered_certificate_of_slackness
   rw [hhelper.toHelperConclusion.averagedConstruction]
   exact sdp_filtered_certificate params strategy T.toSubMeas Z hpair
 
-/-- The certificate also gives the affine lower bound for the filtered
-total effect used in the strong self-consistency argument. -/
-theorem filtered_total_ge_two_dual_sub_one
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (T : SubMeas (Polynomial params) ι)
-    (Z : MIPStarRE.Quantum.Op ι)
-    (hpair : SdpOptimalPairWithSlackness params strategy T Z) :
-    Z + Z - 1 ≤ (averagedSandwichedPolynomialSubMeas params strategy T).total := by
-  have hZherm : Zᴴ = Z :=
-    (Matrix.nonneg_iff_posSemidef.mp hpair.dual_positive).isHermitian.eq
-  have hminus_herm : ((1 : MIPStarRE.Quantum.Op ι) - Z)ᴴ = 1 - Z := by
-    rw [Matrix.conjTranspose_sub, Matrix.conjTranspose_one, hZherm]
-  have hminus : 0 ≤ ((1 : MIPStarRE.Quantum.Op ι) - Z) * (1 - Z) := by
-    have h : 0 ≤ ((1 : MIPStarRE.Quantum.Op ι) - Z)ᴴ * (1 - Z) := by
-      simpa only [Matrix.star_eq_conjTranspose, mul_one, one_mul] using
-        star_left_conjugate_nonneg
-          (Matrix.PosSemidef.one.nonneg : 0 ≤ (1 : MIPStarRE.Quantum.Op ι))
-          ((1 : MIPStarRE.Quantum.Op ι) - Z)
-    rwa [hminus_herm] at h
-  have hlow : Z + Z - 1 ≤ Z * Z := by
-    apply sub_nonneg.mp
-    convert hminus using 1
-    noncomm_ring
-  exact hlow.trans (sdp_dual_square_le_filtered_total params strategy T Z hpair)
-
 end MIPStarRE.LDT.SelfImprovement

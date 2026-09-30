@@ -1,5 +1,4 @@
 import MIPStarRE.LDT.Test.MainTheorem.Simplified.PointRoundingAtomic
-import MIPStarRE.LDT.Test.StrategyRole.Algebra
 
 /-!
 # Point consistency as filtered polynomial mass

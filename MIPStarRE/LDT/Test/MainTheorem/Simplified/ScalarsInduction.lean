@@ -1,5 +1,4 @@
 import MIPStarRE.LDT.Test.MainTheorem.Simplified.ScalarsCore
-import MIPStarRE.LDT.MainInductionStep.Simplified.Main
 
 /-!
 # Scalar induction bound for simplified soundness

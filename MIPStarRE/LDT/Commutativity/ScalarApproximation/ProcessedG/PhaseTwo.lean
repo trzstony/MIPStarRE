@@ -1,8 +1,6 @@
-import MIPStarRE.LDT.Commutativity.ScalarApproximation.Core
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainBasic.Normalization
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainBasic.PointSwap
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainBasic.Reindexing
-import MIPStarRE.LDT.Commutativity.EvaluatedSliceBounds.PhaseOneThree
 import MIPStarRE.LDT.Commutativity.GCommStability.Scalar.First
 
 /-!
@@ -93,7 +91,6 @@ noncomputable def evaluatedSlicePhaseTwoQuestionDefect
             ((evaluatedSliceFirstFactor params family q).outcome a)) *
             (1 - (G (pointHeight params q.2)).total)) *
         rightTensor (ι₁ := ι) ((evaluatedSlicePointMeas params strategy q.2).outcome b))
-
 
 /-- Postprocessing a sandwiched product by its second coordinate sums over the
 outer outcome.

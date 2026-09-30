@@ -5,7 +5,6 @@ import MIPStarRE.Quantum.FiniteMatrix.TracePairing
 import MIPStarRE.Quantum.FiniteMatrix.BlockDiagonal
 import MIPStarRE.Quantum.FiniteMatrix.NormalizedTrace
 import MIPStarRE.Quantum.FiniteConicDuality
-import MIPStarRE.Quantum.ProjectorONB
 import MIPStarRE.Quantum.Measurement
 
 -- Mathlib 4.31 header checks require this for this aggregate module.

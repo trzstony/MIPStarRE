@@ -1,4 +1,3 @@
-import MIPStarRE.LDT.Pasting.SwitcherooContraction.ScalarTerms
 import MIPStarRE.LDT.Pasting.SwitcherooCompletion.Expansion
 
 /-!

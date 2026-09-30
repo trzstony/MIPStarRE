@@ -1,6 +1,3 @@
-import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Averages
-import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Machinery.Marginalization.Y
-import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Machinery.Normalization
 import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Bridges.ClosenessCore
 
 /-!
@@ -46,7 +43,6 @@ private lemma leftTensor_sandwich_adjoint_normalization_family
   simpa using
     leftTensor_normalizationCondition_sandwich_adjoint_bound
       (ι := ι) (P := P ω) (Q := Q ω)
-
 
 lemma xEvaluatedSliceBABAtensor_to_xEvaluatedFullSliceABABAvg
     (params : Parameters) [FieldModel params.q]

@@ -1,5 +1,4 @@
 import MIPStarRE.LDT.MainInductionStep.Simplified.AnswerPositiveSuccessor
-import MIPStarRE.LDT.MainInductionStep.Theorems.MainTheorems.Base
 
 /-!
 # Dimension-one base case for the simplified induction

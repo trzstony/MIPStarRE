@@ -25,13 +25,6 @@ noncomputable def normalizedTrace (A : Op d) : ℂ :=
 @[simp] theorem normalizedTrace_zero : normalizedTrace (0 : Op d) = 0 := by
   simp [normalizedTrace]
 
-/-- The normalized trace of the identity operator is one. -/
-@[simp] theorem normalizedTrace_one [DecidableEq d] [Nonempty d] :
-    normalizedTrace (1 : Op d) = 1 := by
-  unfold normalizedTrace
-  rw [Matrix.trace_one]
-  exact div_self (Nat.cast_ne_zero.mpr Fintype.card_ne_zero)
-
 /-- The normalized trace is additive. -/
 theorem normalizedTrace_add (A B : Op d) :
     normalizedTrace (A + B) = normalizedTrace A + normalizedTrace B := by
@@ -63,41 +56,9 @@ theorem normalizedTrace_reindex {d₁ d₂ : Type*} [Fintype d₁] [Fintype d₂
   rw [Matrix.trace_reindex]
   simp [hcard]
 
-/-! ### Squared τ-norm -/
-
-/--
-The squared τ-norm: `‖A‖²_τ = τ(A⋆ A)`.
-In finite dimensions this is `(1/d) ∑ᵢⱼ |Aᵢⱼ|²`, the normalized squared
-Frobenius norm.
--/
-noncomputable def tauNormSq (A : Op d) : ℂ :=
-  normalizedTrace (Aᴴ * A)
-
-/-- The squared τ-norm of the zero operator is zero. -/
-@[simp] theorem tauNormSq_zero : tauNormSq (0 : Op d) = 0 := by
-  simp [tauNormSq]
-
 /-! ### Projector predicate -/
 
 /-- Paper-facing name for Mathlib's predicate that a matrix is a self-adjoint idempotent. -/
 abbrev IsProj (P : Op d) : Prop := IsStarProjection P
-
-/-! ### Spectral truncation -/
-
-/--
-A spectral truncation witness records the passage from a Hermitian matrix `source`
-to a projection `target` by truncating the spectrum to `{0, 1}`: eigenvalues
-above `1 / 2` are rounded to `1`, and those below are rounded to `0`.
-
-The key output is the τ-distance bound between `source` and `target`.
--/
-structure SpectralTruncation (source target : Op d) : Prop where
-  /-- The source matrix is Hermitian. -/
-  sourceHermitian : source.IsHermitian
-  /-- The target matrix is an orthogonal projection. -/
-  targetProj : IsProj target
-  /-- Spectral truncation does not increase the defect measured by `tauNormSq`. -/
-  tauDistanceBound : Complex.re (tauNormSq (source - target)) ≤
-    Complex.re (tauNormSq (source * source - source))
 
 end MIPStarRE.Quantum

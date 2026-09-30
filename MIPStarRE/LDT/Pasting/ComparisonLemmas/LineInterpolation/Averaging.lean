@@ -1,4 +1,3 @@
-import MIPStarRE.LDT.Basic.DistributionAvg
 import MIPStarRE.LDT.Basic.DistributionUniform
 import MIPStarRE.LDT.Pasting.ComparisonLemmas.Common
 
@@ -22,65 +21,6 @@ open MIPStarRE.LDT.CommutativityPoints
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
-
-lemma avgOver_distinct_bounded_le_avgOver_uniform_add_tv
-    (params : Parameters) [FieldModel params.q]
-    (k : ℕ) (hk : k ≤ params.q)
-    (F : PointTuple params k → Error)
-    (hF_nonneg : ∀ xs, 0 ≤ F xs)
-    (hF_le_one : ∀ xs, F xs ≤ 1) :
-    avgOver (distinctTupleDistribution params k) F
-      ≤ avgOver (uniformDistribution (PointTuple params k)) F
-        + totalVariationDistance
-            (uniformDistribution (PointTuple params k))
-            (distinctTupleDistribution params k) := by
-  simpa [distinctTupleDistribution] using
-    avgOver_uniformOnFinset_le_uniformDistribution_add_totalVariationDistance
-      (s := distinctTupleSupport params k)
-      (distinctTupleSupport_nonempty_of_le params k hk) F hF_nonneg hF_le_one
-
-lemma avgOver_distinct_bounded_le_avgOver_uniform_add_tv_of_any_k
-    (params : Parameters) [FieldModel params.q]
-    (k : ℕ)
-    (F : PointTuple params k → Error)
-    (hF_nonneg : ∀ xs, 0 ≤ F xs)
-    (hF_le_one : ∀ xs, F xs ≤ 1) :
-    avgOver (distinctTupleDistribution params k) F
-      ≤ avgOver (uniformDistribution (PointTuple params k)) F
-        + totalVariationDistance
-            (uniformDistribution (PointTuple params k))
-            (distinctTupleDistribution params k) := by
-  classical
-  by_cases hk : k ≤ params.q
-  · exact avgOver_distinct_bounded_le_avgOver_uniform_add_tv params k hk F hF_nonneg hF_le_one
-  · have hkq : params.q < k := lt_of_not_ge hk
-    let support : Finset (PointTuple params k) :=
-      distinctTupleSupport params k
-    have hsupport_card : support.card = params.q.descFactorial k := by
-      simpa [support] using distinctTupleSupport_card params k
-    have hsupport_empty : support = ∅ := by
-      simpa [support] using distinctTupleSupport_eq_empty_of_lt params k hkq
-    have hdistinct_zero : avgOver (distinctTupleDistribution params k) F = 0 := by
-      unfold avgOver
-      simp [distinctTupleDistribution, support, hsupport_empty]
-    have hright_nonneg :
-        0 ≤ avgOver (uniformDistribution (PointTuple params k)) F +
-            totalVariationDistance
-              (uniformDistribution (PointTuple params k))
-              (distinctTupleDistribution params k) := by
-      have hunif_nonneg : 0 ≤ avgOver (uniformDistribution (PointTuple params k)) F := by
-        unfold avgOver
-        exact Finset.sum_nonneg fun xs _ =>
-          mul_nonneg ((uniformDistribution (PointTuple params k)).nonnegative xs) (hF_nonneg xs)
-      have htv_nonneg :
-          0 ≤ totalVariationDistance
-            (uniformDistribution (PointTuple params k))
-            (distinctTupleDistribution params k) := by
-        unfold totalVariationDistance
-        positivity
-      linarith
-    rw [hdistinct_zero]
-    exact hright_nonneg
 
 lemma max_zero_add_le
     (a t : Error) (ha : 0 ≤ a) :

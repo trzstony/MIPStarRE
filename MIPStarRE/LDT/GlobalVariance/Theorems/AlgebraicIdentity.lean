@@ -1,12 +1,10 @@
 import MIPStarRE.LDT.ExpansionHypercubeGraph.Theorems.Results
 import MIPStarRE.LDT.Preliminaries.CauchySchwarz
 import MIPStarRE.LDT.Preliminaries.CompletionTransfer
-import MIPStarRE.LDT.Preliminaries.ComparisonCore
 import MIPStarRE.LDT.Preliminaries.PolynomialAgreement
 import MIPStarRE.LDT.Preliminaries.SelfConsistency.Extensions
 import MIPStarRE.LDT.GlobalVariance.Theorems.Averaging
 import MIPStarRE.LDT.GlobalVariance.Theorems.Statements
-import MIPStarRE.LDT.Test.StrategyFailures
 
 namespace MIPStarRE.LDT.GlobalVariance
 
@@ -19,7 +17,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-! # Algebraic identities and variance reductions -/
-
 
 lemma pointConditionedExpansionTransfer
     (params : Parameters)
@@ -59,7 +56,6 @@ lemma globalVarianceOfPoints_bound_of_local
     _ = globalVarianceOfPointsError params eps delta := by
       simp [globalVarianceOfPointsError, localVarianceOfPointsError]
       ring
-
 
 /-! ## Algebraic norm/variance reductions -/
 

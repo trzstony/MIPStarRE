@@ -1,5 +1,4 @@
 import MIPStarRE.LDT.Pasting.Simplified.ConsistencyAggregation
-import MIPStarRE.LDT.Pasting.ComparisonLemmas.HAConsistency
 
 /-!
 # Point consistency for simplified pasting
@@ -22,7 +21,6 @@ open MIPStarRE.LDT.CommutativityPoints
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
-
 
 /-- Transport a vertical-line consistency budget to point consistency,
 adding the axis-parallel and point self-consistency distance. -/

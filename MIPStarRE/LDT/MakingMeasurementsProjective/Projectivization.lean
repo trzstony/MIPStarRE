@@ -1,5 +1,4 @@
 import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
-import MIPStarRE.LDT.Basic.MeasurementLift
 import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency.Completion
 import MIPStarRE.LDT.Preliminaries.CauchySchwarz
 
@@ -417,18 +416,6 @@ lemma sourceAlmostProjective_of_ssc {Outcome : Type*}
     _ ≤ max 0 (ev ψ A.toSubMeas.total - diagA) := le_max_right 0 _
     _ ≤ η := hssc'
 
-/-- The source idempotence defect of a measurement is nonnegative. -/
-lemma sourceAlmostProjective_nonneg {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (ψ : QuantumState ι) (A : Measurement Outcome ι) :
-    0 ≤ ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) := by
-  refine Finset.sum_nonneg ?_
-  intro a _
-  exact ev_nonneg_of_psd ψ _ <|
-    sub_nonneg.mpr <|
-      MIPStarRE.Quantum.sq_le_self (A.outcome_pos a) (A.outcome_le_one a)
-
 /-- Consistency implies almost-projective: if `A` is `ζ`-consistent
 with `B`, then `A` is `2ζ`-almost-projective. -/
 lemma consistencyToAlmostProjective {Outcome : Type*}
@@ -531,117 +518,5 @@ lemma consistencyToAlmostProjective_right {Outcome : Type*}
             dsimp [consistencyToAlmostProjectiveError]
             nlinarith [hζ_nonneg]
   · exact sourceAlmostProjective_of_ssc ψ B_lifted _ hsscBound
-
-/-- The zero family is a projective submeasurement. This supplies trivial
-large-error branches where the target error bound is already at least the
-universal `qSDD ≤ 1` estimate. -/
-def zeroProjSubMeas {Outcome : Type*} {ι : Type*}
-    [Fintype Outcome] [Fintype ι] [DecidableEq ι] :
-    ProjSubMeas Outcome ι where
-  toSubMeas :=
-    { outcome := fun _ => 0
-      total := 0
-      outcome_pos := fun _ => le_rfl
-      sum_eq_total := Fintype.sum_eq_zero _ fun _ => rfl
-      total_le_one := zero_le_one }
-  proj := fun _ => by simp
-
-/-- The zero projective submeasurement is within unit `qSDD` of any lifted
-submeasurement on a normalized state. -/
-lemma qSDD_leftPlaced_zeroProjSubMeas_le_one {Outcome : Type*}
-    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    [Fintype Outcome]
-    (ψ : QuantumState (ιA × ιB)) (hψ : ψ.IsNormalized)
-    (A : SubMeas Outcome ιA) :
-    qSDD ψ (leftPlacedSubMeas (ιB := ιB) A)
-      (leftPlacedSubMeas (ιB := ιB)
-        (zeroProjSubMeas (Outcome := Outcome) (ι := ιA)).toSubMeas) ≤ 1 := by
-  have hq :
-      qSDD ψ (leftPlacedSubMeas (ιB := ιB) A)
-          (leftPlacedSubMeas (ιB := ιB)
-            (zeroProjSubMeas (Outcome := Outcome) (ι := ιA)).toSubMeas) =
-        ∑ a : Outcome,
-          ev ψ (((leftPlacedSubMeas (ιB := ιB) A).outcome a) *
-            ((leftPlacedSubMeas (ιB := ιB) A).outcome a)) := by
-    unfold qSDD qSDDCore
-    refine Finset.sum_congr rfl ?_
-    intro a _
-    let Z : MIPStarRE.Quantum.Op (ιA × ιB) := (leftPlacedSubMeas (ιB := ιB) A).outcome a
-    have hzero :
-        (leftPlacedSubMeas (ιB := ιB)
-          (zeroProjSubMeas (Outcome := Outcome) (ι := ιA)).toSubMeas).outcome a = 0 := by
-      ext i j
-      rcases i with ⟨i₁, i₂⟩
-      rcases j with ⟨j₁, j₂⟩
-      by_cases h₁ : i₁ = j₁ <;> by_cases h₂ : i₂ = j₂ <;>
-        simp [zeroProjSubMeas, leftPlacedSubMeas, leftTensor, h₁, h₂]
-    calc
-      ev ψ
-          ((Z -
-              (leftPlacedSubMeas (ιB := ιB)
-                (zeroProjSubMeas (Outcome := Outcome) (ι := ιA)).toSubMeas).outcome a)ᴴ *
-            (Z - (leftPlacedSubMeas (ιB := ιB)
-              (zeroProjSubMeas (Outcome := Outcome) (ι := ιA)).toSubMeas).outcome a))
-        = ev ψ (Zᴴ * Z) := by
-            rw [hzero]
-            simp
-      _ = ev ψ (Z * Z) := by
-            rw [SubMeas.outcome_hermitian (leftPlacedSubMeas (ιB := ιB) A) a]
-      _ = ev ψ (((leftPlacedSubMeas (ιB := ιB) A).outcome a) *
-            ((leftPlacedSubMeas (ιB := ιB) A).outcome a)) := by
-            rfl
-  rw [hq]
-  simpa using
-    MIPStarRE.LDT.Preliminaries.subMeas_diagMass_le_one ψ hψ
-      (leftPlacedSubMeas (ιB := ιB) A)
-
-/-- The zero projective submeasurement is within unit `qSDD` of any
-right-placed submeasurement on a normalized bipartite state. -/
-lemma qSDD_rightPlaced_zeroProjSubMeas_le_one {Outcome : Type*}
-    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    [Fintype Outcome]
-    (ψ : QuantumState (ιA × ιB)) (hψ : ψ.IsNormalized)
-    (A : SubMeas Outcome ιB) :
-    qSDD ψ (rightPlacedSubMeas (ιA := ιA) A)
-      (rightPlacedSubMeas (ιA := ιA)
-        (zeroProjSubMeas (Outcome := Outcome) (ι := ιB)).toSubMeas) ≤ 1 := by
-  have hq :
-      qSDD ψ (rightPlacedSubMeas (ιA := ιA) A)
-          (rightPlacedSubMeas (ιA := ιA)
-            (zeroProjSubMeas (Outcome := Outcome) (ι := ιB)).toSubMeas) =
-        ∑ a : Outcome,
-          ev ψ (((rightPlacedSubMeas (ιA := ιA) A).outcome a) *
-            ((rightPlacedSubMeas (ιA := ιA) A).outcome a)) := by
-    unfold qSDD qSDDCore
-    refine Finset.sum_congr rfl ?_
-    intro a _
-    let Z : MIPStarRE.Quantum.Op (ιA × ιB) := (rightPlacedSubMeas (ιA := ιA) A).outcome a
-    have hzero :
-        (rightPlacedSubMeas (ιA := ιA)
-          (zeroProjSubMeas (Outcome := Outcome) (ι := ιB)).toSubMeas).outcome a = 0 := by
-      ext i j
-      rcases i with ⟨i₁, i₂⟩
-      rcases j with ⟨j₁, j₂⟩
-      by_cases h₁ : i₁ = j₁ <;> by_cases h₂ : i₂ = j₂ <;>
-        simp [zeroProjSubMeas, rightPlacedSubMeas, rightTensor, h₁, h₂]
-    calc
-      ev ψ
-          ((Z -
-              (rightPlacedSubMeas (ιA := ιA)
-                (zeroProjSubMeas (Outcome := Outcome) (ι := ιB)).toSubMeas).outcome a)ᴴ *
-            (Z - (rightPlacedSubMeas (ιA := ιA)
-              (zeroProjSubMeas (Outcome := Outcome) (ι := ιB)).toSubMeas).outcome a))
-        = ev ψ (Zᴴ * Z) := by
-            rw [hzero]
-            simp
-      _ = ev ψ (Z * Z) := by
-            rw [SubMeas.outcome_hermitian (rightPlacedSubMeas (ιA := ιA) A) a]
-      _ = ev ψ (((rightPlacedSubMeas (ιA := ιA) A).outcome a) *
-            ((rightPlacedSubMeas (ιA := ιA) A).outcome a)) := by
-            rfl
-  rw [hq]
-  simpa using
-    MIPStarRE.LDT.Preliminaries.subMeas_diagMass_le_one ψ hψ
-      (rightPlacedSubMeas (ιA := ιA) A)
 
 end MIPStarRE.LDT.MakingMeasurementsProjective

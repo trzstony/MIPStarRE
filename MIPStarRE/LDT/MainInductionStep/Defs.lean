@@ -76,28 +76,6 @@ noncomputable def axisParallelLineAnswerFamily
       (Fq params) ι :=
   MIPStarRE.LDT.axisParallelLineAnswerFamilyOf strategy.axisParallelMeasurement
 
-/-- Sampled point answers in the `j`-restricted diagonal test.
-Point player receives `u` and answers at `u`. -/
-noncomputable def restrictedDiagonalPointAnswerFamily
-    {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : RestrictedSymStrat params ι)
-    (j : Fin params.m) :
-    IdxSubMeas (RestrictedDiagonalSample params j)
-      (Fq params) ι :=
-  MIPStarRE.LDT.diagonalPointAnswerFamilyOf strategy.pointMeasurement j
-
-/-- Sampled diagonal-line answers in the `j`-restricted diagonal
-test, evaluated at the base point (parameter `zeroCoord`). -/
-noncomputable def restrictedDiagonalLineAnswerFamily
-    {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : RestrictedSymStrat params ι)
-    (j : Fin params.m) :
-    IdxSubMeas (RestrictedDiagonalSample params j)
-      (Fq params) ι :=
-  MIPStarRE.LDT.diagonalLineAnswerFamilyOf strategy.diagonalMeasurement (· zeroCoord) j
-
 /-- Failure surrogate for the axis-parallel lines test. -/
 noncomputable def axisParallelFailureProbability
     {params : Parameters} [FieldModel params.q]
@@ -116,36 +94,6 @@ noncomputable def selfConsistencyFailureProbability
   bipartiteSSCError strategy.state
     (uniformDistribution (Point params))
     (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-
-/-- Failure surrogate for the diagonal lines test.
-Averages over restriction index `j`, then the
-`j`-restricted diagonal test. -/
-noncomputable def diagonalFailureProbability
-    {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : RestrictedSymStrat params ι) : Error :=
-  (1 / (params.m : Error)) *
-    ∑ j : Fin params.m,
-      bipartiteConsError strategy.state
-        (uniformDistribution (RestrictedDiagonalSample params j))
-        (restrictedDiagonalPointAnswerFamily strategy j)
-        (restrictedDiagonalLineAnswerFamily strategy j)
-
-/-- Goodness data for a restricted strategy. -/
-structure IsGood {params : Parameters}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [FieldModel params.q]
-    (strategy : RestrictedSymStrat params ι)
-    (eps delta gamma : Error) : Prop where
-  /-- The restricted axis-parallel test fails with probability at most `eps`. -/
-  axisParallelTest :
-    strategy.axisParallelFailureProbability ≤ eps
-  /-- The restricted self-consistency test fails with probability at most `delta`. -/
-  selfConsistencyTest :
-    strategy.selfConsistencyFailureProbability ≤ delta
-  /-- The restricted diagonal-line test fails with probability at most `gamma`. -/
-  diagonalLineTest :
-    strategy.diagonalFailureProbability ≤ gamma
 
 end RestrictedSymStrat
 
@@ -380,23 +328,6 @@ restriction of the ambient diagonal measurement. -/
       restrictDiagonalAnswerMeasurement params strategy x ℓ :=
   rfl
 
-/-- Evaluating the answer-valued restricted diagonal measurement at the base point
-recovers the ambient slice-preserving diagonal readout. -/
-@[simp] theorem restrictDiagonalAnswerMeasurement_postprocess_zero (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι) (x : Fq params)
-    (ℓ : DiagonalLine params) :
-    postprocess ((restrictDiagonalAnswerMeasurement params strategy x ℓ).toSubMeas)
-        (fun f : DiagonalLineAnswer params => f zeroCoord) =
-      postprocess
-        ((strategy.diagonalMeasurement
-          (DiagonalLine.appendAtHeight params ℓ x)).toSubMeas)
-        (fun f : DiagonalLinePolynomial params.next => f zeroCoord) := by
-  simp [restrictDiagonalAnswerMeasurement, ProjMeas.postprocess_toSubMeas,
-    SubMeas.postprocess_comp, DiagonalLinePolynomial.toAnswer,
-    DiagonalLineAnswer.restrictAtHeight]
-  rfl
-
 /-- The `x`-restricted strategy from the proof of the main induction theorem. -/
 noncomputable def xRestrictedStrategy (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (x : Fq params) : RestrictedSymStrat params ι where
@@ -414,13 +345,6 @@ noncomputable def xRestrictedStrategy (params : Parameters) [FieldModel params.q
     [FieldModel params.q]
     (strategy : SymStrat params.next ι) (x : Fq params) :
     (xRestrictedStrategy params strategy x).state = strategy.state :=
-  rfl
-
-/-- Restricting a strategy reuses the parent strategy's normalization witness. -/
-@[simp] theorem xRestrictedStrategy_isNormalized (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι) (x : Fq params) :
-    (xRestrictedStrategy params strategy x).isNormalized = strategy.isNormalized :=
   rfl
 
 /-- Restricting a strategy reindexes point questions by appending the slice height. -/
@@ -441,68 +365,6 @@ noncomputable def xRestrictedStrategy (params : Parameters) [FieldModel params.q
         (AxisParallelLine.appendAtHeight params ℓ x)).toSubMeas.outcome
         (liftAxisAnswer params x f) :=
   rfl
-
-/-- Postprocessing the restricted diagonal measurement at the base point recovers
-exactly the ambient slice-preserving diagonal answer distribution at the base
-point. -/
-@[simp] theorem restrictDiagonalMeasurement_postprocess_zero (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι) (x : Fq params)
-    (ℓ : DiagonalLine params) :
-    postprocess ((restrictDiagonalMeasurement params strategy x ℓ).toSubMeas)
-        (fun f : DiagonalLinePolynomial params => f zeroCoord) =
-      postprocess
-        ((strategy.diagonalMeasurement
-          (DiagonalLine.appendAtHeight params ℓ x)).toSubMeas)
-        (fun f : DiagonalLinePolynomial params.next => f zeroCoord) := by
-  classical
-  let evalNext : DiagonalLinePolynomial params.next → Fq params := fun f => f zeroCoord
-  let evalSlice : DiagonalLinePolynomial params → Fq params := fun f => f zeroCoord
-  simp only [restrictDiagonalMeasurement, ProjMeas.postprocess_toSubMeas,
-    SubMeas.postprocess_comp]
-  simp [diagonalValueRepresentative, DiagonalLinePolynomial.toFun, evalLinePolynomialModel]
-  rfl
-
-/-- The intermediate `ν` from `thm:main-induction`. -/
-noncomputable def mainInductionNu (params : Parameters) (k : ℕ)
-    (eps delta gamma : Error) : Error :=
-  1000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (2 : ℕ)) *
-    (Real.rpow eps (1 / (1024 : Error)) +
-      Real.rpow delta (1 / (1024 : Error)) +
-      Real.rpow gamma (1 / (1024 : Error)) +
-      Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error)))
-
-/-- The explicit `σ` of `thm:main-induction`. -/
-noncomputable def mainInductionError (params : Parameters) (k : ℕ)
-    (eps delta gamma : Error) : Error :=
-  ((params.m : Error) ^ (2 : ℕ)) *
-    (mainInductionNu params k eps delta gamma +
-      Real.exp (-((k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ))))))
-
-/-- The section-local self-improvement error. -/
-noncomputable def selfImprovementInInductionError (params : Parameters)
-    (eps delta _gamma : Error) : Error :=
-  3000 * (params.m : Error) *
-    (Real.rpow eps (1 / (32 : Error)) +
-      Real.rpow delta (1 / (32 : Error)) +
-      Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error)))
-
-/-- The intermediate `ν` from the section-local pasting theorem. -/
-noncomputable def ldPastingInInductionNu (params : Parameters) (k : ℕ)
-    (eps delta gamma zeta : Error) : Error :=
-  100 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) *
-    (Real.rpow eps (1 / (32 : Error)) +
-      Real.rpow delta (1 / (32 : Error)) +
-      Real.rpow gamma (1 / (32 : Error)) +
-      Real.rpow zeta (1 / (32 : Error)) +
-      Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error)))
-
-/-- The section-local pasting consistency error. -/
-noncomputable def ldPastingInInductionError (params : Parameters) (k : ℕ)
-    (eps delta gamma kappa zeta : Error) : Error :=
-  kappa * (1 + 1 / (100 * (params.m : Error))) +
-    2 * ldPastingInInductionNu params k eps delta gamma zeta +
-    Real.exp (-((k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ)))))
 
 /-- Tensor-failure expectation on a bipartite space.
 

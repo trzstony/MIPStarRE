@@ -1,5 +1,4 @@
 import MIPStarRE.LDT.Pasting.Simplified.FineEnergyBase
-import MIPStarRE.LDT.Preliminaries.CauchySchwarz
 
 /-!
 # Direct-sum triangle inequality for operator energies

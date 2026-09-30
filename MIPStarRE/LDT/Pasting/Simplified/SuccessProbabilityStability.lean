@@ -41,10 +41,6 @@ theorem marginalRootBudget_factor (k : ℕ) (alpha : Error) :
       rw [← Finset.sum_mul]
       simp [marginalRootBudget, mul_comm]
 
-/-- A word of length one has no marginal-stability cost. -/
-theorem marginalRootBudget_one : marginalRootBudget 1 = 0 := by
-  simp [marginalRootBudget]
-
 /-- The first-moment root budget is at most the sum of prefix lengths. -/
 theorem marginalRootBudget_le_prefix_sum (k : ℕ) :
     marginalRootBudget k ≤ ∑ i : Fin k, (i.1 : Error) := by
@@ -273,29 +269,6 @@ theorem distinctSuccessPastedMass_ge_explicit
   have hden : 0 ≤ ((k - params.d : ℕ) : Error) := by positivity
   exact (sub_le_sub_right
     (div_le_div_of_nonneg_right (sub_le_sub_right hcount _) hden) _).trans hmass
-
-/-- Degree-zero pasted mass has the same first-moment lower bound without
-any collision loss. -/
-theorem distinctSuccessPastedMass_degree_zero_explicit
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι) (k : ℕ)
-    (u : Point params) (ψ : QuantumState (ι × ι))
-    (hψ : ψ.IsNormalized) (hd : params.d = 0) (hk : 0 < k) (zeta : Error)
-    (hsc : SDDRel ψ (uniformDistribution (Fq params))
-      (gHatSelfConsistencyLeftFamily params family)
-      (gHatSelfConsistencyRightFamily params family)
-      (2 * zeta)) :
-    ((k : Error) * ev ψ (leftTensor (ι₂ := ι) (meanSliceTotal params family)) -
-        ∑ i : Fin k, Real.sqrt ((i.1 : Error) * (2 * zeta))) / (k : Error) ≤
-      ev ψ (leftTensor (ι₂ := ι)
-        (distinctSuccessPastedSubMeas params family k).total) := by
-  have hcount := completedWord_expectedSuccessCount_ge_mean_sub_sqrt_sum
-    params strategy family k u ψ hψ zeta hsc
-  have hmass := distinctSuccessPastedMass_degree_zero
-    params family k ψ hψ hd hk
-  have hk_nonneg : 0 ≤ (k : Error) := by positivity
-  exact (div_le_div_of_nonneg_right hcount hk_nonneg).trans hmass
 
 /-- Completeness of the input slice family gives the pasted mass lower bound
 with a linear dependence on its failure parameter. -/

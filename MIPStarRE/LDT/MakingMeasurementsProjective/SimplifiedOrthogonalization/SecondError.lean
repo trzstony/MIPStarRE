@@ -1,7 +1,5 @@
 import MIPStarRE.LDT.MakingMeasurementsProjective.SimplifiedOrthogonalization.PolarAlgebra
 import MIPStarRE.LDT.MakingMeasurementsProjective.SimplifiedOrthogonalization.SelectedProjectors
-import MIPStarRE.LDT.Basic.OperatorExpectations
-import MIPStarRE.Quantum.FiniteMatrix.Order
 
 /-!
 # The middle error in linear orthogonalization

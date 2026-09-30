@@ -1,8 +1,9 @@
 import Mathlib.Data.Fintype.EquivFin
-import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.Core
-import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.RankReduction.LowRank
-import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.QCompleteness
-import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.AlmostProjective
+import MIPStarRE.LDT.MakingMeasurementsProjective.Projectivization
+import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.TruncationCombinatorics
+import MIPStarRE.LDT.Preliminaries.CompletionTransfer
+import MIPStarRE.Quantum.FiniteHilbert
+import Mathlib.Analysis.Matrix.Spectrum
 
 /-!
 # Section 5 — Q/X/XHat/P identities and approximations
@@ -196,28 +197,6 @@ noncomputable def positiveGramSpectrumImageRows
   normalizedMatrixImageRows X
     (fun i : {i : ι // 0 < hQ.eigenvalues i} => hQ.eigenvectorBasis i.1)
     (fun i : {i : ι // 0 < hQ.eigenvalues i} => hQ.eigenvalues i.1)
-
-/-- The normalized positive Gram images assemble into a coisometry matrix.
-
-This is the row-matrix form of the preceding orthonormality statement.  It is
-the bridge from the singular-vector calculation to the matrix equation
-`Xhat Xhat† = I` used by the QXP layer. -/
-theorem normalized_matrix_image_rows_mul_conjTranspose
-    {κ μ ι : Type*}
-    [DecidableEq κ] [Fintype μ] [Fintype ι] [DecidableEq ι]
-    (X : Matrix μ ι ℂ)
-    (v : κ → EuclideanSpace ℂ ι) (lam : κ → ℝ)
-    (hv : Orthonormal ℂ v)
-    (hlam : ∀ i : κ, 0 < lam i)
-    (heig : ∀ i : κ,
-      Matrix.toEuclideanLin (Xᴴ * X) (v i) = (lam i : ℂ) • v i) :
-    normalizedMatrixImageRows X v lam * (normalizedMatrixImageRows X v lam)ᴴ =
-      (1 : Matrix κ κ ℂ) := by
-  simpa [normalizedMatrixImageRows] using
-    Matrix.mul_conjTranspose_eq_one_of_orthonormal_rows
-    (fun i : κ =>
-      ((1 / Real.sqrt (lam i) : ℝ) : ℂ) • Matrix.toEuclideanLin X (v i))
-    (orthonormal_normalized_matrix_image_of_gram_eigenvectors X v lam hv hlam heig)
 
 /-- The transpose of the normalized-image row matrix satisfies the mixed
 Gram identity on the chosen eigenvector family.
@@ -506,26 +485,6 @@ theorem adjoint_image_eq_zero_of_orthogonal_positive_gram_images
             rw [LinearMap.adjoint_inner_right]
       _ = 0 := by rw [hzero, inner_zero_left]
 
-/-- Spectral form of `normalized_matrix_image_rows_mul_conjTranspose`.
-
-The rows indexed by the strictly positive eigenvalues of the Hermitian Gram
-operator are the normalized images of the corresponding Gram eigenvectors.
-They therefore assemble into a coisometry. -/
-theorem normalized_matrix_image_rows_mul_conjTranspose_of_positive_gram_spectrum
-    {μ ι : Type*}
-    [Fintype μ] [Fintype ι] [DecidableEq ι]
-    (X : Matrix μ ι ℂ) (Q : Matrix ι ι ℂ)
-    (hQ : Q.IsHermitian)
-    (hgram : Xᴴ * X = Q) :
-    positiveGramSpectrumImageRows X Q hQ * (positiveGramSpectrumImageRows X Q hQ)ᴴ =
-      (1 : Matrix {i : ι // 0 < hQ.eigenvalues i} {i : ι // 0 < hQ.eigenvalues i} ℂ) := by
-  simpa [positiveGramSpectrumImageRows, normalizedMatrixImageRows] using
-    Matrix.mul_conjTranspose_eq_one_of_orthonormal_rows
-      (fun i : {i : ι // 0 < hQ.eigenvalues i} =>
-        ((1 / Real.sqrt (hQ.eigenvalues i.1) : ℝ) : ℂ) •
-          Matrix.toEuclideanLin X (hQ.eigenvectorBasis i.1))
-      (orthonormal_normalized_matrix_image_of_positive_gram_spectrum X Q hQ hgram)
-
 /-- The strictly positive Gram spectrum has cardinality at most the row
 dimension of the rectangular matrix.
 
@@ -548,7 +507,6 @@ theorem positive_gram_spectrum_card_le_rows
   have hcard :=
     (Orthonormal.linearIndependent horth).fintype_card_le_finrank
   simpa using hcard
-
 
 end
 

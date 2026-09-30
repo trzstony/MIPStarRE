@@ -1,5 +1,6 @@
 import MIPStarRE.LDT.MainInductionStep.Simplified.AnswerScalarPowers
-import MIPStarRE.LDT.MainInductionStep.Simplified.ScalarSuccessor
+import MIPStarRE.LDT.MainInductionStep.Simplified.ScalarRecurrence
+import MIPStarRE.LDT.MainInductionStep.Simplified.Compression
 
 /-!
 # Scalar absorption for the answer-valued successor

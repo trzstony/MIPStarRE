@@ -175,23 +175,4 @@ theorem commutingWithGIncomplete_ofComplete
       _ ≤ commutingWithGIncompleteError params gamma zeta := by
           simpa [commutingWithGIncompleteError] using hcomplete_bound
 
-/-- `cor:commuting-with-G-incomplete`, source-facing form. -/
-theorem commutingWithGIncomplete
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι)
-    (eps delta gamma zeta : Error)
-    (hgamma_nonneg : 0 ≤ gamma) (hgamma : gamma ≤ 1)
-    (hzeta_nonneg : 0 ≤ zeta) (hzeta : zeta ≤ 1)
-    (hd_le_q : params.d ≤ params.q)
-    (hgood : strategy.IsGood eps delta gamma)
-    (hcons : family.ConsistentWithPoints strategy zeta)
-    (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
-    CommutingWithGIncompleteStatement params strategy.state family gamma zeta := by
-  exact commutingWithGIncomplete_ofComplete params strategy.state family gamma zeta
-    (commutingWithGComplete params strategy family eps delta gamma zeta
-      hgamma_nonneg hgamma hzeta_nonneg hzeta hd_le_q hgood hcons hself hbound)
-
 end MIPStarRE.LDT.Pasting

@@ -1,10 +1,7 @@
-import MIPStarRE.LDT.Basic.DistributionAvg
 import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Bridges.Closeness
 import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Bridges.ClosenessXEval
 import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Bridges.QSDD
 import MIPStarRE.LDT.Commutativity.Transport.FullSlice.ZeroBounds
-import MIPStarRE.LDT.Commutativity.Transport.EvaluationSpecialization
-import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation.Averages
 
 /-!
 # Section 11 commutativity: scalar marginalization lemmas

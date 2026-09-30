@@ -495,36 +495,6 @@ theorem gHatFacts_ofSelfConsistencyAndCommutation
                     simp [gHatCommutationError, sixteenthSum]
                     ring
 
-/-- `cor:G-hat-facts`, source-facing form. -/
-theorem gHatFacts
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι)
-    (eps delta gamma zeta : Error)
-    (hgamma_nonneg : 0 ≤ gamma) (hgamma : gamma ≤ 1)
-    (hzeta_nonneg : 0 ≤ zeta) (hzeta : zeta ≤ 1)
-    (hd_le_q : params.d ≤ params.q)
-    (hgood : strategy.IsGood eps delta gamma)
-    (hcons : family.ConsistentWithPoints strategy zeta)
-    (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
-    GHatFactsStatement params strategy.state family gamma zeta := by
-  have hselfComplete : GCompleteSelfConsistencyStatement params strategy.state family zeta :=
-    gCompleteSelfConsistency params strategy.state family zeta strategy.permInvState hself
-  have hselfIncomplete : GBotSelfConsistencyStatement params strategy.state family zeta :=
-    gBotSelfConsistency params strategy.state family zeta strategy.permInvState hself
-  have hcommComplete : CommutingWithGCompleteStatement params strategy.state family gamma zeta :=
-    commutingWithGComplete params strategy family eps delta gamma zeta
-      hgamma_nonneg hgamma hzeta_nonneg hzeta hd_le_q hgood hcons hself hbound
-  have hcommIncomplete :
-      CommutingWithGIncompleteStatement params strategy.state family gamma zeta :=
-    commutingWithGIncomplete params strategy family eps delta gamma zeta
-      hgamma_nonneg hgamma hzeta_nonneg hzeta hd_le_q hgood hcons hself hbound
-  exact gHatFacts_ofSelfConsistencyAndCommutation params strategy.state family gamma zeta
-    hgamma_nonneg hgamma hzeta_nonneg hzeta hd_le_q
-    hselfComplete hselfIncomplete hcommComplete hcommIncomplete
-
 /-- Internal form of `cor:G-hat-facts` after applying `thm:com-main`.
 
 The construction of the `\widehat G` estimates needs the commutativity

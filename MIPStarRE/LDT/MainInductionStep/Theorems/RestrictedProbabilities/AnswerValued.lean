@@ -1,6 +1,6 @@
-import MIPStarRE.LDT.MainInductionStep.Theorems.RestrictedProbabilities.Core
+import MIPStarRE.LDT.MainInductionStep.Theorems.RestrictedProbabilities.Axis
 import MIPStarRE.LDT.MainInductionStep.Theorems.SelfImprovementAssembly.AnswerSlice
-import MIPStarRE.LDT.MainInductionStep.Theorems.InductionParameterBounds.MainError
+import MIPStarRE.LDT.MainInductionStep.Theorems.InductionParameterBounds.Preliminaries
 
 /-!
 # Section 6 -- Answer-Valued Restricted Probability Statement
@@ -42,31 +42,6 @@ lemma answerRestricted_selfConsistencyFailureProbability_eq
       (xRestrictedStrategy params strategy x).selfConsistencyFailureProbability := by
   rfl
 
-/-- The answer-valued slice has the same verifier-visible diagonal failure
-probability as the legacy restricted slice after evaluating line answers at the
-base point. -/
-lemma answerRestricted_diagonalFailureProbability_eq
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι) (x : Fq params) :
-    (xRestrictedAnswerSymStrat params strategy x).diagonalFailureProbability =
-      (xRestrictedStrategy params strategy x).diagonalFailureProbability := by
-  unfold AnswerSymStrat.diagonalFailureProbability RestrictedSymStrat.diagonalFailureProbability
-  apply congrArg (fun s => (1 / (params.m : Error)) * s)
-  refine Finset.sum_congr rfl ?_
-  intro j _hj
-  apply congrArg
-  funext s
-  let ℓ : DiagonalLine params :=
-    { base := s.1, direction := extendRestrictedDirection j s.2 }
-  change
-    postprocess ((restrictDiagonalAnswerMeasurement params strategy x ℓ).toSubMeas)
-        (fun f : DiagonalLineAnswer params => f zeroCoord) =
-      postprocess ((restrictDiagonalMeasurement params strategy x ℓ).toSubMeas)
-        (fun f : DiagonalLinePolynomial params => f zeroCoord)
-  rw [restrictDiagonalAnswerMeasurement_postprocess_zero,
-    restrictDiagonalMeasurement_postprocess_zero]
-
 /-- The weighted average of the answer-valued restricted axis-parallel slice errors
 is bounded by the ambient axis-parallel test error. -/
 lemma answer_weighted_axisParallel_bound
@@ -90,93 +65,6 @@ lemma answer_weighted_axisParallel_bound
             intro x
             rw [answerRestricted_axisParallelFailureProbability_eq]
     _ ≤ eps := weighted_axisParallel_bound params strategy eps delta gamma hgood
-
-/-- The weighted average of the answer-valued restricted diagonal slice errors is
-bounded by the ambient diagonal-line test error. -/
-lemma answer_weighted_diagonal_bound
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma : Error)
-    (hgood : strategy.IsGood eps delta gamma) :
-    avgOver (uniformDistribution (Fq params))
-        (fun x => sliceTransverseDirectionWeight params *
-          (xRestrictedAnswerSymStrat params strategy x).diagonalFailureProbability) ≤ gamma := by
-  calc
-    avgOver (uniformDistribution (Fq params))
-        (fun x => sliceTransverseDirectionWeight params *
-          (xRestrictedAnswerSymStrat params strategy x).diagonalFailureProbability)
-      = avgOver (uniformDistribution (Fq params))
-          (fun x => sliceTransverseDirectionWeight params *
-            (xRestrictedStrategy params strategy x).diagonalFailureProbability) := by
-            refine avgOver_congr _ _ _ ?_
-            intro x
-            rw [answerRestricted_diagonalFailureProbability_eq]
-    _ ≤ gamma := weighted_diagonal_bound params strategy eps delta gamma hgood
-
-/-- Data answer-valued weighted restricted axis/diagonal bounds into the public
-answer-valued restricted-probabilities statement. -/
-lemma AnswerRestrictedProbabilitiesStatement.ofWeightedBounds
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma : Error)
-    (hgood : strategy.IsGood eps delta gamma)
-    (haxisWeightedBound :
-      avgOver (uniformDistribution (Fq params))
-          (fun x => sliceTransverseDirectionWeight params *
-            (xRestrictedAnswerSymStrat params strategy x).axisParallelFailureProbability) ≤ eps)
-    (hdiagonalWeightedBound :
-      avgOver (uniformDistribution (Fq params))
-          (fun x => sliceTransverseDirectionWeight params *
-            (xRestrictedAnswerSymStrat params strategy x).diagonalFailureProbability) ≤ gamma) :
-    AnswerRestrictedProbabilitiesStatement params strategy eps delta gamma := by
-  let profile : AnswerRestrictedFailureProfile params strategy :=
-    { axisParallel := fun x =>
-        (xRestrictedAnswerSymStrat params strategy x).axisParallelFailureProbability
-      selfConsistency := fun x =>
-        (xRestrictedAnswerSymStrat params strategy x).selfConsistencyFailureProbability
-      diagonal := fun x =>
-        (xRestrictedAnswerSymStrat params strategy x).diagonalFailureProbability
-      restrictedGood := fun _ => ⟨le_rfl, le_rfl, le_rfl⟩ }
-  have haxis_weighted_avg :
-      sliceTransverseDirectionWeight params *
-          averageAnswerRestrictedAxisParallelError params profile ≤ eps := by
-    simpa [profile, averageAnswerRestrictedAxisParallelError, avgOver_const_mul] using
-      haxisWeightedBound
-  have hdiag_weighted_avg :
-      sliceTransverseDirectionWeight params *
-          averageAnswerRestrictedDiagonalError params profile ≤ gamma := by
-    simpa [profile, averageAnswerRestrictedDiagonalError, avgOver_const_mul] using
-      hdiagonalWeightedBound
-  refine ⟨profile, ?_⟩
-  refine ⟨weighted_bound_to_average params haxis_weighted_avg, ?_, ?_⟩
-  · calc
-      averageAnswerRestrictedSelfConsistencyError params profile
-        = avgOver (uniformDistribution (Fq params))
-            (fun x =>
-              (xRestrictedStrategy params strategy x).selfConsistencyFailureProbability) := by
-            refine avgOver_congr _ _ _ ?_
-            intro x
-            simp [profile,
-              answerRestricted_selfConsistencyFailureProbability_eq]
-      _ = strategy.selfConsistencyFailureProbability := by
-            exact selfConsistencyRestrictedAverage_eq params strategy
-      _ ≤ delta := hgood.selfConsistencyTest
-  · exact weighted_bound_to_average params hdiag_weighted_avg
-
-/-- Answer-valued version of `lem:restricted-probabilities`. -/
-lemma answerRestrictedProbabilities
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma : Error)
-    (hgood : strategy.IsGood eps delta gamma) :
-    AnswerRestrictedProbabilitiesStatement params strategy eps delta gamma := by
-  exact AnswerRestrictedProbabilitiesStatement.ofWeightedBounds
-    params strategy eps delta gamma hgood
-    (answer_weighted_axisParallel_bound params strategy eps delta gamma hgood)
-    (answer_weighted_diagonal_bound params strategy eps delta gamma hgood)
 
 /-! ### Answer-valued successor restrictions
 
@@ -621,57 +509,5 @@ lemma answerSuccessorRestrictedProbabilities
     params strategy eps delta gamma hgood
     (answerSuccessor_weighted_axisParallel_bound params strategy eps delta gamma hgood)
     (answerSuccessor_weighted_diagonal_bound params strategy eps delta gamma hgood)
-
-/-- Recursive predecessor conclusions for the answer-valued successor slices.
-
-Paper origin: `references/ldt-paper/inductive_step.tex:441-454`, in the
-answer-valued successor interface used by the simultaneous induction route.
-
-This theorem is the formal content of the recursive call: from the
-answer-valued restricted-probabilities theorem and the predecessor
-answer-valued induction hypothesis, it obtains the main-induction conclusion
-for every restricted slice.  The hypotheses `k ≥ 1` and
-`400 * params.m * params.d ≤ k` are derived here from the nontrivial
-successor branch, rather than being stored in a source theorem statement. -/
-theorem answerSuccessorRestrictedSliceConclusions
-    (params : Parameters)
-    [FieldModel.{uF} params.q]
-    (strategy : AnswerSymStrat params.next ι)
-    (eps delta gamma : Error)
-    (k : ℕ)
-    (hgood : strategy.IsGood eps delta gamma)
-    (hinduction : AnswerMainInductionHypothesis.{uF, uι} params)
-    (hk_next : 400 * params.next.m * params.next.d ≤ k)
-    (hsmall : mainInductionError params.next k eps delta gamma < 1) :
-    ∃ profile : AnswerSuccessorRestrictedFailureProfile params strategy,
-      averageAnswerSuccessorRestrictedAxisParallelError params profile ≤
-          sliceConditioningLoss params * eps ∧
-        averageAnswerSuccessorRestrictedSelfConsistencyError params profile ≤ delta ∧
-        averageAnswerSuccessorRestrictedDiagonalError params profile ≤
-          sliceConditioningLoss params * gamma ∧
-        ∀ x,
-          AnswerMainInductionConclusion params
-            (xRestrictedAnswerSymStratOfAnswer params strategy x)
-            (profile.axisParallel x)
-            (profile.selfConsistency x)
-            (profile.diagonal x)
-            k := by
-  classical
-  let hrestricted :=
-    answerSuccessorRestrictedProbabilities params strategy eps delta gamma hgood
-  rcases hrestricted.profileExists with
-    ⟨profile, haxisAverage, hselfAverage, hdiagonalAverage⟩
-  have hk_pos : 1 ≤ k :=
-    one_le_k_of_mainInductionError_lt_one params.next k eps delta gamma hsmall
-  have hk_pred : 400 * params.m * params.d ≤ k :=
-    mainInductionSuccessorBound_pred params hk_next
-  refine ⟨profile, haxisAverage, hselfAverage, hdiagonalAverage, ?_⟩
-  intro x
-  exact
-    hinduction ι (xRestrictedAnswerSymStratOfAnswer params strategy x)
-      (profile.axisParallel x)
-      (profile.selfConsistency x)
-      (profile.diagonal x)
-      k (profile.restrictedGood x) hk_pos hk_pred
 
 end MIPStarRE.LDT.MainInductionStep

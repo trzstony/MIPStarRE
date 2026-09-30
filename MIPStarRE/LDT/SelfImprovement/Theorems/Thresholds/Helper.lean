@@ -58,42 +58,6 @@ theorem d_q_ratio_le_one_of_d_le_q
     ((params.d : Error) / (params.q : Error)) ≤ 1 :=
   (div_le_one params.q_cast_pos).mpr hd_le_q
 
-/-- For `m ≥ 1`, `√(100m) ≤ 10m`. -/
-theorem sqrt_100m_le_10m (params : Parameters) :
-    Real.sqrt (100 * (params.m : Error)) ≤ 10 * (params.m : Error) := by
-  have hmpos : (0 : Error) ≤ (params.m : Error) := m_cast_nonneg params
-  have hm1 : (1 : Error) ≤ (params.m : Error) := one_le_m_cast params
-  have h10m_nn : (0 : Error) ≤ 10 * (params.m : Error) := by positivity
-  refine (Real.sqrt_le_left h10m_nn).mpr ?_
-  nlinarith [hmpos, hm1]
-
-/-- For `m ≥ 1`, `√(10m) ≤ 4m`. -/
-theorem sqrt_10m_le_4m (params : Parameters) :
-    Real.sqrt (10 * (params.m : Error)) ≤ 4 * (params.m : Error) := by
-  have hmpos : (0 : Error) ≤ (params.m : Error) := m_cast_nonneg params
-  have hm1 : (1 : Error) ≤ (params.m : Error) := one_le_m_cast params
-  have h4m_nn : (0 : Error) ≤ 4 * (params.m : Error) := by positivity
-  refine (Real.sqrt_le_left h4m_nn).mpr ?_
-  nlinarith [hmpos, hm1]
-
-/-- For `m ≥ 1`, `√(400m) ≤ 20m`. -/
-theorem sqrt_400m_le_20m (params : Parameters) :
-    Real.sqrt (400 * (params.m : Error)) ≤ 20 * (params.m : Error) := by
-  have hmpos : (0 : Error) ≤ (params.m : Error) := m_cast_nonneg params
-  have hm1 : (1 : Error) ≤ (params.m : Error) := one_le_m_cast params
-  have h20m_nn : (0 : Error) ≤ 20 * (params.m : Error) := by positivity
-  refine (Real.sqrt_le_left h20m_nn).mpr ?_
-  nlinarith [hmpos, hm1]
-
-/-- For `m ≥ 1`, `√(960m) ≤ 31m`. -/
-theorem sqrt_960m_le_31m (params : Parameters) :
-    Real.sqrt (960 * (params.m : Error)) ≤ 31 * (params.m : Error) := by
-  have hmpos : (0 : Error) ≤ (params.m : Error) := m_cast_nonneg params
-  have hm1 : (1 : Error) ≤ (params.m : Error) := one_le_m_cast params
-  have h31m_nn : (0 : Error) ≤ 31 * (params.m : Error) := by positivity
-  refine (Real.sqrt_le_left h31m_nn).mpr ?_
-  nlinarith [hmpos, hm1]
-
 /-! ## Subroutine: square-root bound on `globalVarianceOfPointsError`
 
 The paper's central arithmetic step (`self_improvement.tex`, line 441) is
@@ -509,6 +473,5 @@ theorem helper_completeness_error_le_selfImprovementHelperError
     _ ≤ selfImprovementHelperError params eps delta :=
           helper_boundedness_error_le_selfImprovementHelperError params eps delta
             heps hdelta
-
 
 end MIPStarRE.LDT.SelfImprovement

@@ -150,85 +150,6 @@ noncomputable def helperOffDiagonalBareQuantity
             ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h')
             (T.outcome h)))
 
-/-- The bare off-diagonal polynomial-pair mass is a contraction.
-
-For each point `u`, the off-diagonal sum is bounded by the full double sum
-`Σ_h Σ_{h'} H^u_{h'} ⊗ T_h`, which is
-`(H^u.total) ⊗ T.total`.  Both factors are submeasurement totals, so the
-expectation is at most `1` in the normalized strategy state. -/
-theorem helperOffDiagonalBareQuantity_le_one
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (T : SubMeas (Polynomial params) ι) :
-    helperOffDiagonalBareQuantity params strategy T ≤ 1 := by
-  classical
-  have hpointwise : ∀ u : Point params,
-      (∑ h : Polynomial params,
-        ∑ h' ∈ (Finset.univ : Finset (Polynomial params)).erase h,
-          ev strategy.state
-            (opTensor
-              ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h')
-              (T.outcome h))) ≤ 1 := by
-    intro u
-    let H := sandwichedPolynomialSubMeasAt params strategy T u
-    have hnonneg : ∀ h h' : Polynomial params,
-        0 ≤ ev strategy.state (opTensor (H.outcome h') (T.outcome h)) := by
-      intro h h'
-      exact ev_nonneg_of_psd strategy.state _ <|
-        opTensor_nonneg (H.outcome_pos h') (T.outcome_pos h)
-    have hoffdiag_le_full :
-        (∑ h : Polynomial params,
-          ∑ h' ∈ (Finset.univ : Finset (Polynomial params)).erase h,
-            ev strategy.state (opTensor (H.outcome h') (T.outcome h))) ≤
-          ∑ h : Polynomial params,
-            ∑ h' : Polynomial params,
-              ev strategy.state (opTensor (H.outcome h') (T.outcome h)) := by
-      refine Finset.sum_le_sum ?_
-      intro h _
-      exact Finset.sum_le_sum_of_subset_of_nonneg
-        (Finset.erase_subset h Finset.univ)
-        (fun h' _ _ => hnonneg h h')
-    have hfull_op :
-        (∑ h : Polynomial params,
-          ∑ h' : Polynomial params, opTensor (H.outcome h') (T.outcome h)) =
-          opTensor H.total T.total := by
-      calc
-        (∑ h : Polynomial params,
-          ∑ h' : Polynomial params, opTensor (H.outcome h') (T.outcome h)) =
-            ∑ h : Polynomial params, opTensor H.total (T.outcome h) := by
-              refine Finset.sum_congr rfl ?_
-              intro h _
-              rw [← H.sum_eq_total, opTensor_sum_left_univ]
-        _ = opTensor H.total T.total := by
-              rw [← T.sum_eq_total, opTensor_sum_right_univ]
-    have hfull_le_one :
-        (∑ h : Polynomial params,
-            ∑ h' : Polynomial params,
-              ev strategy.state (opTensor (H.outcome h') (T.outcome h))) ≤ 1 := by
-      calc
-        (∑ h : Polynomial params,
-            ∑ h' : Polynomial params,
-              ev strategy.state (opTensor (H.outcome h') (T.outcome h))) =
-            ev strategy.state
-              (∑ h : Polynomial params,
-                ∑ h' : Polynomial params, opTensor (H.outcome h') (T.outcome h)) := by
-              rw [ev_sum]
-              refine Finset.sum_congr rfl ?_
-              intro h _
-              rw [ev_sum]
-        _ = ev strategy.state (opTensor H.total T.total) := by
-              rw [hfull_op]
-        _ ≤ ev strategy.state (1 : MIPStarRE.Quantum.Op (ι × ι)) := by
-              exact ev_mono strategy.state _ _ <|
-                le_trans
-                  (opTensor_le_leftTensor (SubMeas.total_nonneg H) T.total_le_one)
-                  (leftTensor_le_one (ι₂ := ι) H.total_le_one)
-        _ = 1 := ev_one_of_isNormalized strategy.state strategy.isNormalized
-    exact hoffdiag_le_full.trans hfull_le_one
-  simpa [helperOffDiagonalBareQuantity] using
-    avgOver_uniform_le_const
-      _ (1 : Error) hpointwise
-
 /-! ### Off-diagonal variance swaps -/
 
 /-- The selected support for the two off-diagonal variance swaps in the helper
@@ -494,6 +415,5 @@ theorem helperOffDiagonalOneSidedSwappedIndicator_abs_sub_swappedIndicator_le_sq
   simpa [helperOffDiagonalSelectedCSChainQ3_eq_oneSidedSwappedIndicator,
     helperOffDiagonalSelectedCSChainQ2_eq_swappedIndicator,
     abs_sub_comm, selfImprovementVarianceError] using hsteps.1
-
 
 end MIPStarRE.LDT.SelfImprovement

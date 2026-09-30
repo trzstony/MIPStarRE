@@ -1,5 +1,4 @@
-import MIPStarRE.LDT.MainInductionStep.Simplified.SliceDilation
-import MIPStarRE.LDT.MainInductionStep.Theorems.RestrictedProbabilities.AnswerValued
+import MIPStarRE.LDT.MainInductionStep.Simplified.Statements
 
 /-!
 # Common-ancilla dilation of answer-valued successor slices

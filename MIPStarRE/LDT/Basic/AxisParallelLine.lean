@@ -55,26 +55,6 @@ def rebaseAt {params : Parameters} [FieldModel params.q]
   base := ℓ.pointAt t
   direction := ℓ.direction
 
-@[simp] theorem rebaseAt_pointAt_zero {params : Parameters} [FieldModel params.q]
-    (ℓ : AxisParallelLine params) (t : Fq params) :
-    (rebaseAt ℓ t).pointAt zeroCoord = ℓ.pointAt t := by
-  ext i
-  simp [rebaseAt, pointAt, addCoord, zeroCoord]
-
-@[simp] theorem rebaseAt_zero {params : Parameters} [FieldModel params.q]
-    (ℓ : AxisParallelLine params) :
-    rebaseAt ℓ zeroCoord = ℓ := by
-  cases ℓ with
-  | mk base direction =>
-      change
-        ({ base :=
-             ({ base := base, direction := direction } : AxisParallelLine params).pointAt zeroCoord,
-           direction := direction } : AxisParallelLine params) =
-        ({ base := base, direction := direction } : AxisParallelLine params)
-      congr
-      funext i
-      simp [pointAt, addCoord, zeroCoord]
-
 @[simp] theorem rebaseAt_direction {params : Parameters} [FieldModel params.q]
     (ℓ : AxisParallelLine params) (t : Fq params) :
     (rebaseAt ℓ t).direction = ℓ.direction :=

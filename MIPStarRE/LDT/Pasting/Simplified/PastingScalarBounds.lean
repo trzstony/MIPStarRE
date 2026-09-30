@@ -1,5 +1,4 @@
 import MIPStarRE.LDT.Pasting.Simplified.PastingFinal
-import MIPStarRE.LDT.Pasting.Simplified.ConsistencyAggregation
 import MIPStarRE.LDT.Pasting.Bernoulli.ScalarBounds
 
 /-!
@@ -414,40 +413,6 @@ noncomputable def simplifiedPastingPaperError
     21 * (k : Error) ^ (2 : ℕ) * Real.sqrt (params.m : Error) *
       pastingEighthSum params eps delta gamma zeta
 
-/-- Quantitative simplified pasting in the unit error regime. The
-measurement is constructed by the first-success word and then completed
-at a fixed polynomial. -/
-theorem distinctSuccessPastedMeasurement_pointConsistency_paperBound_small
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι)
-    (eps delta gamma kappa zeta : Error)
-    (hgood : strategy.IsGood eps delta gamma)
-    (heps0 : 0 ≤ eps) (heps1 : eps ≤ 1)
-    (hdelta0 : 0 ≤ delta) (hdelta1 : delta ≤ 1)
-    (hgamma0 : 0 ≤ gamma) (hgamma1 : gamma ≤ 1)
-    (hzeta0 : 0 ≤ zeta) (hzeta1 : zeta ≤ 1)
-    (hd : 0 < params.d) (hdq : params.d ≤ params.q)
-    (hcomplete : family.Complete strategy.state kappa)
-    (hcons : family.ConsistentWithPoints strategy zeta)
-    (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
-    (k : ℕ) (hdk : params.d < k) :
-    ConsRel strategy.state (uniformDistribution (Point params.next))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-      (polynomialEvaluationFamily params.next
-        (distinctSuccessPastedMeasurement params family k).toSubMeas)
-      (simplifiedPastingPaperError params k eps delta gamma kappa zeta) := by
-  have hraw := distinctSuccessPastedMeasurement_pointConsistency_ofPaperHypotheses
-    params strategy family eps delta gamma kappa zeta
-    hgood hgamma0 hgamma1 hzeta0 hzeta1 hdq
-    hcomplete hcons hself hbound k hdk
-  have hscalar := distinctSuccessPastingError_le_paperBound
-    params k eps delta gamma kappa zeta
-    hd hdk hdq heps0 heps1 hdelta0 hdelta1 hgamma0 hzeta0 hzeta1
-  exact ConsRel.mono (by simpa [simplifiedPastingPaperError] using hscalar) hraw
-
 /-- The error parameter of pasting in the simplified induction step. -/
 noncomputable def simplifiedInductionPaperError
     (params : Parameters) (eps delta gamma kappa zeta : Error) : Error :=
@@ -485,44 +450,6 @@ theorem simplifiedPastingPaperError_induction_eq
     field_simp
   rw [hratio]
   ring
-
-/-- Positive-degree simplified pasting with no externally supplied
-attempt count and the induction section's stated error formula. -/
-theorem distinctSuccessPastedMeasurement_induction_paperBound_small
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι)
-    (eps delta gamma kappa zeta : Error)
-    (hgood : strategy.IsGood eps delta gamma)
-    (heps0 : 0 ≤ eps) (heps1 : eps ≤ 1)
-    (hdelta0 : 0 ≤ delta) (hdelta1 : delta ≤ 1)
-    (hgamma0 : 0 ≤ gamma) (hgamma1 : gamma ≤ 1)
-    (hzeta0 : 0 ≤ zeta) (hzeta1 : zeta ≤ 1)
-    (hd : 0 < params.d) (hdq : params.d ≤ params.q)
-    (hcomplete : family.Complete strategy.state kappa)
-    (hcons : family.ConsistentWithPoints strategy zeta)
-    (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
-    ConsRel strategy.state (uniformDistribution (Point params.next))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-      (polynomialEvaluationFamily params.next
-        (distinctSuccessPastedMeasurement params family
-          (simplifiedInductionAttemptCount params)).toSubMeas)
-      (simplifiedInductionPaperError params eps delta gamma kappa zeta) := by
-  have hdk : params.d < simplifiedInductionAttemptCount params := by
-    unfold simplifiedInductionAttemptCount
-    have hm := params.hm
-    have hm2 : 2 ≤ params.m + 1 := by omega
-    have htwo : params.d < 2 * params.d := by omega
-    exact htwo.trans_le (Nat.mul_le_mul_right params.d hm2)
-  have h := distinctSuccessPastedMeasurement_pointConsistency_paperBound_small
-    params strategy family eps delta gamma kappa zeta
-    hgood heps0 heps1 hdelta0 hdelta1 hgamma0 hgamma1 hzeta0 hzeta1
-    hd hdq hcomplete hcons hself hbound
-    (simplifiedInductionAttemptCount params) hdk
-  simpa [simplifiedPastingPaperError_induction_eq params eps delta gamma kappa zeta hd]
-    using h
 
 /-- A saturated eighth-power summand makes the paper's pasting error
 at least one. -/
@@ -588,112 +515,5 @@ theorem one_le_pastingEighthSum_of_component
     (1 / (8 : Error)) at h₅
   unfold pastingEighthSum
   rcases hcomponent with h | h | h | h | h <;> linarith
-
-/-- Positive-degree simplified pasting, with the large error cases
-closed by a fixed polynomial measurement. -/
-theorem exists_simplifiedPastedMeasurement_positiveDegree
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι)
-    (eps delta gamma kappa zeta : Error)
-    (hgood : strategy.IsGood eps delta gamma)
-    (hcomplete : family.Complete strategy.state kappa)
-    (hcons : family.ConsistentWithPoints strategy zeta)
-    (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
-    (hd : 0 < params.d) (k : ℕ) (hdk : params.d < k) :
-    ∃ H : Measurement (Polynomial params.next) ι,
-      ConsRel strategy.state (uniformDistribution (Point params.next))
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-        (polynomialEvaluationFamily params.next H.toSubMeas)
-        (simplifiedPastingPaperError params k eps delta gamma kappa zeta) := by
-  have heps0 := eps_nonneg_of_isGood params.next strategy hgood
-  have hdelta0 := delta_nonneg_of_isGood params.next strategy hgood
-  have hgamma0 := gamma_nonneg_of_isGood params.next strategy hgood
-  have hzeta0 := IdxPolyFamily.zeta_nonneg_of_consistentWithPoints
-    strategy family hcons
-  have hkappa0 := kappa_nonneg_of_complete params strategy family hcomplete
-  by_cases hregime : eps ≤ 1 ∧ delta ≤ 1 ∧ gamma ≤ 1 ∧
-      zeta ≤ 1 ∧ params.d ≤ params.q
-  · rcases hregime with ⟨heps1, hdelta1, hgamma1, hzeta1, hdq⟩
-    let H := distinctSuccessPastedMeasurement params family k
-    refine ⟨H, ?_⟩
-    exact distinctSuccessPastedMeasurement_pointConsistency_paperBound_small
-      params strategy family eps delta gamma kappa zeta
-      hgood heps0 heps1 hdelta0 hdelta1 hgamma0 hgamma1 hzeta0 hzeta1
-      hd hdq hcomplete hcons hself hbound k hdk
-  · have hbad : 1 < eps ∨ 1 < delta ∨ 1 < gamma ∨
-        1 < zeta ∨ params.q < params.d := by
-      by_contra h
-      push Not at h
-      exact hregime ⟨h.1, h.2.1, h.2.2.1, h.2.2.2.1, h.2.2.2.2⟩
-    have hcomponent :
-        1 ≤ Real.rpow eps (1 / (8 : Error)) ∨
-        1 ≤ Real.rpow delta (1 / (8 : Error)) ∨
-        1 ≤ Real.rpow gamma (1 / (8 : Error)) ∨
-        1 ≤ Real.rpow zeta (1 / (8 : Error)) ∨
-        1 ≤ Real.rpow ((params.d : Error) / (params.q : Error))
-          (1 / (8 : Error)) := by
-      rcases hbad with h | h | h | h | h
-      · exact Or.inl (le_of_lt (Real.one_lt_rpow h (by norm_num)))
-      · exact Or.inr (Or.inl (le_of_lt (Real.one_lt_rpow h (by norm_num))))
-      · exact Or.inr (Or.inr (Or.inl
-          (le_of_lt (Real.one_lt_rpow h (by norm_num)))))
-      · exact Or.inr (Or.inr (Or.inr (Or.inl
-          (le_of_lt (Real.one_lt_rpow h (by norm_num))))))
-      · have hq : (0 : Error) < (params.q : Error) := by exact_mod_cast params.hq
-        have hratio : (1 : Error) <
-            (params.d : Error) / (params.q : Error) := by
-          apply (lt_div_iff₀ hq).2
-          have hcast : (params.q : Error) < (params.d : Error) := by
-            exact_mod_cast h
-          simpa using hcast
-        exact Or.inr (Or.inr (Or.inr (Or.inr
-          (le_of_lt (Real.one_lt_rpow hratio (by norm_num))))))
-    have hsum := one_le_pastingEighthSum_of_component
-      params eps delta gamma zeta heps0 hdelta0 hgamma0 hzeta0 hcomponent
-    have herror := one_le_simplifiedPastingPaperError_of_large_sum
-      params k eps delta gamma kappa zeta hdk hkappa0 hsum
-    let H : Measurement (Polynomial params.next) ι :=
-      Measurement.trivialDistinguishedOutcome (fallbackInterpolatedPolynomial params)
-    refine ⟨H, ?_⟩
-    exact ⟨le_trans
-      (bipartiteConsError_uniform_le_one strategy.state strategy.isNormalized
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-        (polynomialEvaluationFamily params.next H.toSubMeas)) herror⟩
-
-/-- Simplified Section 6 pasting with its internal attempt count and
-the displayed induction error parameter. -/
-theorem exists_simplifiedPastedMeasurement_induction
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι)
-    (eps delta gamma kappa zeta : Error)
-    (hgood : strategy.IsGood eps delta gamma)
-    (hcomplete : family.Complete strategy.state kappa)
-    (hcons : family.ConsistentWithPoints strategy zeta)
-    (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
-    (hd : 0 < params.d) :
-    ∃ H : Measurement (Polynomial params.next) ι,
-      ConsRel strategy.state (uniformDistribution (Point params.next))
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-        (polynomialEvaluationFamily params.next H.toSubMeas)
-        (simplifiedInductionPaperError params eps delta gamma kappa zeta) := by
-  have hdk : params.d < simplifiedInductionAttemptCount params := by
-    unfold simplifiedInductionAttemptCount
-    have hm := params.hm
-    have hm2 : 2 ≤ params.m + 1 := by omega
-    have htwo : params.d < 2 * params.d := by omega
-    exact htwo.trans_le (Nat.mul_le_mul_right params.d hm2)
-  obtain ⟨H, hH⟩ := exists_simplifiedPastedMeasurement_positiveDegree
-    params strategy family eps delta gamma kappa zeta
-    hgood hcomplete hcons hself hbound hd
-    (simplifiedInductionAttemptCount params) hdk
-  exact ⟨H, by
-    simpa [simplifiedPastingPaperError_induction_eq
-      params eps delta gamma kappa zeta hd] using hH⟩
 
 end MIPStarRE.LDT.Pasting

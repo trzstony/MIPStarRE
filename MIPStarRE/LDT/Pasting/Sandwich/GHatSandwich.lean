@@ -17,73 +17,6 @@ universe u v
 
 variable {ι : Type u} [Fintype ι] [DecidableEq ι]
 
-/-- Each binomial term in the Bernoulli tail operator is positive semidefinite. -/
-lemma binomialOperatorTerm_nonneg {G : MIPStarRE.Quantum.Op ι} (n r : ℕ)
-    (hG : 0 ≤ G) (hGle : G ≤ 1) :
-    0 ≤ (Nat.choose n r : ℂ) • (G ^ r * (1 - G) ^ (n - r)) := by
-  have hcomm : Commute G (1 - G) :=
-    (Commute.one_right G).sub_right (Commute.refl G)
-  refine smul_nonneg ?_ ?_
-  · positivity
-  · have hGr : 0 ≤ G ^ r := by
-      exact (Matrix.PosSemidef.pow (Matrix.nonneg_iff_posSemidef.mp hG) r).nonneg
-    have hIG : 0 ≤ (1 - G) ^ (n - r) := by
-      exact
-        (Matrix.PosSemidef.pow
-          (Matrix.nonneg_iff_posSemidef.mp (sub_nonneg.mpr hGle)) (n - r)).nonneg
-    have hcommPow : Commute (G ^ r) ((1 - G) ^ (n - r)) :=
-      (hcomm.pow_left r).pow_right (n - r)
-    exact Commute.mul_nonneg hGr hIG hcommPow
-
-/-- Positivity of the Bernoulli tail operator for a PSD contraction. -/
-theorem bernoulliTailOperator_nonneg
-    (k degree : ℕ) (G : MIPStarRE.Quantum.Op ι)
-    (hG : 0 ≤ G) (hGle : G ≤ 1) :
-    0 ≤ bernoulliTailOperator k degree G := by
-  unfold bernoulliTailOperator
-  refine Finset.sum_nonneg fun r _ => ?_
-  simpa using binomialOperatorTerm_nonneg (G := G) k r hG hGle
-
-/-- The Bernoulli tail operator is bounded by the identity for a PSD contraction. -/
-theorem bernoulliTailOperator_le_one
-    (k degree : ℕ) (G : MIPStarRE.Quantum.Op ι)
-    (hG : 0 ≤ G) (hGle : G ≤ 1) :
-    bernoulliTailOperator k degree G ≤ 1 := by
-  let term : ℕ → MIPStarRE.Quantum.Op ι := fun r =>
-    (Nat.choose k r : ℂ) • (G ^ r * (1 - G) ^ (k - r))
-  have hsubset : Finset.Icc (degree + 1) k ⊆ Finset.range (k + 1) := by
-    intro r hr
-    simp only [Finset.mem_Icc, Finset.mem_range] at hr ⊢
-    exact Nat.lt_succ_of_le hr.2
-  have htail_le_full :
-      ∑ r ∈ Finset.Icc (degree + 1) k, term r ≤ ∑ r ∈ Finset.range (k + 1), term r := by
-    refine Finset.sum_le_sum_of_subset_of_nonneg hsubset ?_
-    intro r hrange hrnot
-    simpa [term] using binomialOperatorTerm_nonneg (G := G) k r hG hGle
-  have hcomm : Commute G (1 - G) :=
-    (Commute.one_right G).sub_right (Commute.refl G)
-  have hfull :
-      ∑ r ∈ Finset.range (k + 1), term r = 1 := by
-    calc
-      ∑ r ∈ Finset.range (k + 1), term r
-          = ∑ r ∈ Finset.range (k + 1), G ^ r * (1 - G) ^ (k - r) * Nat.choose k r := by
-              refine Finset.sum_congr rfl ?_
-              intro r hr
-              let A := G ^ r * (1 - G) ^ (k - r)
-              have hcast_comm : Commute (Nat.choose k r : MIPStarRE.Quantum.Op ι) A :=
-                Nat.cast_commute (Nat.choose k r) A
-              simpa [term, A, Algebra.smul_def] using hcast_comm.eq
-      _ = (G + (1 - G)) ^ k := by
-            symm
-            exact Commute.add_pow hcomm k
-      _ = 1 := by simp
-  calc
-    bernoulliTailOperator k degree G
-        = ∑ r ∈ Finset.Icc (degree + 1) k, term r := by
-            simp [bernoulliTailOperator, term]
-    _ ≤ ∑ r ∈ Finset.range (k + 1), term r := htail_le_full
-    _ = 1 := hfull
-
 /-- Concrete family for the full sandwich
 `\widehat G^{x_1}_{g_1} \cdots \widehat G^{x_k}_{g_k} \cdots \widehat G^{x_1}_{g_1}`. -/
 noncomputable def gHatSandwichFamily (params : Parameters) [FieldModel.{v} params.q]
@@ -237,18 +170,6 @@ noncomputable def restrictSubMeas {α : Type*} [Fintype α]
       _ = A.total := A.sum_eq_total
       _ ≤ 1 := A.total_le_one
 
-/-- Restricting a submeasurement can only decrease its total operator. -/
-lemma restrictSubMeas_total_le_total {α : Type*} [Fintype α]
-    (A : SubMeas α ι) (p : α → Prop) [DecidablePred p] :
-    (restrictSubMeas A p).total ≤ A.total := by
-  calc
-    (restrictSubMeas A p).total = ∑ a ∈ Finset.univ.filter p, A.outcome a := rfl
-    _ ≤ ∑ a : α, A.outcome a := by
-      exact Finset.sum_le_univ_sum_of_nonneg
-        (s := Finset.univ.filter p)
-        (w := fun a => A.outcome_pos a)
-    _ = A.total := A.sum_eq_total
-
 /-- Restrict the sandwiched completed-slice family to tuples with support of size at
 least `d + 1`, matching the `|τ| ≥ d+1` filter in the paper before interpolation. -/
 noncomputable def interpolationEligibleSandwichFamily (params : Parameters) [FieldModel params.q]
@@ -258,25 +179,5 @@ noncomputable def interpolationEligibleSandwichFamily (params : Parameters) [Fie
     restrictSubMeas
       (gHatSandwichFamily params family k xs)
       (InterpolationEligible params)
-
-/-- Concrete family for the half-sandwich product of `k` completed slices. -/
-noncomputable def gHatHalfSandwichLeft (params : Parameters) [FieldModel params.q]
-    (family : IdxPolyFamily params ι) (k : ℕ) :
-    IdxOpFamily (PointTuple params k) (GHatTupleOutcome params k) (ι × ι) :=
-  fun xs =>
-    OpFamily.leftPlacedOpFamily (ιB := ι) <|
-      { outcome := fun gs => gHatHalfProductOutcomeOperator params family k xs gs
-        total := gHatHalfProductTotalOperator params family k xs
-      }
-
-/-- Concrete family for the cyclically permuted half-sandwich product. -/
-noncomputable def gHatHalfSandwichRight (params : Parameters) [FieldModel params.q]
-    (family : IdxPolyFamily params ι) (k : ℕ) :
-    IdxOpFamily (PointTuple params k) (GHatTupleOutcome params k) (ι × ι) :=
-  fun xs =>
-    OpFamily.leftPlacedOpFamily (ιB := ι) <|
-      { outcome := fun gs => gHatRotatedHalfProductOutcomeOperator params family k xs gs
-        total := gHatRotatedHalfProductTotalOperator params family k xs
-      }
 
 end MIPStarRE.LDT.Pasting

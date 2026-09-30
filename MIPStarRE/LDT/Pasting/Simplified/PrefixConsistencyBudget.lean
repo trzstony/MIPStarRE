@@ -107,66 +107,6 @@ theorem prefix_movedOutcomeSum_le_endpoint
   exact (ldSandwichLineOnePointPrefixMoved_consRel_endpoint_of_axis_self
     params strategy eps delta zeta haxis hself_good family hcons hi).offDiagonalBound
 
-/-- The selected-position mismatch has the sharp simplified proof budget. -/
-theorem prefix_sourceOutcomeSum_le_sharp
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι)
-    (eps delta gamma zeta : Error)
-    (haxis : strategy.axisParallelFailureProbability ≤ eps)
-    (hself_good : strategy.selfConsistencyFailureProbability ≤ delta)
-    (hcons : family.ConsistentWithPoints strategy zeta)
-    (hcom : ComMainConclusion params strategy family gamma zeta)
-    (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hsc : SDDRel strategy.state (uniformDistribution (Fq params))
-      (gHatSelfConsistencyLeftFamily params family)
-      (gHatSelfConsistencyRightFamily params family)
-      (2 * zeta))
-    {k i : ℕ} (hi : i < k) :
-    ldSandwichLineOnePoint_prefix_sourceOutcomeSum params strategy family hi ≤
-      2 * (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta)) +
-      2 * ((2 * (i : Error)) *
-        (Real.sqrt (comMainError params gamma zeta) +
-          2 * Real.sqrt zeta) ^ 2) := by
-  have htri := prefix_sourceOutcomeSum_le_two_moved_add_comm
-    params strategy family hi
-  have hmoved := prefix_movedOutcomeSum_le_endpoint
-    params strategy family eps delta zeta haxis hself_good hcons hi
-  have hcomm := (prefixQuadraticCommEnergy_le_randomWordAdjoint
-    params strategy family hi).trans
-    (randomWordAdjointCommutatorEnergy_le_sharp
-      params strategy family gamma zeta i hcom hself hsc)
-  linarith
-
-/-- One-point line consistency in the sharp positive-contraction budget. -/
-theorem ldSandwichLineOnePoint_simplified_sharp
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι)
-    (eps delta gamma zeta : Error)
-    (haxis : strategy.axisParallelFailureProbability ≤ eps)
-    (hself_good : strategy.selfConsistencyFailureProbability ≤ delta)
-    (hcons : family.ConsistentWithPoints strategy zeta)
-    (hcom : ComMainConclusion params strategy family gamma zeta)
-    (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hsc : SDDRel strategy.state (uniformDistribution (Fq params))
-      (gHatSelfConsistencyLeftFamily params family)
-      (gHatSelfConsistencyRightFamily params family)
-      (2 * zeta))
-    {k i : ℕ} (hi : i < k) :
-    ConsRel strategy.state
-      (uniformDistribution (SandwichedLineQuestion params k))
-      (ldSandwichLineOnePointLeftFamily params strategy family k i)
-      (ldSandwichLineOnePointRightFamily params strategy family k i)
-      (2 * (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta)) +
-        2 * ((2 * (i : Error)) *
-          (Real.sqrt (comMainError params gamma zeta) +
-            2 * Real.sqrt zeta) ^ 2)) := by
-  refine ⟨?_⟩
-  rw [← prefix_sourceOutcomeSum_eq_consError params strategy family hi]
-  exact prefix_sourceOutcomeSum_le_sharp params strategy family
-    eps delta gamma zeta haxis hself_good hcons hcom hself hsc hi
-
 /-- Coarse one-point line consistency at the numerical rate used by
 the simplified pasting lemma. -/
 theorem ldSandwichLineOnePoint_simplified_coarse

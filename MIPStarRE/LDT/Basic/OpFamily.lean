@@ -92,15 +92,4 @@ noncomputable def postprocess {α β : Type*} {ι : Type*}
 
 end OpFamily
 
-namespace IdxOpFamily
-
-/-- Lift an indexed raw operator family to the left tensor factor. -/
-def liftLeft {Question Outcome : Type*} {ι : Type*}
-    [Fintype ι] [DecidableEq ι]
-    (A : IdxOpFamily Question Outcome ι) :
-    IdxOpFamily Question Outcome (ι × ι) :=
-  fun q => OpFamily.leftPlacedOpFamily (ιB := ι) (A q)
-
-end IdxOpFamily
-
 end MIPStarRE.LDT

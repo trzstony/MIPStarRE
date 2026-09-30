@@ -57,25 +57,6 @@ theorem ev_opTensor_mul_conjTranspose_add_le_weighted
     ring
   rwa [hrewrite] at htri
 
-/-- A mismatch effect admits the same quadratic comparison. The error
-term is bounded by its unweighted commutator energy. -/
-theorem ev_opTensor_mul_conjTranspose_add_le
-    {ι₁ ι₂ : Type*}
-    [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
-    (ψ : QuantumState (ι₁ × ι₂))
-    (X Y : MIPStarRE.Quantum.Op ι₁)
-    (C : MIPStarRE.Quantum.Op ι₂)
-    (hCpos : 0 ≤ C) (hCle : C ≤ 1) :
-    ev ψ (opTensor ((X + Y) * (X + Y)ᴴ) C) ≤
-      2 * ev ψ (opTensor (X * Xᴴ) C) +
-        2 * ev ψ (leftTensor (ι₂ := ι₂) (Y * Yᴴ)) := by
-  have hYpos : 0 ≤ Y * Yᴴ :=
-    (Matrix.posSemidef_self_mul_conjTranspose Y).nonneg
-  have hY := ev_mono ψ _ _ (opTensor_le_leftTensor hYpos hCle)
-  have htri := ev_opTensor_mul_conjTranspose_add_le_weighted
-    ψ X Y C hCpos
-  linarith
-
 /-- Weighted direct-sum quadratic comparison. -/
 theorem averaged_effect_triangle_le_weighted
     {Question Outcome ι₁ ι₂ : Type*}
@@ -115,49 +96,6 @@ theorem averaged_effect_triangle_le_weighted
           ev ψ (opTensor (X q a * (X q a)ᴴ) (C q a))) +
         2 * avgOver D (fun q => ∑ a : Outcome,
           ev ψ (opTensor (Y q a * (Y q a)ᴴ) (C q a))) := by
-      rw [avgOver_add, avgOver_const_mul, avgOver_const_mul]
-
-/-- The quadratic effect comparison survives sums over outcomes and
-averages over questions. This is the analytic step behind the per-position
-bound in the simplified interpolation argument. -/
-theorem averaged_effect_triangle_le
-    {Question Outcome ι₁ ι₂ : Type*}
-    [Fintype Outcome]
-    [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
-    (ψ : QuantumState (ι₁ × ι₂)) (D : Distribution Question)
-    (X Y : Question → Outcome → MIPStarRE.Quantum.Op ι₁)
-    (C : Question → Outcome → MIPStarRE.Quantum.Op ι₂)
-    (hCpos : ∀ q a, 0 ≤ C q a) (hCle : ∀ q a, C q a ≤ 1) :
-    avgOver D (fun q => ∑ a : Outcome,
-      ev ψ (opTensor ((X q a + Y q a) * (X q a + Y q a)ᴴ) (C q a))) ≤
-      2 * avgOver D (fun q => ∑ a : Outcome,
-        ev ψ (opTensor (X q a * (X q a)ᴴ) (C q a))) +
-      2 * avgOver D (fun q => ∑ a : Outcome,
-        ev ψ (leftTensor (ι₂ := ι₂) (Y q a * (Y q a)ᴴ))) := by
-  have hpoint (q : Question) :
-      (∑ a : Outcome,
-        ev ψ (opTensor ((X q a + Y q a) * (X q a + Y q a)ᴴ) (C q a))) ≤
-      2 * (∑ a : Outcome,
-        ev ψ (opTensor (X q a * (X q a)ᴴ) (C q a))) +
-      2 * (∑ a : Outcome,
-        ev ψ (leftTensor (ι₂ := ι₂) (Y q a * (Y q a)ᴴ))) := by
-    have hsum := Finset.sum_le_sum (s := Finset.univ) (fun a _ =>
-      ev_opTensor_mul_conjTranspose_add_le ψ (X q a) (Y q a) (C q a)
-        (hCpos q a) (hCle q a))
-    simpa only [Finset.sum_add_distrib, ← Finset.mul_sum] using hsum
-  calc
-    avgOver D (fun q => ∑ a : Outcome,
-        ev ψ (opTensor ((X q a + Y q a) * (X q a + Y q a)ᴴ) (C q a))) ≤
-      avgOver D (fun q =>
-        2 * (∑ a : Outcome,
-          ev ψ (opTensor (X q a * (X q a)ᴴ) (C q a))) +
-        2 * (∑ a : Outcome,
-          ev ψ (leftTensor (ι₂ := ι₂) (Y q a * (Y q a)ᴴ)))) :=
-        avgOver_mono D _ _ hpoint
-    _ = 2 * avgOver D (fun q => ∑ a : Outcome,
-          ev ψ (opTensor (X q a * (X q a)ᴴ) (C q a))) +
-        2 * avgOver D (fun q => ∑ a : Outcome,
-          ev ψ (leftTensor (ι₂ := ι₂) (Y q a * (Y q a)ᴴ))) := by
       rw [avgOver_add, avgOver_const_mul, avgOver_const_mul]
 
 end MIPStarRE.LDT.Pasting

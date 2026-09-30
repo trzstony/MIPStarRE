@@ -57,15 +57,6 @@ theorem ev_zero {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) : ev ψ (0 : MIPStarRE.Quantum.Op ι) = 0 := by
   simp [ev]
 
-/-- Expectation of a tensor product can be written using left/right placements. -/
-theorem ev_opTensor
-    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
-    (ψ : QuantumState (ι₁ × ι₂))
-    (A : MIPStarRE.Quantum.Op ι₁) (B : MIPStarRE.Quantum.Op ι₂) :
-    ev ψ (opTensor A B) =
-      ev ψ (leftTensor (ι₂ := ι₂) A * rightTensor (ι₁ := ι₁) B) := by
-  rw [leftTensor_mul_rightTensor_eq_opTensor]
-
 /-- A normalized state has unit expectation on the identity operator. -/
 @[simp] theorem ev_one_of_isNormalized {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (hψ : ψ.IsNormalized) :

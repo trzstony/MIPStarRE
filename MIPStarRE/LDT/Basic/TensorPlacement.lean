@@ -1,4 +1,3 @@
-import MIPStarRE.LDT.Basic.Distribution
 import MIPStarRE.LDT.Basic.SubMeasurementCore
 import MIPStarRE.LDT.Basic.OperatorExpectations
 
@@ -84,33 +83,6 @@ theorem rightTensor_finset_sum {α : Type*}
   simpa [rightTensor, opTensor] using
     (opTensor_sum_right_finset (A := (1 : MIPStarRE.Quantum.Op ι₁)) (s := s)
       (f := f)).symm
-
-/-- Right tensor placement commutes with operator averages. -/
-theorem rightTensor_averageOperatorOverDistribution {α : Type*}
-    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
-    (𝒟 : Distribution α) (A : α → MIPStarRE.Quantum.Op ι₂) :
-    rightTensor (ι₁ := ι₁) (averageOperatorOverDistribution 𝒟 A) =
-      averageOperatorOverDistribution 𝒟 (fun a => rightTensor (ι₁ := ι₁) (A a)) := by
-  unfold averageOperatorOverDistribution
-  rw [← rightTensor_finset_sum (ι₁ := ι₁) 𝒟.support
-    (fun a => 𝒟.weight a • A a)]
-  refine Finset.sum_congr rfl ?_
-  intro a _
-  simpa [rightTensor, opTensor] using
-    (opTensor_smul_right_error
-      (ι₁ := ι₁) (ι₂ := ι₂) (𝒟.weight a) (1 : MIPStarRE.Quantum.Op ι₁) (A a))
-
-/-- Evaluation of a right-placed operator average is the average of the
-right-placed evaluations. -/
-theorem ev_rightTensor_averageOperatorOverDistribution {α : Type*}
-    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
-    (ψ : QuantumState (ι₁ × ι₂)) (𝒟 : Distribution α)
-    (A : α → MIPStarRE.Quantum.Op ι₂) :
-    ev ψ (rightTensor (ι₁ := ι₁) (averageOperatorOverDistribution 𝒟 A)) =
-      avgOver 𝒟 (fun a => ev ψ (rightTensor (ι₁ := ι₁) (A a))) := by
-  rw [rightTensor_averageOperatorOverDistribution]
-  exact ev_averageOperatorOverDistribution ψ 𝒟
-    (fun a => rightTensor (ι₁ := ι₁) (A a))
 
 /-- Tensoring on the right commutes with operator averages in the left factor. -/
 theorem opTensor_averageOperatorOverDistribution_left {α ι₁ ι₂ : Type*}

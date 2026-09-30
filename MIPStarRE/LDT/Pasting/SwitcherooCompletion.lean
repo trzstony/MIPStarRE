@@ -260,28 +260,4 @@ lemma commutativitySwitcheroo_ofCompleteSelfConsistency
           simp [commutativitySwitcherooError, Real.sqrt_eq_rpow]
           ring
 
-/-- `lem:commutativity-switcheroo`, source-facing form. -/
-lemma commutativitySwitcheroo {Outcome : Type*} [Fintype Outcome]
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι)
-    (M : IdxProjSubMeas (Fq params) Outcome ι)
-    (zeta omega chi : Error)
-    (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hselfM : SDDRel strategy.state
-      (uniformDistribution (SliceQuestion params))
-      (switcherooSelfConsistencyLeft params M)
-      (switcherooSelfConsistencyRight params M)
-      omega)
-    (hcomm : SDDOpRel strategy.state
-      (uniformDistribution (SlicePairQuestion params))
-      (switcherooPointProductLeft params family M)
-      (switcherooPointProductRight params family M)
-      chi) :
-    CommutativitySwitcherooStatement params strategy.state family M zeta omega chi := by
-  have hselfG : GCompleteSelfConsistencyStatement params strategy.state family zeta :=
-    gCompleteSelfConsistency params strategy.state family zeta strategy.permInvState hself
-  exact commutativitySwitcheroo_ofCompleteSelfConsistency params strategy.state
-    strategy.isNormalized strategy.densityFixed family M zeta omega chi hselfG hselfM hcomm
-
 end MIPStarRE.LDT.Pasting

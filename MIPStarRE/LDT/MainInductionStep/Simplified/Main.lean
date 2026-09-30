@@ -1,5 +1,4 @@
 import MIPStarRE.LDT.MainInductionStep.Simplified.AnswerStrategyConversion
-import MIPStarRE.LDT.MainInductionStep.Simplified.PositiveSuccessor
 
 /-!
 # Main induction theorem of the simplified low-degree proof

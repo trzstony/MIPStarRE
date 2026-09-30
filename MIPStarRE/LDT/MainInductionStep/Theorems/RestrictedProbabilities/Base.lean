@@ -1,5 +1,5 @@
-import MIPStarRE.LDT.MainInductionStep.Statements
-import MIPStarRE.LDT.Test.StrategyFailures
+import MIPStarRE.LDT.MainInductionStep.Defs
+import MIPStarRE.LDT.Test.StrategyPolynomialFamilies
 import MIPStarRE.LDT.CommutativityPoints.Approximation
 import MIPStarRE.LDT.Tactic.AvgCongr
 

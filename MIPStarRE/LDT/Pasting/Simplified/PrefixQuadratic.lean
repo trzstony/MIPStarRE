@@ -1,5 +1,4 @@
 import MIPStarRE.LDT.Pasting.Simplified.EffectTriangle
-import MIPStarRE.LDT.Pasting.ComparisonLemmas.LdSandwichLineOnePoint.OutcomeLemmas
 import MIPStarRE.LDT.Pasting.ComparisonLemmas.LdSandwichLineOnePoint.CSSetup
 
 /-!

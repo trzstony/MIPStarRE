@@ -176,101 +176,6 @@ noncomputable def fourierBasisProjector (params : Parameters)
   Matrix.vecMulVec (fourierBasisState params α)
     (star (fourierBasisState params α))
 
-/-- Paper origin: `references/ldt-paper/expansion.tex:145-154`
-(`\label{lem:local-rewrite}`); trace witness for the local-variance rewrite. -/
-noncomputable def localVarianceTraceWitness (params : Parameters)
-    (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) :
-    MIPStarRE.Quantum.Op ι :=
-  let Acombine := combinedOperator params A
-  let liftedLaplacianState :
-      Matrix (combinedColumnIndex params ι) (combinedColumnIndex params ι) ℂ :=
-    Matrix.kronecker (laplacian params) ψ.density
-  Acombineᴴ * (liftedLaplacianState * Acombine)
-
-/-- A packaged decomposition for `lem:global-rewrite`.
-
-The Lean witness stores the pointwise average `A_avg = E_u A^u` together with the
-full residual family `u ↦ A^u - A_avg`. This carries the same geometric content as
-writing `A_combine = |φ₀⟩ ⊗ A₀ + |φ_⊥⟩ ⊗ A_⊥`, but it does not force
-the orthogonal part to be rank one on `Point params ⊗ ι`. -/
-structure GlobalVarianceDecomposition (params : Parameters)
-    (A : Point params → MIPStarRE.Quantum.Op ι) where
-  averageComponent : MIPStarRE.Quantum.Op ι
-  orthogonalComponent : Point params → MIPStarRE.Quantum.Op ι
-  averageComponent_eq :
-    averageComponent = ((hypercubeVertexCount params : ℂ)⁻¹) • ∑ u, A u
-  orthogonal_sum_zero :
-    ∑ u, orthogonalComponent u = 0
-  decomposition :
-    ∀ u, A u = averageComponent + orthogonalComponent u
-
-omit [Fintype ι] [DecidableEq ι] in
-/-- Recover the centered residual as `A^u - A_avg`. -/
-lemma GlobalVarianceDecomposition.orthogonalComponent_eq_sub_average
-    {params : Parameters} {A : Point params → MIPStarRE.Quantum.Op ι}
-    (decomp : GlobalVarianceDecomposition params A) (u : Point params) :
-    decomp.orthogonalComponent u = A u - decomp.averageComponent := by
-  rw [eq_sub_iff_add_eq]
-  simpa [add_comm, add_left_comm, add_assoc] using (decomp.decomposition u).symm
-
-omit [Fintype ι] [DecidableEq ι] in
-private lemma centered_sum_eq_zero (params : Parameters)
-    (A : Point params → MIPStarRE.Quantum.Op ι) :
-    ∑ u, (A u - ((hypercubeVertexCount params : ℂ)⁻¹) • ∑ v, A v) = 0 := by
-  classical
-  have hM_ne : (hypercubeVertexCount params : ℂ) ≠ 0 := by
-    exact_mod_cast (Nat.ne_of_gt (pow_pos params.hq params.m))
-  rw [Finset.sum_sub_distrib, Finset.sum_const, sub_eq_zero,
-    ← Nat.cast_smul_eq_nsmul ℂ]
-  simp only [Finset.card_univ, Fintype.card_pi, Fintype.card_fin,
-    Finset.prod_const, hypercubeVertexCount, Nat.cast_pow]
-  have hqm_ne : (params.q ^ params.m : ℂ) ≠ 0 := by
-    simpa [hypercubeVertexCount] using hM_ne
-  rw [smul_smul, mul_inv_cancel₀ hqm_ne, one_smul]
-
-/-- The canonical decomposition from `lem:global-rewrite`.
-
-Its `averageComponent` is the paper's `A_avg = E_u A^u = (1/M) · ∑_u A^u`, and its
-orthogonal component is the centered family `u ↦ A^u - A_avg`. Equivalently, the
-paper's coefficient `A_0 = M^{-1/2} · ∑_u A^u` is `M^{1/2} · A_avg`. -/
-noncomputable def canonicalGlobalVarianceDecomposition (params : Parameters)
-    (A : Point params → MIPStarRE.Quantum.Op ι) :
-    GlobalVarianceDecomposition params A where
-  averageComponent :=
-    ((hypercubeVertexCount params : ℂ)⁻¹) • ∑ u, A u
-  orthogonalComponent := fun u =>
-    A u - ((hypercubeVertexCount params : ℂ)⁻¹) • ∑ v, A v
-  averageComponent_eq := rfl
-  orthogonal_sum_zero := centered_sum_eq_zero params A
-  decomposition := fun _ => eq_add_of_sub_eq' rfl
-
-/-- Paper origin: `references/ldt-paper/expansion.tex:179-190`
-(`\label{lem:global-rewrite}`); trace witness for the global-variance rewrite.
-This uses the orthogonal residual family supplied by the decomposition. -/
-noncomputable def globalVarianceTraceWitness (params : Parameters)
-    (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι)
-    (decomp : GlobalVarianceDecomposition params A) : MIPStarRE.Quantum.Op ι :=
-  let orthogonalCombine := combinedOperator params decomp.orthogonalComponent
-  let liftedState :
-      Matrix (combinedColumnIndex params ι) (combinedColumnIndex params ι) ℂ :=
-    Matrix.kronecker (1 : MIPStarRE.Quantum.Op (Point params)) ψ.density
-  orthogonalCombineᴴ * (liftedState * orthogonalCombine)
-
-/-- The local-variance trace expression from `lem:local-rewrite`. -/
-noncomputable def localVarianceTraceForm (params : Parameters)
-    (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) : Error :=
-  Complex.re (MIPStarRE.Quantum.normalizedTrace (localVarianceTraceWitness params A ψ))
-
-/-- The global-variance trace expression from `lem:global-rewrite`.
-
-The prefactor `1 / hypercubeVertexCount params` is the paper's `1 / M`
-normalization from Section 7. -/
-noncomputable def globalVarianceTraceForm (params : Parameters)
-    (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι)
-    (decomp : GlobalVarianceDecomposition params A) : Error :=
-  (1 / (hypercubeVertexCount params : Error)) *
-    Complex.re (MIPStarRE.Quantum.normalizedTrace (globalVarianceTraceWitness params A ψ decomp))
-
 /-- The number of nonzero coordinates of a frequency `α ∈ F_q^m`. -/
 noncomputable def frequencyWeight (params : Parameters) (α : Point params) : ℕ :=
   (Finset.univ.filter (fun i : Fin params.m => α i ≠ ⟨0, params.hq⟩)).card
@@ -320,14 +225,6 @@ lemma fourierBasisState_total_update_sum (params : Parameters) (u α : Point par
     _ = ((((params.m - frequencyWeight params α : ℕ) : ℂ) * (params.q : ℂ)) *
           fourierBasisState params α u) := by
             rw [zeroCoordinateContributionSum]
-
-/-- The actual inner product of two Fourier basis states on `ℂ^{F_q^m}`.
-
-Since `fourierBasisState` already includes the `1 / √M` normalization, this is
-just the finite sum `∑_u conj(φ_α(u)) * φ_β(u)`. -/
-noncomputable def fourierBasisInnerProduct (params : Parameters)
-    (α β : Point params) : ℂ :=
-  ∑ u : Point params, star (fourierBasisState params α u) * fourierBasisState params β u
 
 /-- The additive character on `Point params` indexed by a frequency `α`. -/
 noncomputable def pointAddChar (params : Parameters) (α : Point params) :
@@ -521,11 +418,6 @@ lemma fourierBasisState_inner_product (params : Parameters) (α β : Point param
               simp [hab]
             simp [h0, hab]
 
-/-- `prop:eigenvectors`, item 1: orthonormality of the Fourier basis. -/
-lemma eigenvectors_orthonormality (params : Parameters) (α β : Point params) :
-    fourierBasisInnerProduct params α β = if α = β then 1 else 0 := by
-  simpa [fourierBasisInnerProduct] using fourierBasisState_inner_product params α β
-
 /-- The eigenvalue of `K` on `φ_α`. -/
 noncomputable def adjacencyEigenvalue (params : Parameters) (α : Point params) : Error :=
   (1 / (hypercubeVertexCount params : Error)) *
@@ -539,11 +431,6 @@ noncomputable def laplacianEigenvalue (params : Parameters) (α : Point params) 
 /-- The spectral gap `1 / (m M)` from `cor:laplacian-spectral-gap`. -/
 noncomputable def hypercubeSpectralGap (params : Parameters) : Error :=
   1 / ((params.m : Error) * (hypercubeVertexCount params : Error))
-
-/-- The Fourier index set `F_q^m` has cardinality `M = q^m`. -/
-lemma eigenvectors_card (params : Parameters) :
-    Fintype.card (Point params) = hypercubeVertexCount params := by
-  simp [hypercubeVertexCount, Fintype.card_fin]
 
 /-- `prop:eigenvectors`, item 2: each `|φ_α⟩` is an eigenvector of the
 adjacency matrix `K` with eigenvalue `λ_α`. -/
@@ -627,13 +514,5 @@ theorem hypercubeSpectralGap_le_laplacianEigenvalue (params : Parameters) (α : 
   simp only [hypercubeSpectralGap, laplacianEigenvalue, hypercubeVertexCount]
   apply div_le_div_of_nonneg_right _ (by positivity)
   exact_mod_cast hα
-
-/-- `cor:laplacian-spectral-gap`, attainment: for `|α| = 1`, the spectral gap
-is attained: `λ_L(α) = 1/(mM)`. -/
-theorem laplacianEigenvalue_of_weight_one (params : Parameters) (α : Point params)
-    (hα : frequencyWeight params α = 1) :
-    laplacianEigenvalue params α = hypercubeSpectralGap params := by
-  simp only [laplacianEigenvalue, hypercubeSpectralGap, hypercubeVertexCount, hα]
-  norm_cast
 
 end MIPStarRE.LDT.ExpansionHypercubeGraph

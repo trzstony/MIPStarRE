@@ -1,6 +1,4 @@
 import MIPStarRE.LDT.Test.MainTheorem.Simplified.Rounding
-import MIPStarRE.LDT.Preliminaries.ComparisonProjective
-import MIPStarRE.LDT.Preliminaries.DistanceBounds
 
 /-!
 # Polynomial consistency after linear rounding

@@ -236,43 +236,6 @@ noncomputable def helperMoveOverVQuantity
             (T.outcome h *
               pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.2)))
 
-/-- Assemble the post-`delete-an-A` transport estimates.
-
-The first hypothesis is the variance replacement
-`A^u_{h(u)} → A^v_{h(v)}` in `eq:swap-u-for-v-attack-of-the-clones`.  The second
-hypothesis is the self-consistency move `eq:move-over-v`, which moves the
-remaining point projector from Alice's tensor factor to Bob's tensor factor.
-This lemma only performs the scalar triangle-inequality assembly; the analytic
-proofs of the two displayed hypotheses remain separate. -/
-theorem helperDeleteAQuantity_le_moveOverV_of_abs_transports
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (eps delta : Error)
-    (T : SubMeas (Polynomial params) ι)
-    (hclone :
-      |helperDeleteAQuantity params strategy T -
-        helperDeleteAClonedQuantity params strategy T| ≤
-          Real.sqrt (selfImprovementVarianceError params eps delta))
-    (hmove :
-      |helperDeleteAClonedQuantity params strategy T -
-        helperMoveOverVQuantity params strategy T| ≤
-          Real.sqrt (2 * delta)) :
-    helperDeleteAQuantity params strategy T ≤
-      helperMoveOverVQuantity params strategy T +
-        Real.sqrt (selfImprovementVarianceError params eps delta) +
-        Real.sqrt (2 * delta) := by
-  have hclone_le :
-      helperDeleteAQuantity params strategy T -
-          helperDeleteAClonedQuantity params strategy T ≤
-        Real.sqrt (selfImprovementVarianceError params eps delta) :=
-    (abs_le.mp hclone).2
-  have hmove_le :
-      helperDeleteAClonedQuantity params strategy T -
-          helperMoveOverVQuantity params strategy T ≤
-        Real.sqrt (2 * delta) :=
-    (abs_le.mp hmove).2
-  linarith
-
 /-- The reverse scalar direction of the post-`delete-an-A` transport estimates.
 
 This is the direction used when the final `move-over-v` expression is known to
@@ -434,6 +397,5 @@ theorem helperOffDiagonalOuterSandwichQuantity_le_two_sqrt_variance_add_mdq_of_a
     params strategy eps delta T
     (helperOffDiagonalIndicatorQuantity_le_swapped_of_abs_transports
       params strategy eps delta T hleft hright)
-
 
 end MIPStarRE.LDT.SelfImprovement

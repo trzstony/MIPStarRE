@@ -1,7 +1,5 @@
-import MIPStarRE.LDT.MakingMeasurementsProjective.Defs
 import MIPStarRE.LDT.MakingMeasurementsProjective.SimplifiedOrthogonalization.RankAllocation
 import MIPStarRE.LDT.MakingMeasurementsProjective.SimplifiedOrthogonalization.Defect
-import MIPStarRE.LDT.Basic.OperatorExpectations
 import Mathlib.Analysis.Matrix.Spectrum
 
 /-!
@@ -62,23 +60,6 @@ noncomputable def measurementEigenProjector {Outcome ι : Type*}
   let hM : (M.outcome a).IsHermitian := M.outcome_hermitian a
   Matrix.vecMulVec ((hM.eigenvectorBasis j).ofLp)
     (star ((hM.eigenvectorBasis j).ofLp))
-
-/-- Every rank-one spectral projector is positive semidefinite. -/
-theorem measurementEigenProjector_nonneg {Outcome ι : Type*}
-    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
-    (M : Measurement Outcome ι) (a : Outcome) (j : ι) :
-    0 ≤ measurementEigenProjector M a j := by
-  unfold measurementEigenProjector
-  exact Matrix.nonneg_iff_posSemidef.mpr
-    (Matrix.posSemidef_vecMulVec_self_star _)
-
-/-- A state assigns nonnegative mass to each rank-one spectral projector. -/
-theorem ev_measurementEigenProjector_nonneg {Outcome ι : Type*}
-    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState ι) (M : Measurement Outcome ι) (a : Outcome) (j : ι) :
-    0 ≤ ev ψ (measurementEigenProjector M a j) :=
-  ev_nonneg_of_psd ψ (measurementEigenProjector M a j)
-    (measurementEigenProjector_nonneg M a j)
 
 /-- The eigenvalues of all effects of a complete measurement sum to the
 dimension of the local Hilbert space. -/

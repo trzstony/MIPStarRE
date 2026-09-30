@@ -102,35 +102,6 @@ theorem conicNormalizedSeparatorFunctional_apply
         conicSeparatorConstraintFunctional φ y := by
   rfl
 
-/-- A separator that is nonnegative on a conic image gives a normalized
-functional dual bound on any point whose constraint-objective image lies in
-that conic image. -/
-theorem conicObjective_le_normalizedSeparator_of_mem
-    {E F : Type*}
-    [TopologicalSpace E] [AddCommMonoid E] [Module ℝ E]
-    [TopologicalSpace F] [AddCommMonoid F] [Module ℝ F]
-    (A : E →L[ℝ] F) (c : E →L[ℝ] ℝ)
-    {C : Set (F × ℝ)}
-    (φ : StrongDual ℝ (F × ℝ))
-    (hφ : ∀ z ∈ C, 0 ≤ φ z)
-    (hcoeff : conicSeparatorObjectiveCoefficient φ < 0)
-    (x : E)
-    (hx : (A x, c x) ∈ C) :
-    c x ≤ conicNormalizedSeparatorFunctional φ (A x) := by
-  have hpositiveCoeff : 0 < -conicSeparatorObjectiveCoefficient φ :=
-    neg_pos.mpr hcoeff
-  have hnonneg := hφ (A x, c x) hx
-  have hdecomp :
-      0 ≤ conicSeparatorConstraintFunctional φ (A x) +
-        c x * conicSeparatorObjectiveCoefficient φ := by
-    rwa [conicSeparator_decompose] at hnonneg
-  have hmul :
-      c x * (-conicSeparatorObjectiveCoefficient φ) ≤
-        conicSeparatorConstraintFunctional φ (A x) := by
-    nlinarith
-  rw [conicNormalizedSeparatorFunctional_apply]
-  exact (le_inv_mul_iff₀' hpositiveCoeff).mpr hmul
-
 /-- The normalized constraint functional associated to a separator is feasible
 for the functional dual problem of the conic image. -/
 theorem conicFunctionalDualFeasible_normalizedSeparator

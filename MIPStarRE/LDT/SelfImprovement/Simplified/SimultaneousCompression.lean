@@ -63,18 +63,6 @@ theorem compressAtNone_sum {α : Type w} {ι : Type u} {Outcome : Type v}
   | @insert a s ha ih =>
       simp [Finset.sum_insert ha, compressAtNone_add, ih]
 
-/-- Compression is monotone for the positive-operator order. -/
-theorem compressAtNone_mono {ι : Type u} {Outcome : Type v}
-    [Fintype ι] [DecidableEq ι] [Fintype Outcome] [DecidableEq Outcome]
-    (X Y : MIPStarRE.Quantum.Op (ι × Option Outcome))
-    (hXY : X ≤ Y) : compressAtNone X ≤ compressAtNone Y := by
-  have h : 0 ≤ compressAtNone (Y - X) :=
-    compressAtNone_nonneg (Y - X) (sub_nonneg.mpr hXY)
-  have heq : compressAtNone (Y - X) = compressAtNone Y - compressAtNone X := by
-    ext i j
-    rfl
-  exact sub_nonneg.mp (heq ▸ h)
-
 /-- A measurement on the enlarged register compresses to a
 measurement on the original register. -/
 noncomputable def compressMeasurementAtNone
@@ -94,34 +82,5 @@ noncomputable def compressMeasurementAtNone
         _ = 1 := by rw [T.sum_eq_total, T.total_eq_one, compressAtNone_one]
     total_le_one := le_rfl }
   total_eq_one := rfl
-
-/-- Compression preserves a correlation with an original operator
-extended by the identity on the auxiliary register. -/
-theorem original_left_compressed_correlation
-    {ι : Type u} {Outcome : Type v}
-    [Fintype ι] [DecidableEq ι] [Nonempty ι]
-    [Fintype Outcome] [DecidableEq Outcome]
-    (ψ : QuantumState (ι × ι))
-    (R : MIPStarRE.Quantum.Op ι)
-    (T : MIPStarRE.Quantum.Op (ι × Option Outcome)) :
-    ev ψ (opTensor R (compressAtNone T)) =
-      ev (simultaneousDilationState (Outcome := Outcome) ψ)
-        (opTensor
-          (opTensor R (1 : MIPStarRE.Quantum.Op (Option Outcome))) T) := by
-  let HA : MIPStarRE.LDT.MakingMeasurementsProjective.FiniteHilbertSpace.{u} :=
-    simultaneousDilationBaseSpace ι
-  have hR : ∀ i j : ι,
-      (opTensor R (1 : MIPStarRE.Quantum.Op (Option Outcome)))
-        (i, none) (j, none) = R i j := by
-    intro i j
-    simp [opTensor]
-  have hT : ∀ i j : ι, T (i, none) (j, none) = compressAtNone T i j := by
-    intro i j
-    rfl
-  have h := productExtension_correlation_of_compression
-    (Outcome := Outcome) HA ψ R (compressAtNone T)
-    (opTensor R (1 : MIPStarRE.Quantum.Op (Option Outcome))) T hR hT
-  convert h using 1 <;>
-    simp [simultaneousDilationState, HA] <;> rfl
 
 end MIPStarRE.LDT.SelfImprovement

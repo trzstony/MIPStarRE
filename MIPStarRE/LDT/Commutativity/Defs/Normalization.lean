@@ -171,43 +171,10 @@ noncomputable def normalizationConditionSquareFamily {OutcomeA OutcomeB : Type*}
     simpa [normalizationConditionSandwichedTotalOperator_hermitian P Q a] using
       normCondSandwichedTotal_sq_le P Q a
 
-/-- The family `a ↦ (∑_b C_{a,b})^†(∑_b C_{a,b})`. -/
-noncomputable def normalizationConditionAdjointSquareFamily {OutcomeA OutcomeB : Type*}
-    [Fintype OutcomeA] [Fintype OutcomeB]
-    (P : SubMeas OutcomeA ι) (Q : ProjSubMeas OutcomeB ι) :
-    SubMeas OutcomeA ι where
-  outcome := fun a =>
-    (normalizationConditionSandwichedTotalOperator P Q a)ᴴ *
-      normalizationConditionSandwichedTotalOperator P Q a
-  total :=
-    ∑ a : OutcomeA,
-      (normalizationConditionSandwichedTotalOperator P Q a)ᴴ *
-        normalizationConditionSandwichedTotalOperator P Q a
-  outcome_pos := fun a =>
-    (Matrix.posSemidef_conjTranspose_mul_self
-      (normalizationConditionSandwichedTotalOperator P Q a)).nonneg
-  sum_eq_total := rfl
-  total_le_one := normalizationConditionSandwichedTotalSum_le_one P Q fun a => by
-    simpa [normalizationConditionSandwichedTotalOperator_hermitian P Q a] using
-      normCondSandwichedTotal_sq_le P Q a
-
 /-- The operator `∑_a (∑_b C_{a,b})(∑_b C_{a,b})^†`. -/
 noncomputable def normalizationConditionSquareOperator {OutcomeA OutcomeB : Type*}
     [Fintype OutcomeA] [Fintype OutcomeB]
     (P : SubMeas OutcomeA ι) (Q : ProjSubMeas OutcomeB ι) : MIPStarRE.Quantum.Op ι :=
   (normalizationConditionSquareFamily P Q).total
-
-/-- The operator `∑_a (∑_b C_{a,b})^†(∑_b C_{a,b})`. -/
-noncomputable def normalizationConditionAdjointSquareOperator {OutcomeA OutcomeB : Type*}
-    [Fintype OutcomeA] [Fintype OutcomeB]
-    (P : SubMeas OutcomeA ι) (Q : ProjSubMeas OutcomeB ι) : MIPStarRE.Quantum.Op ι :=
-  (normalizationConditionAdjointSquareFamily P Q).total
-
-/-- The identity bound appearing in `lem:normalization-condition`. -/
-def normalizationConditionIdentityBound {OutcomeA OutcomeB : Type*}
-    [Fintype OutcomeA] [Fintype OutcomeB]
-    (_P : SubMeas OutcomeA ι) (_Q : ProjSubMeas OutcomeB ι) : MIPStarRE.Quantum.Op ι :=
-  1
-
 
 end MIPStarRE.LDT.Commutativity

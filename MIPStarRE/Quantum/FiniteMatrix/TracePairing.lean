@@ -221,14 +221,6 @@ theorem nonneg_of_trace_mul_nonneg_of_isHermitian {A : Op d}
   exact Complex.nonneg_iff.mpr ⟨hx_re, by
     simpa using (hA.im_star_dotProduct_mulVec_self x).symm⟩
 
-/-- For a Hermitian operator, nonnegativity is equivalent to nonnegative real
-trace pairing against every positive semidefinite operator. -/
-theorem trace_mul_nonneg_forall_nonneg_iff_of_isHermitian {A : Op d}
-    (hA : A.IsHermitian) :
-    (∀ B : Op d, 0 ≤ B → 0 ≤ Complex.re (Matrix.trace (A * B))) ↔ 0 ≤ A := by
-  exact ⟨nonneg_of_trace_mul_nonneg_of_isHermitian hA, fun hA_nonneg B hB =>
-    trace_mul_nonneg_of_nonneg hA_nonneg hB⟩
-
 /-- If two positive semidefinite operators have zero trace pairing, then their
 product is zero.
 

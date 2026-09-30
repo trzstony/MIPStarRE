@@ -262,45 +262,7 @@ lemma matrixLocalToGlobal (params : Parameters)
     _ = (params.m : Error) * matrixLocalVariance params model := by
       rw [matrixLocalVariance_eq_closedForm, matrixLocalVarianceTraceForm_eq_closedForm]
 
-/-- The concrete matrix-level counterpart of `lem:local-rewrite`. -/
-lemma matrixLocalRewrite (params : Parameters)
-    (model : MatrixOperatorFamilyRealization params) :
-    MatrixLocalRewriteStatement params model := by
-  refine ⟨?_⟩
-  rw [matrixLocalVariance_eq_closedForm, matrixLocalVarianceTraceForm_eq_closedForm]
-
-/-- The concrete matrix-level counterpart of `lem:global-rewrite`. -/
-lemma matrixGlobalRewrite (params : Parameters)
-    (model : MatrixOperatorFamilyRealization params) :
-    MatrixGlobalRewriteStatement params model := by
-  refine ⟨?_⟩
-  rw [matrixGlobalVariance_eq_closedForm, matrixGlobalVarianceTraceForm_eq_closedForm]
-
-/-- `prop:laplacian-rewrite` — the edge-difference form of the Laplacian
-equals the standard `(1/M)I - K` form.  Proved in
-`MIPStarRE.LDT.ExpansionHypercubeGraph.laplacian_eq_edgeDifferenceForm`. -/
-theorem laplacianRewrite (params : Parameters) :
-    laplacian params = laplacianDifferenceForm params :=
-  laplacian_eq_edgeDifferenceForm params
-
 /-! ## Public theorem wrappers -/
-
-/-- The local variance for a bipartite state when the operator family acts on
-the left tensor factor.  The squared difference is represented as
-`(leftTensor (A u) - leftTensor (A v))ᴴ *
-  (leftTensor (A u) - leftTensor (A v))`; for self-adjoint `A u`, this is the
-operator-square expression appearing in the paper. -/
-noncomputable def bipartiteLocalVariance (params : Parameters)
-    {ιA ιB : Type} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    (A : Point params → MIPStarRE.Quantum.Op ιA) (ψ : QuantumState (ιA × ιB)) : Error :=
-  localVariance params (fun u => leftTensor (ι₂ := ιB) (A u)) ψ
-
-/-- The global variance for a bipartite state when the operator family acts on
-the left tensor factor. -/
-noncomputable def bipartiteGlobalVariance (params : Parameters)
-    {ιA ιB : Type} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    (A : Point params → MIPStarRE.Quantum.Op ιA) (ψ : QuantumState (ιA × ιB)) : Error :=
-  globalVariance params (fun u => leftTensor (ι₂ := ιB) (A u)) ψ
 
 /-- General local-to-global inequality for an arbitrary operator family on a
 finite-dimensional state space.
@@ -319,73 +281,5 @@ lemma localToGlobal (params : Parameters)
   · rw [globalVariance_eq_zero_of_isEmpty hι params A ψ,
       localVariance_eq_zero_of_isEmpty hι params A ψ]
     positivity
-
-/-- `lem:local-to-global`, in bipartite form.
-
-This is the local-to-global variance inequality for the bipartite operator
-family `A^u ⊗ I`.  The surrounding paper section discusses positive
-contractions, but the spectral estimate itself is valid for every operator
-family. -/
-lemma localToGlobalBipartite (params : Parameters)
-    {ιA ιB : Type} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    (A : Point params → MIPStarRE.Quantum.Op ιA)
-    (ψ : QuantumState (ιA × ιB)) :
-    bipartiteGlobalVariance params A ψ ≤
-      (params.m : Error) * bipartiteLocalVariance params A ψ := by
-  exact localToGlobal params (fun u => leftTensor (ι₂ := ιB) (A u)) ψ
-
-/-- `lem:local-rewrite`.
-
-The local variance agrees with the Laplacian trace form of the combined
-operator family.  The proof is obtained from the concrete matrix rewrite, with a
-separate zero-dimensional branch for the empty state space. -/
-lemma localRewrite (params : Parameters)
-    (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) :
-    LocalRewriteStatement params A ψ := by
-  by_cases hι : Nonempty ι
-  · letI := hι
-    exact ⟨by
-      change matrixLocalVariance params (abstractMatrixModel params A ψ) =
-        matrixLocalVarianceTraceForm params (abstractMatrixModel params A ψ)
-      exact (matrixLocalRewrite params (abstractMatrixModel params A ψ)).traceFormula⟩
-  · exact ⟨by
-      rw [localVariance_eq_zero_of_isEmpty hι params A ψ,
-        localVarianceTraceForm_eq_zero_of_isEmpty hι params A ψ]⟩
-
-/-- `lem:global-rewrite`.
-The existential witness is the canonical `canonicalGlobalVarianceDecomposition`,
-determined by `params` and `A`, whose `averageComponent` is the paper's
-`A_avg = E_u A^u = (1/M) · ∑_u A^u`; equivalently,
-`A_0 = M^{1/2} · A_avg` (expansion.tex §7.2, *Local and global variance*). -/
-lemma globalRewrite (params : Parameters)
-    (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) :
-    GlobalRewriteStatement params A ψ := by
-  refine ⟨canonicalGlobalVarianceDecomposition params A, ?_⟩
-  by_cases hι : Nonempty ι
-  · letI := hι
-    calc
-      globalVariance params A ψ
-          = (hypercubeVertexCount params : Error)⁻¹ *
-              ∑ u, ev ψ ((A u)ᴴ * A u) -
-            (hypercubeVertexCount params : Error)⁻¹ *
-              (hypercubeVertexCount params : Error)⁻¹ *
-                ∑ u, ∑ v, ev ψ ((A v)ᴴ * A u) := by
-              change matrixGlobalVariance params (abstractMatrixModel params A ψ) =
-                ((hypercubeVertexCount params : Error)⁻¹ *
-                    ∑ u, ev (matrixModelState (abstractMatrixModel params A ψ))
-                      ((A u)ᴴ * A u) -
-                  (hypercubeVertexCount params : Error)⁻¹ *
-                    (hypercubeVertexCount params : Error)⁻¹ *
-                      ∑ u, ∑ v, ev (matrixModelState (abstractMatrixModel params A ψ))
-                        ((A v)ᴴ * A u))
-              exact matrixGlobalVariance_eq_closedForm params (abstractMatrixModel params A ψ)
-      _ = globalVarianceTraceForm params A ψ (canonicalGlobalVarianceDecomposition params A) := by
-              symm
-              simpa using
-                (globalVarianceTraceForm_eq_closedForm params A ψ
-                  (canonicalGlobalVarianceDecomposition params A))
-  · rw [globalVariance_eq_zero_of_isEmpty hι params A ψ,
-      globalVarianceTraceForm_eq_zero_of_isEmpty hι params A ψ
-        (canonicalGlobalVarianceDecomposition params A)]
 
 end MIPStarRE.LDT.ExpansionHypercubeGraph

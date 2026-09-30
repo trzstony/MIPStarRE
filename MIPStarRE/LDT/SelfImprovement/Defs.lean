@@ -69,31 +69,6 @@ theorem sdpStrictPrimalConstantSum (params : Parameters)
           unfold sdpStrictPrimalWeight
           field_simp [hdenom]
 
-/-- The paper's strict-feasible primal SDP witness
-`T_g = (2 |\polyfunc{m}{q}{d}|)^{-1} I`. -/
-noncomputable def sdpStrictPrimalSubMeas (params : Parameters)
-    [FieldModel params.q] : SubMeas (Polynomial params) ι :=
-  { outcome := fun _ => sdpStrictPrimalWeight params • (1 : MIPStarRE.Quantum.Op ι)
-    total := ∑ g : Polynomial params,
-      sdpStrictPrimalWeight params • (1 : MIPStarRE.Quantum.Op ι)
-    outcome_pos := fun _ => smul_nonneg (by
-      unfold sdpStrictPrimalWeight
-      positivity) (Matrix.PosSemidef.one.nonneg : 0 ≤ (1 : MIPStarRE.Quantum.Op ι))
-    sum_eq_total := rfl
-    total_le_one := (le_of_eq (sdpStrictPrimalConstantSum (ι := ι) params)).trans (by
-      simpa using smul_le_smul_of_nonneg_right
-        (show (1 / 2 : Error) ≤ 1 by norm_num)
-        (Matrix.PosSemidef.one.nonneg : 0 ≤ (1 : MIPStarRE.Quantum.Op ι))) }
-
-/-- The paper's uniform strict-feasible primal witness has total mass
-`(1 / 2) • I`. -/
-@[simp] theorem sdpStrictPrimalSubMeas_total (params : Parameters)
-    [FieldModel params.q] :
-    (sdpStrictPrimalSubMeas (ι := ι) params).total =
-      ((1 / 2 : Error) • (1 : MIPStarRE.Quantum.Op ι)) := by
-  simpa [sdpStrictPrimalSubMeas] using
-    sdpStrictPrimalConstantSum (ι := ι) params
-
 /-- Paper origin: `references/ldt-paper/self_improvement.tex:168-176`
 (`\label{lem:sdp}` strict feasible dual witness `Z = 2I`);
 blueprint `\label{lem:sdp-uniform-feasible-witness}`.
@@ -101,14 +76,6 @@ blueprint `\label{lem:sdp-uniform-feasible-witness}`.
 The paper's strict-feasible dual SDP witness `Z = 2I`. -/
 noncomputable def sdpStrictDualWitness : MIPStarRE.Quantum.Op ι :=
   (2 : Error) • (1 : MIPStarRE.Quantum.Op ι)
-
-/-- The paper's strict-feasible dual witness `2I` is positive semidefinite. -/
-@[simp] theorem sdpStrictDualWitness_nonneg {ι : Type*} [Finite ι] [DecidableEq ι] :
-    0 ≤ (sdpStrictDualWitness (ι := ι)) := by
-  letI := Fintype.ofFinite ι
-  unfold sdpStrictDualWitness
-  exact smul_nonneg (by norm_num)
-    (Matrix.PosSemidef.one.nonneg : 0 ≤ (1 : MIPStarRE.Quantum.Op ι))
 
 /-- The paper's strict-feasible dual witness dominates the identity: `I ≤ 2I`. -/
 theorem one_le_sdpStrictDualWitness {ι : Type*} [Finite ι] [DecidableEq ι] :
@@ -135,33 +102,6 @@ theorem averagedPointOperator_nonneg (params : Parameters)
   exact averageOperatorOverDistribution_nonneg (uniformDistribution (Point params))
     (pointConditionedOutcomeOperatorAtPolynomial params strategy g)
     (fun u => (strategy.pointMeasurement u).toSubMeas.outcome_pos (g u))
-
-/--
-The operator `T_g A_g` contributing to the primal SDP objective.
-
-We take `T` to be a `SubMeas` rather than a full `Measurement` because the
-paper's Section 9 primal only assumes `∑_g T_g ≤ I`.
--/
-noncomputable def sdpPrimalContributionOperator (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (T : SubMeas (Polynomial params) ι)
-    (g : Polynomial params) : MIPStarRE.Quantum.Op ι :=
-  T.outcome g * averagedPointOperator params strategy g
-
-/-- The formal primal objective operator `Σ_g T_g A_g`. -/
-noncomputable def sdpPrimalObjectiveOperator (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (T : SubMeas (Polynomial params) ι) : MIPStarRE.Quantum.Op ι :=
-  ∑ g : Polynomial params, sdpPrimalContributionOperator params strategy T g
-
-/-- The primal objective value `Σ_g Tr(T_g A_g)`. -/
-noncomputable def sdpPrimalObjective (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (T : SubMeas (Polynomial params) ι) : Error :=
-  Complex.re (Matrix.trace (sdpPrimalObjectiveOperator params strategy T))
 
 /-- The dual slack operator `Z - A_g`. -/
 noncomputable def sdpDualSlackOperator (params : Parameters)
@@ -355,25 +295,5 @@ noncomputable def selfImprovementHelperError (params : Parameters)
     (Real.rpow eps (1 / (2 : Error)) +
       Real.rpow delta (1 / (2 : Error)) +
       Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (2 : Error)))
-
-/-- The orthogonalization error applied to the helper output. -/
-noncomputable def selfImprovementOrthogonalizationError (params : Parameters)
-    [FieldModel params.q]
-    (eps delta : Error) : Error :=
-  orthonormalizationError (selfImprovementHelperError params eps delta)
-
-/-- The postprocessed error after projecting the helper output. -/
-noncomputable def selfImprovementDataProcessingError (params : Parameters)
-    [FieldModel params.q]
-    (eps delta : Error) : Error :=
-  8 * selfImprovementHelperError params eps delta +
-    8 * Real.rpow (selfImprovementOrthogonalizationError params eps delta)
-      (1 / (2 : Error))
-
-/-- The quantitative error from `thm:self-improvement`. -/
-noncomputable def selfImprovementError (params : Parameters)
-    [FieldModel params.q]
-    (eps delta : Error) : Error :=
-  MainInductionStep.selfImprovementInInductionError params eps delta 0
 
 end MIPStarRE.LDT.SelfImprovement

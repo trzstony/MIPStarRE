@@ -27,13 +27,6 @@ noncomputable def idempotenceDefect {Outcome ι : Type*}
     (ψ : QuantumState ι) (M : Measurement Outcome ι) : Error :=
   ∑ a, ev ψ (M.outcome a - M.outcome a * M.outcome a)
 
-/-- The idempotence defect is nonnegative. -/
-theorem idempotenceDefect_nonneg {Outcome ι : Type*}
-    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState ι) (M : Measurement Outcome ι) :
-    0 ≤ idempotenceDefect ψ M := by
-  exact sourceAlmostProjective_nonneg ψ M
-
 /-- For a normalized state, the defect is
 `1 − φ(Σₐ Mₐ²)`, as in the simplified proof. -/
 theorem idempotenceDefect_eq_one_sub_sum_squares {Outcome ι : Type*}

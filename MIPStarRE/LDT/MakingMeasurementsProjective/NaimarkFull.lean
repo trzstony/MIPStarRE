@@ -61,41 +61,6 @@ theorem questionwiseOneMeasNaimarkData_source_effect
         sum_le_one := idxSubMeas_outcome_sum_le_one A x
       } : MIPStarRE.Quantum.Submeasurement Outcome ι)
 
-/-- Lean-only questionwise Naimark interface.
-
-This theorem proves `NaimarkStatement`, the restricted interface consisting of
-per-question local dilations and single-outcome marginal preservation.  It is
-not the full tensor-product preservation statement of `thm:naimark`. -/
-theorem questionwiseNaimark {QuestionA OutcomeA QuestionB OutcomeB : Type*}
-    {ι : Type*}
-    [Fintype QuestionA] [DecidableEq QuestionA]
-    [Fintype OutcomeA] [DecidableEq OutcomeA]
-    [Fintype QuestionB] [DecidableEq QuestionB]
-    [Fintype OutcomeB] [DecidableEq OutcomeB]
-    [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState ι)
-    (A : IdxSubMeas QuestionA OutcomeA ι)
-    (B : IdxSubMeas QuestionB OutcomeB ι) :
-    ∃ data : NaimarkData QuestionA OutcomeA QuestionB OutcomeB ι,
-      NaimarkStatement ψ A B data := by
-  classical
-  let leftData : (x : QuestionA) → OneMeasNaimarkData OutcomeA ι :=
-    questionwiseOneMeasNaimarkData A
-  let rightData : (y : QuestionB) → OneMeasNaimarkData OutcomeB ι :=
-    questionwiseOneMeasNaimarkData B
-  have hleft : ∀ x : QuestionA, (leftData x).source.effect = (A x).outcome := by
-    intro x
-    simpa [leftData] using questionwiseOneMeasNaimarkData_source_effect A x
-  have hright : ∀ y : QuestionB, (rightData y).source.effect = (B y).outcome := by
-    intro y
-    simpa [rightData] using questionwiseOneMeasNaimarkData_source_effect B y
-  refine ⟨{ left := leftData, right := rightData }, ?_⟩
-  refine ⟨hleft, hright, ?_, ?_⟩
-  · intro x ρ a
-    simpa [leftData, hleft x] using (leftData x).expectation_preservation ρ a
-  · intro y ρ b
-    simpa [rightData, hright y] using (rightData y).expectation_preservation ρ b
-
 /-! ### Full tensor-product Naimark interface -/
 
 /-- The single auxiliary Hilbert space used by the full Naimark assembly on one side.
@@ -283,86 +248,5 @@ theorem OneMeasNaimarkData.twoSidedCorrelationPreservation
         _ = cA * cB * S := by
               simp [S, mul_assoc, Finset.mul_sum]]
   ring_nf
-
-/-- Full tensor-product Naimark correlation theorem.
-
-This is the Lean statement corresponding to
-`references/ldt-paper/orthonormalization.tex:36-80`
-(`\label{thm:naimark}`).  It is proved from the checked one-measurement
-Naimark construction and the two-sided trace identity
-`OneMeasNaimarkData.twoSidedCorrelationPreservation`. -/
-theorem naimarkTensorProductCorrelation
-    {QuestionA OutcomeA QuestionB OutcomeB : Type u}
-    [Fintype QuestionA] [DecidableEq QuestionA]
-    [Fintype OutcomeA] [DecidableEq OutcomeA]
-    [Fintype QuestionB] [DecidableEq QuestionB]
-    [Fintype OutcomeB] [DecidableEq OutcomeB]
-    (HA HB : FiniteHilbertSpace.{u})
-    (ψ : QuantumState (HA.carrier × HB.carrier))
-    (A : IdxSubMeas QuestionA OutcomeA HA.carrier)
-    (B : IdxSubMeas QuestionB OutcomeB HB.carrier) :
-    NaimarkTensorProductCorrelationStatement HA HB ψ A B := by
-  classical
-  intro hψ
-  let HauxA : FiniteHilbertSpace.{u} := oneNaimarkAuxHilbertSpace OutcomeA
-  let HauxB : FiniteHilbertSpace.{u} := oneNaimarkAuxHilbertSpace OutcomeB
-  let auxLeft : QuantumState HauxA.carrier := oneNaimarkAuxState OutcomeA
-  let auxRight : QuantumState HauxB.carrier := oneNaimarkAuxState OutcomeB
-  let auxState : QuantumState (HauxA.carrier × HauxB.carrier) :=
-    QuantumState.tensor auxLeft auxRight
-  let leftData : (x : QuestionA) → OneMeasNaimarkData OutcomeA HA.carrier :=
-    fun x => Classical.choose <| oneMeasNaimark ({
-      effect := (A x).outcome
-      pos := (A x).outcome_pos
-      sum_le_one := idxSubMeas_outcome_sum_le_one A x
-    } : MIPStarRE.Quantum.Submeasurement OutcomeA HA.carrier)
-  let rightData : (y : QuestionB) → OneMeasNaimarkData OutcomeB HB.carrier :=
-    fun y => Classical.choose <| oneMeasNaimark ({
-      effect := (B y).outcome
-      pos := (B y).outcome_pos
-      sum_le_one := idxSubMeas_outcome_sum_le_one B y
-    } : MIPStarRE.Quantum.Submeasurement OutcomeB HB.carrier)
-  have hleft : ∀ x : QuestionA, (leftData x).source.effect = (A x).outcome := by
-    intro x
-    simpa [leftData] using congrArg MIPStarRE.Quantum.Submeasurement.effect <|
-      Classical.choose_spec <| oneMeasNaimark ({
-        effect := (A x).outcome
-        pos := (A x).outcome_pos
-        sum_le_one := idxSubMeas_outcome_sum_le_one A x
-      } : MIPStarRE.Quantum.Submeasurement OutcomeA HA.carrier)
-  have hright : ∀ y : QuestionB, (rightData y).source.effect = (B y).outcome := by
-    intro y
-    simpa [rightData] using congrArg MIPStarRE.Quantum.Submeasurement.effect <|
-      Classical.choose_spec <| oneMeasNaimark ({
-        effect := (B y).outcome
-        pos := (B y).outcome_pos
-        sum_le_one := idxSubMeas_outcome_sum_le_one B y
-      } : MIPStarRE.Quantum.Submeasurement OutcomeB HB.carrier)
-  have hauxLeft : auxLeft.IsNormalized := by
-    simpa [auxLeft, HauxA] using oneNaimarkAuxState_isNormalized OutcomeA
-  have hauxRight : auxRight.IsNormalized := by
-    simpa [auxRight, HauxB] using oneNaimarkAuxState_isNormalized OutcomeB
-  have hauxState : auxState.IsNormalized := by
-    exact QuantumState.tensor_isNormalized hauxLeft hauxRight
-  refine ⟨HauxA, HauxB, ⟨?_⟩⟩
-  exact {
-    auxState := auxState
-    auxState_normalized := hauxState
-    auxLeft := auxLeft
-    auxRight := auxRight
-    auxLeft_normalized := hauxLeft
-    auxRight_normalized := hauxRight
-    auxState_product := rfl
-    dilatedState := naimarkProductExtensionState HA HB HauxA HauxB ψ auxState
-    dilatedState_density := rfl
-    dilatedState_normalized :=
-      naimarkProductExtensionState_isNormalized HA HB HauxA HauxB hψ hauxState
-    left := fun x => (leftData x).toProjSubMeas
-    right := fun y => (rightData y).toProjSubMeas
-    correlation_preservation := fun x y a b => by
-      simpa [HauxA, HauxB, auxLeft, auxRight, auxState, hleft x, hright y] using
-        OneMeasNaimarkData.twoSidedCorrelationPreservation HA HB ψ
-          (leftData x) (rightData y) a b
-  }
 
 end MIPStarRE.LDT.MakingMeasurementsProjective

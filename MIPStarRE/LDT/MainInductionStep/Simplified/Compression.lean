@@ -1,5 +1,4 @@
 import MIPStarRE.LDT.MainInductionStep.Simplified.Statements
-import MIPStarRE.LDT.SelfImprovement.Simplified.DilationTransfer
 
 /-!
 # Compressing the pasted polynomial measurement
@@ -51,38 +50,5 @@ theorem compressed_postprocessed_consistency
       (by intro h r t; rfl) (readout s) a i j
   · intro s i j
     simp [postprocess_total, Measurement.total_eq_one, Matrix.one_apply]
-
-/-- The polynomial measurement returned by enlarged-space pasting can be
-compressed without changing its consistency error with the original point
-measurements. -/
-theorem compressed_polynomial_consistency
-    (params : Parameters) [FieldModel params.q]
-    {Aux : Type t} [Fintype Aux] [DecidableEq Aux]
-    {ι : Type u} [Fintype ι] [DecidableEq ι] [Nonempty ι]
-    (strategy : SymStrat params ι)
-    (T : Measurement (Polynomial params)
-      (ι × Option Aux))
-    (δ : Error)
-    (hcons : ConsRel
-      (extendSymStrat params strategy Aux).state
-      (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas
-        (extendSymStrat params strategy Aux).pointMeasurement)
-      (polynomialEvaluationFamily params T.toSubMeas) δ) :
-    ConsRel strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-      (polynomialEvaluationFamily params
-        (compressMeasurementAtNone T).toSubMeas) δ := by
-  constructor
-  have heq := compressed_postprocessed_consistency
-    strategy.state (uniformDistribution (Point params))
-    (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-    T (fun u g => g u)
-  change bipartiteConsError strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-      (fun u => postprocess (compressMeasurementAtNone T).toSubMeas
-        (fun g => g u)) ≤ δ
-  rw [heq]
-  exact hcons.offDiagonalBound
 
 end MIPStarRE.LDT.MainInductionStep

@@ -1,5 +1,4 @@
 import MIPStarRE.LDT.MainInductionStep.Simplified.AnswerScalarAverages
-import MIPStarRE.LDT.MainInductionStep.Theorems.PastingAssembly.Basic
 
 /-!
 # Family assumptions from answer-valued successor slices
@@ -80,7 +79,7 @@ theorem SimplifiedAnswerSuccessorDilationData.pastingInputs
         ((family.meas x).toSubMeas.liftLeft) ((1 - σ x) - ζ x) := by
     intro x
     simpa [extended, family, σ, ζ, SimplifiedAnswerSuccessorDilationData.toIdxPolyFamily,
-      answerSuccessorSliceDilationError, answerRestrictedCarrier,
+      answerSuccessorSliceDilationError,
       answerSelfImprovementCarrier, extendSymStrat] using
       (data.conclusion x).completeness
   have hpoint : ∀ x,
@@ -146,7 +145,7 @@ theorem SimplifiedAnswerSuccessorDilationData.pastingInputs
         (family.witness x) (family.meas x).toSubMeas ≤ ζ x := by
     intro x
     simpa [extended, family, ζ, SimplifiedAnswerSuccessorDilationData.toIdxPolyFamily,
-      answerSuccessorSliceDilationError, answerRestrictedCarrier,
+      answerSuccessorSliceDilationError,
       answerSelfImprovementCarrier, extendSymStrat, tensorFailureExpectation,
       leftTensor_mul_rightTensor_eq_opTensor] using (data.conclusion x).residual
   have hdom : ∀ x : Fq params, ∀ g : Polynomial params,

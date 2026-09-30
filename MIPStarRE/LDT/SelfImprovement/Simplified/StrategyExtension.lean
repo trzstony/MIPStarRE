@@ -1,7 +1,5 @@
 import MIPStarRE.LDT.SelfImprovement.Simplified.SimultaneousCompression
-import MIPStarRE.LDT.Test.StrategyRole.Core
 import MIPStarRE.LDT.Test.StrategyFailures
-import MIPStarRE.LDT.Basic.MeasurementLift
 
 /-!
 # Extending projective measurements through a common ancilla
@@ -435,111 +433,5 @@ noncomputable def extendSymStrat
         exact extendProjMeas_transport _ _
     }
   }
-
-/-- The point-answer family in the extended axis test is the identity
-extension of the original family. -/
-theorem extendSymStrat_axisParallelPointAnswerFamily
-    (params : Parameters) [FieldModel params.q]
-    {ι : Type u} [Fintype ι] [DecidableEq ι]
-    (strategy : SymStrat params ι)
-    (Outcome : Type z) [Fintype Outcome] [DecidableEq Outcome] :
-    axisParallelPointAnswerFamily (extendSymStrat params strategy Outcome) =
-      fun s => leftPlacedSubMeas (ιB := Option Outcome)
-        (axisParallelPointAnswerFamily strategy s) := by
-  funext s
-  rfl
-
-/-- Evaluating an extended axis-line answer commutes with identity
-extension of its submeasurement. -/
-theorem extendSymStrat_axisParallelLineAnswerFamily
-    (params : Parameters) [FieldModel params.q]
-    {ι : Type u} [Fintype ι] [DecidableEq ι]
-    (strategy : SymStrat params ι)
-    (Outcome : Type z) [Fintype Outcome] [DecidableEq Outcome] :
-    axisParallelLineAnswerFamily (extendSymStrat params strategy Outcome) =
-      fun s => leftPlacedSubMeas (ιB := Option Outcome)
-        (axisParallelLineAnswerFamily strategy s) := by
-  funext s
-  exact postprocess_leftPlacedSubMeas _ _
-
-/-- The point-answer family in an extended restricted diagonal test is
-the identity extension of the original family. -/
-theorem extendSymStrat_diagonalPointAnswerFamily
-    (params : Parameters) [FieldModel params.q]
-    {ι : Type u} [Fintype ι] [DecidableEq ι]
-    (strategy : SymStrat params ι)
-    (Outcome : Type z) [Fintype Outcome] [DecidableEq Outcome]
-    (j : Fin params.m) :
-    diagonalPointAnswerFamily (extendSymStrat params strategy Outcome) j =
-      fun s => leftPlacedSubMeas (ιB := Option Outcome)
-        (diagonalPointAnswerFamily strategy j s) := by
-  funext s
-  rfl
-
-/-- Evaluating an extended diagonal-line answer commutes with identity
-extension of its submeasurement. -/
-theorem extendSymStrat_diagonalLineAnswerFamily
-    (params : Parameters) [FieldModel params.q]
-    {ι : Type u} [Fintype ι] [DecidableEq ι]
-    (strategy : SymStrat params ι)
-    (Outcome : Type z) [Fintype Outcome] [DecidableEq Outcome]
-    (j : Fin params.m) :
-    diagonalLineAnswerFamily (extendSymStrat params strategy Outcome) j =
-      fun s => leftPlacedSubMeas (ιB := Option Outcome)
-        (diagonalLineAnswerFamily strategy j s) := by
-  funext s
-  exact postprocess_leftPlacedSubMeas _ _
-
-/-- Extending a good symmetric strategy by the common ancilla preserves
-all three tested failure probabilities. -/
-theorem extendSymStrat_isGood
-    (params : Parameters) [FieldModel params.q]
-    {ι : Type u} [Fintype ι] [DecidableEq ι]
-    (strategy : SymStrat params ι)
-    (Outcome : Type z) [Fintype Outcome] [DecidableEq Outcome]
-    (eps delta gamma : Error)
-    (hgood : strategy.IsGood eps delta gamma) :
-    (extendSymStrat params strategy Outcome).IsGood eps delta gamma := by
-  letI : Nonempty ι := strategy.isNormalized.nonempty.map Prod.fst
-  constructor
-  · have h := extended_bipartiteConsError (Outcome := Outcome)
-      strategy.state (uniformDistribution (AxisParallelTestSample params))
-      (axisParallelPointAnswerFamily strategy)
-      (axisParallelLineAnswerFamily strategy)
-    change (extendSymStrat params strategy Outcome).axisParallelFailureProbability ≤ eps
-    unfold SymStrat.axisParallelFailureProbability
-    rw [extendSymStrat_axisParallelPointAnswerFamily,
-      extendSymStrat_axisParallelLineAnswerFamily]
-    exact h.symm.le.trans hgood.axisParallelTest
-  · have h := extended_bipartiteSSCError (Outcome := Outcome)
-      strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-    change (extendSymStrat params strategy Outcome).selfConsistencyFailureProbability ≤
-      delta
-    unfold SymStrat.selfConsistencyFailureProbability
-    exact h.symm.le.trans hgood.selfConsistencyTest
-  · unfold SymStrat.diagonalFailureProbability
-    have hsum :
-        (∑ j : Fin params.m,
-          bipartiteConsError
-            (extendSymStrat params strategy Outcome).state
-            (uniformDistribution (RestrictedDiagonalSample params j))
-            (diagonalPointAnswerFamily (extendSymStrat params strategy Outcome) j)
-            (diagonalLineAnswerFamily (extendSymStrat params strategy Outcome) j)) =
-          ∑ j : Fin params.m,
-            bipartiteConsError strategy.state
-              (uniformDistribution (RestrictedDiagonalSample params j))
-              (diagonalPointAnswerFamily strategy j)
-              (diagonalLineAnswerFamily strategy j) := by
-      apply Finset.sum_congr rfl
-      intro j _
-      rw [extendSymStrat_diagonalPointAnswerFamily,
-        extendSymStrat_diagonalLineAnswerFamily]
-      exact (extended_bipartiteConsError (Outcome := Outcome)
-        strategy.state (uniformDistribution (RestrictedDiagonalSample params j))
-        (diagonalPointAnswerFamily strategy j)
-        (diagonalLineAnswerFamily strategy j)).symm
-    rw [hsum]
-    exact hgood.diagonalLineTest
 
 end MIPStarRE.LDT.SelfImprovement

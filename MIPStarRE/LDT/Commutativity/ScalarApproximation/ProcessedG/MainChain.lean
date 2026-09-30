@@ -1,8 +1,5 @@
-import MIPStarRE.LDT.Commutativity.ScalarApproximation.Core
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainReverse
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainTail
-import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation.Consequences
-import MIPStarRE.LDT.Commutativity.GCommStability.Scalar.RawSecond
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.ProcessedG.PhaseTwo
 
 /-!

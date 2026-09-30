@@ -1,5 +1,4 @@
 import MIPStarRE.LDT.Test.MainTheorem.Simplified.PointRoundingMass
-import MIPStarRE.LDT.Preliminaries.DistanceBounds
 
 /-!
 # Point consistency under linear projective rounding

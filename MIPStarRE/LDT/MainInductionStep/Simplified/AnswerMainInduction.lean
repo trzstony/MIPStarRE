@@ -1,5 +1,4 @@
 import MIPStarRE.LDT.MainInductionStep.Simplified.ScalarLargeError
-import MIPStarRE.LDT.MainInductionStep.Simplified.AnswerPositiveSuccessor
 
 /-!
 # Answer-valued simplified main induction

@@ -435,30 +435,6 @@ theorem helper_slackness_eq_of_helper_with_slackness
       T.toSubMeas.outcome h * Z :=
   (hhelper.complementarySlackness h).symm
 
-/-- The `Hhat`-versus-`Z` comparison from point self-consistency and a helper
-conclusion carrying SDP complementary slackness.
-
-This is the version of `eq:gonna-use-this-later-H-versus-Z` whose inputs are a
-single strengthened helper conclusion and point-measurement self-consistency,
-rather than a separate family of slackness equations. -/
-theorem helper_hhat_vs_z_of_self_consistency_and_helper_slackness
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (eps delta : Error)
-    {T : Measurement (Polynomial params) ι}
-    {Hhat : SubMeas (Polynomial params) ι}
-    {Z : MIPStarRE.Quantum.Op ι}
-    (hhelper :
-      SelfImprovementHelperConclusionWithSlackness params strategy T Hhat Z eps delta)
-    (hssc : BipartiteSSCRel strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) delta) :
-    ev strategy.state (leftTensor (ι₂ := ι) Z) - 3 * Real.sqrt delta ≤
-      subMeasMass strategy.state Hhat.liftLeft :=
-  helper_hhat_vs_z_of_self_consistency_and_complementary_slackness
-    params strategy eps delta hhelper.toHelperConclusion hssc
-    (helper_slackness_eq_of_helper_with_slackness params strategy eps delta hhelper)
-
 /-- Helper-stage completeness from point self-consistency, a helper conclusion
 carrying SDP complementary slackness, and input consistency.
 
@@ -509,27 +485,6 @@ theorem sdp_statement_with_slackness
     SdpStatementWithSlackness params strategy := by
   exact MatrixSdpStatementWithSlackness.toSdpStatementWithSlackness params strategy
     (matrixSdpPointRealization_statementWithSlackness params strategy)
-
-/-- Displayed measurement and complementary-slackness conclusion of `lem:sdp`.
-
-Paper origin: `references/ldt-paper/self_improvement.tex` lines 82--88 state
-that the Section 9 SDP admits a primal family `{T_g}` with `∑ g, T_g = I` and
-a dual operator `Z` satisfying `T_g Z = T_g A_g` for every polynomial `g`.
-This theorem extracts exactly that complete-measurement and slackness form from
-the source-shaped SDP statement `sdp_statement_with_slackness`, whose proof now
-derives the strong-duality and complementary-slackness witnesses from the
-canonical Section 9 SDP argument. -/
-theorem sdp_slackness_measurement
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι) :
-    ∃ T : Measurement (Polynomial params) ι,
-      ∃ Z : MIPStarRE.Quantum.Op ι,
-        0 ≤ Z ∧
-        (∀ g : Polynomial params, 0 ≤ sdpDualSlackOperator params strategy Z g) ∧
-        ∀ g : Polynomial params,
-          sdpComplementarySlacknessEquation params strategy T.toSubMeas Z g :=
-  (sdp_statement_with_slackness params strategy).exists_measurement_witness
 
 -- The reduced add-in-u lemma invokes the global-variance transport record and
 -- checks the full polynomial-indexed variance family.

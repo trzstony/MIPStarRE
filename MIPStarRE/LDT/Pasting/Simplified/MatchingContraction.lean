@@ -1,6 +1,5 @@
 import MIPStarRE.LDT.Pasting.Simplified.ContractionPowers
 import MIPStarRE.LDT.Pasting.Defs.Families
-import MIPStarRE.LDT.Basic.TensorPlacement
 
 /-!
 # Matching-outcome contraction

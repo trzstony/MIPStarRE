@@ -73,22 +73,6 @@ structure IsGood {params : Parameters} {ι : Type*} [Fintype ι] [DecidableEq ι
 
 end SymStrat
 
-/-- The diagonal-line failure surrogate is nonnegative. -/
-theorem diagonalFailureProbability_nonneg
-    (params : Parameters) [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SymStrat params ι) :
-    0 ≤ strategy.diagonalFailureProbability := by
-  unfold SymStrat.diagonalFailureProbability
-  refine mul_nonneg ?_ ?_
-  · positivity
-  · refine Finset.sum_nonneg ?_
-    intro j _
-    exact bipartiteConsError_nonneg strategy.state
-      (uniformDistribution (RestrictedDiagonalSample params j))
-      (diagonalPointAnswerFamily strategy j)
-      (diagonalLineAnswerFamily strategy j)
-
 /-- A good symmetric strategy has a nonnegative axis-parallel error parameter
 `ε`. -/
 theorem eps_nonneg_of_isGood
@@ -121,19 +105,6 @@ theorem delta_nonneg_of_isGood
       (uniformDistribution (Point params))
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
     hgood.selfConsistencyTest
-
-/-- A good symmetric strategy has a nonnegative diagonal-lines error parameter
-`γ`. -/
-theorem gamma_nonneg_of_isGood
-    (params : Parameters)
-    [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SymStrat params ι)
-    {eps delta gamma : Error}
-    (hgood : strategy.IsGood eps delta gamma) :
-    0 ≤ gamma := by
-  exact le_trans (diagonalFailureProbability_nonneg params strategy)
-    hgood.diagonalLineTest
 
 /-! ### Answer-valued symmetric strategies -/
 

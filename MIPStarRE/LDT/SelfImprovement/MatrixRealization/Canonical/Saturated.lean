@@ -1,4 +1,3 @@
-import MIPStarRE.Quantum.FiniteMatrix.TracePairing
 import MIPStarRE.LDT.SelfImprovement.MatrixRealization.Canonical.Witness
 
 /-!
@@ -84,22 +83,6 @@ noncomputable def matrixSdpCanonicalSaturateSlackBlockMatrix
     matrixSdpCanonicalDiagonalBlock params model
         (matrixSdpCanonicalSaturateSlackBlockMatrix params model X) none =
       0 := by
-  simp [matrixSdpCanonicalSaturateSlackBlockMatrix]
-
-/-- The polynomial blocks of the saturated canonical matrix agree with the
-original diagonal blocks, except that the distinguished polynomial receives the
-old `none` slack block. -/
-@[simp] theorem matrixSdpCanonicalDiagonalBlock_saturateSlackBlockMatrix_some
-    (params : Parameters) [FieldModel params.q]
-    (model : MatrixSdpRealization params)
-    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model))
-    (g : Polynomial params) :
-    matrixSdpCanonicalDiagonalBlock params model
-        (matrixSdpCanonicalSaturateSlackBlockMatrix params model X) (some g) =
-      matrixSdpCanonicalDiagonalBlock params model X (some g) +
-        if g = sdpDistinguishedPolynomial params then
-          matrixSdpCanonicalDiagonalBlock params model X none
-        else 0 := by
   simp [matrixSdpCanonicalSaturateSlackBlockMatrix]
 
 /-- Feasibility is preserved by moving the `none` slack block into
@@ -308,27 +291,6 @@ theorem matrixSdpCanonicalSaturateSlackBlockMatrix_strongDuality
       params model X hX
   exact le_antisymm hsat_le_dual hdual_le_sat
 
-/-- Vanishing of the slack diagonal block saturates the extracted paper
-primal submeasurement.
-
-This is the paper-faithful replacement for deriving saturation from an
-auxiliary lower bound on the dual variable: if the canonical optimal solution
-is supplied with zero slack block, then the extracted family satisfies
-`∑_g T_g = I` directly. -/
-theorem matrixSdpPrimalTotalEqOne_extracted_of_canonicalSlackBlock_eq_zero
-    (params : Parameters) [FieldModel params.q]
-    (model : MatrixSdpRealization params)
-    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model))
-    (hX : MatrixSdpCanonicalPrimalFeasible params model X)
-    (hSlack : matrixSdpCanonicalDiagonalBlock params model X none = 0) :
-    ∑ g : Polynomial params,
-        (matrixSdpCanonicalExtractedPrimalSubmeasurement params model X hX).effect g =
-      1 := by
-  refine matrixSdpPrimalTotalEqOne_of_canonicalSlackOperator_eq_zero
-    params model (matrixSdpCanonicalExtractedPrimalSubmeasurement params model X hX) ?_
-  rw [matrixSdpCanonicalSlackOperator_extractedPrimalSubmeasurement]
-  exact hSlack
-
 /-- Assemble a paper-form optimal witness from canonical complementary
 slackness and an explicitly saturated slack block.
 
@@ -408,39 +370,6 @@ theorem matrixSdpOptimalWitness_of_canonicalFeasibleSaturatedComplementarySlackn
       params model X hX Z hcanonical
   · rw [matrixSdpCanonicalSlackOperator_extractedPrimalSubmeasurement]
     exact hSlack
-
-/-- Assemble the canonical block-SDP conclusions as the matrix-level statement
-with an explicitly saturated slack block.
-
-This is the statement form of
-`matrixSdpOptimalWitness_of_canonicalSaturatedComplementarySlackness`.
-It records the paper-form strong-duality output with the saturated canonical
-slack block as an explicit hypothesis, and it does not add an auxiliary
-dominance condition. -/
-theorem matrixSdpStatementWithSlackness_of_canonicalSaturatedComplementarySlackness
-    (params : Parameters) [FieldModel params.q]
-    (model : MatrixSdpRealization params)
-    (T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
-    (Z : MatrixOperator model.space)
-    (hdual :
-      ∀ g : Polynomial params,
-        0 ≤ matrixSdpDualSlackOperator params model Z g)
-    (hstrong :
-      matrixSdpPrimalObjective params model T = matrixSdpDualObjective model Z)
-    (hcanonical :
-      matrixSdpCanonicalPrimalBlockMatrix params model T *
-          (matrixSdpCanonicalDualOperator params model Z -
-            matrixSdpCanonicalObjectiveOperator params model) =
-        0)
-    (hSlack : matrixSdpCanonicalSlackOperator params model T = 0) :
-    MatrixSdpStatementWithSlackness params model where
-  witness :=
-    let hopt :=
-      matrixSdpOptimalWitness_of_canonicalSaturatedComplementarySlackness
-        params model T Z hdual hstrong hcanonical hSlack
-    ⟨hopt.primalMeasurement, Z, by
-      simpa [MatrixSdpOptimalWitness.primalMeasurement,
-        MIPStarRE.Quantum.Measurement.ofSumEqOne] using hopt⟩
 
 /-- Assemble the canonical block-SDP conclusions as the matrix-level statement
 with zero slack block.

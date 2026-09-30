@@ -22,7 +22,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-
 /-- Averaged squared commutator of a fine-slice outcome with the adjoint
 of a uniformly sampled completed-measurement word. -/
 noncomputable def randomWordAdjointCommutatorEnergy
@@ -97,26 +96,6 @@ theorem randomWordAdjointCommutatorEnergy_eq
   apply avgOver_congr
   intro xs
   rw [eX.apply_symm_apply]
-
-/-- Sharp simplified commutation estimate in the word orientation used by
-the sequential sandwich. -/
-theorem randomWordAdjointCommutatorEnergy_le_sharp
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι) (gamma zeta : Error) (k : ℕ)
-    (hcom : ComMainConclusion params strategy family gamma zeta)
-    (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hsc : SDDRel strategy.state (uniformDistribution (Fq params))
-      (gHatSelfConsistencyLeftFamily params family)
-      (gHatSelfConsistencyRightFamily params family)
-      (2 * zeta)) :
-    randomWordAdjointCommutatorEnergy params family strategy.state k ≤
-      (2 * (k : Error)) *
-        (Real.sqrt (comMainError params gamma zeta) +
-          2 * Real.sqrt zeta) ^ 2 := by
-  rw [randomWordAdjointCommutatorEnergy_eq]
-  exact randomWordCommutatorEnergy_le_sharp params strategy family gamma zeta k
-    hcom hself hsc
 
 /-- Coarse simplified commutation estimate in the word orientation used by
 the sequential sandwich. -/

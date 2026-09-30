@@ -1,6 +1,5 @@
 import MIPStarRE.LDT.Test.MainTheorem.Simplified.SmallError
 import MIPStarRE.LDT.Test.MainTheorem.Simplified.Saturated
-import MIPStarRE.LDT.Test.MainTheorem.ScalarBounds.Definitions
 
 /-!
 # Main-formal soundness theorem

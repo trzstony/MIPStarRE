@@ -66,24 +66,4 @@ abbrev ComMainConclusion (params : Parameters)
     (fullSliceProductRight params strategy family)
     (comMainError params gamma zeta)
 
-/-- Paper origin: `references/ldt-paper/commutativity-G.tex:309-338`
-(`\label{lem:normalization-condition}`); records the Hermitian-square /
-identity-bound expansion used inside the proof of the commutativity theorem
-`\label{thm:com-main}` (`references/ldt-paper/commutativity-G.tex:228-378`).
-
-Conclusion statement for `lem:normalization-condition`. -/
-structure NormalizationConditionStatement {OutcomeA OutcomeB : Type*}
-    [Fintype OutcomeA] [Fintype OutcomeB]
-    (P : SubMeas OutcomeA ι)
-    (Q : ProjSubMeas OutcomeB ι) : Prop where
-  /-- The two square operators formed from `∑_b Q_b P_a Q_b` agree. -/
-  sandwichedHermitianSquare :
-    normalizationConditionAdjointSquareOperator P Q =
-      normalizationConditionSquareOperator P Q
-  /-- The square operator formed from the sandwiched family is bounded by the
-  identity operator. -/
-  sandwichedBoundedByIdentity :
-    normalizationConditionSquareOperator P Q ≤ normalizationConditionIdentityBound P Q
-
-
 end MIPStarRE.LDT.Commutativity

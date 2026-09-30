@@ -19,16 +19,6 @@ namespace MIPStarRE.LDT.Preliminaries
 
 open MIPStarRE.LDT
 
-/-- For a constant `Unit`-indexed family, `sddError` reduces to `qSDD`. -/
-lemma constFamily_sdd_unit
-    {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (ψ : QuantumState ι) (A B : SubMeas Outcome ι) :
-    sddError ψ (uniformDistribution Unit)
-      (constSubMeasFamily A) (constSubMeasFamily B) =
-      qSDD ψ A B := by
-  simp [sddError, avgOver, uniformDistribution, constSubMeasFamily]
-
 /-- For a constant `Unit`-indexed family, `sscError` reduces to `qSSCDefect`. -/
 lemma constFamily_ssc_unit
     {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -37,53 +27,6 @@ lemma constFamily_ssc_unit
     sscError ψ (uniformDistribution Unit) (constSubMeasFamily A) =
       qSSCDefect ψ A := by
   simp [sscError, avgOver, uniformDistribution, constSubMeasFamily]
-
-/-- Completing `B` at `a0` changes only the missing mass, so the self-distance is
-exactly the squared residual mass. -/
-lemma completion_self_distance
-    {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (ψ : QuantumState ι) (B : SubMeas Outcome ι) (a0 : Outcome) :
-    qSDD ψ B (completeAtOutcome B a0).toSubMeas =
-      ev ψ (((1 : MIPStarRE.Quantum.Op ι) - B.total) *
-        ((1 : MIPStarRE.Quantum.Op ι) - B.total)) := by
-  classical
-  let R : MIPStarRE.Quantum.Op ι := 1 - B.total
-  have hsum :
-      ∑ a : Outcome,
-          ev ψ
-            ((B.outcome a -
-                (completeAtOutcome B a0).toSubMeas.outcome a)ᴴ *
-              (B.outcome a -
-                (completeAtOutcome B a0).toSubMeas.outcome a)) =
-        ev ψ (R * R) := by
-    have hBtotal_herm : B.totalᴴ = B.total := by
-      exact (Matrix.nonneg_iff_posSemidef.mp B.total_nonneg).isHermitian.eq
-    have hsingle :
-        ∑ a : Outcome,
-          (if a = a0 then ev ψ (R * R) else 0) =
-          ev ψ (R * R) := by
-      simp
-    calc
-      ∑ a : Outcome,
-          ev ψ
-            ((B.outcome a -
-                (completeAtOutcome B a0).toSubMeas.outcome a)ᴴ *
-              (B.outcome a -
-                (completeAtOutcome B a0).toSubMeas.outcome a))
-        = ∑ a : Outcome, if a = a0 then ev ψ (R * R) else 0 := by
-            refine Finset.sum_congr rfl ?_
-            intro a _
-            by_cases ha : a = a0
-            · subst ha
-              have hRflip :
-                  (B.total - 1) * (B.total - 1) =
-                    (1 - B.total) * (1 - B.total) := by
-                noncomm_ring
-              simp [completeAtOutcome, R, hBtotal_herm, hRflip]
-            · simp [completeAtOutcome, ha, ev_zero]
-      _ = ev ψ (R * R) := hsingle
-  simpa [qSDD, qSDDCore, R] using hsum
 
 /-- Evaluating a completed polynomial submeasurement at a point is the same as
 completing the evaluated submeasurement at the induced outcome. -/

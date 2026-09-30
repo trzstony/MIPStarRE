@@ -22,24 +22,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- The squared mirror differences of a completed slice dominate the
-gap of its matching-outcome contraction. -/
-theorem one_sub_matchingOutcomeAt_le_mirror_energy
-    (params : Parameters) [FieldModel params.q]
-    (family : IdxPolyFamily params ι) (x : Fq params) :
-    1 - matchingOutcomeAt params family x ≤
-      ∑ a : GHatOutcome params,
-        (leftTensor (ι₂ := ι) ((gHatIdxMeas params family x).outcome a) -
-          rightTensor (ι₁ := ι) ((gHatIdxMeas params family x).outcome a)) *
-        (leftTensor (ι₂ := ι) ((gHatIdxMeas params family x).outcome a) -
-          rightTensor (ι₁ := ι) ((gHatIdxMeas params family x).outcome a)) := by
-  rw [matchingOutcomeAt_mirror_energy]
-  have hgap : 0 ≤ (1 : MIPStarRE.Quantum.Op (ι × ι)) -
-      matchingOutcomeAt params family x :=
-    sub_nonneg.mpr (matchingOutcomeAt_le_one params family x)
-  apply sub_nonneg.mp
-  convert hgap using 1; abel
-
 /-- The diagonal tensor sum of the uncompleted slice outcomes is bounded
 by the tensor square of their total projector. -/
 theorem fineSlice_diagonal_le_totalTensor

@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Pasting.ComparisonLemmas.CommuteGHalfSandwich
+import MIPStarRE.LDT.Pasting.ComparisonLemmas.Common
 
 /-!
 # Section 12 pasting: line one-point transport — endpoint equivalences
@@ -152,84 +152,6 @@ def gHatTupleOutcomeLastFrontEquiv
         simp only [hne, ↓reduceDIte, Fin.cons_succ]
         exact congrArg gs (Fin.ext rfl)
 
-/-- Move the last coordinate to the front and reverse the preceding prefix. -/
-def pointTupleLastReverseEquiv
-    (params : Parameters) (i : ℕ) :
-    PointTuple params (i + 1) ≃ PointTuple params (i + 1) where
-  toFun xs := Fin.cons (xs ⟨i, Nat.lt_succ_self i⟩)
-    (fun j => xs ⟨i - 1 - j.1, by omega⟩)
-  invFun xs := fun j =>
-    if hji : j.1 = i then
-      xs 0
-    else
-      xs ⟨i - j.1, by omega⟩
-  left_inv := fun xs => by
-    funext j
-    by_cases hji : j.1 = i
-    · have hj : j = ⟨i, Nat.lt_succ_self i⟩ := Fin.ext hji
-      subst j
-      simp
-    · simp only [hji, ↓reduceDIte]
-      have hjlt : j.1 < i := by omega
-      rw [show (⟨i - (j : ℕ), by omega⟩ : Fin (i + 1)) =
-          Fin.succ ⟨i - 1 - (j : ℕ), by omega⟩ by
-        ext
-        change i - (j : ℕ) = i - 1 - (j : ℕ) + 1
-        omega]
-      simp only [Fin.cons_succ]
-      have hle : (j : ℕ) ≤ i - 1 := by omega
-      exact congrArg xs (Fin.ext (Nat.sub_sub_self hle))
-  right_inv := fun xs => by
-    funext j
-    cases j using Fin.cases with
-    | zero => simp
-    | succ j =>
-        have hne : ¬ i - 1 - j.1 = i := by omega
-        simp only [Fin.cons_succ, hne, ↓reduceDIte]
-        have hle : (j : ℕ) ≤ i - 1 := by omega
-        exact congrArg xs (Fin.ext (by
-          change i - (i - 1 - (j : ℕ)) = (j : ℕ) + 1
-          omega))
-
-/-- Move the last completed-slice outcome to the front and reverse the preceding prefix. -/
-def gHatTupleOutcomeLastReverseEquiv
-    (params : Parameters) [FieldModel params.q] (i : ℕ) :
-    GHatTupleOutcome params (i + 1) ≃ GHatTupleOutcome params (i + 1) where
-  toFun gs := Fin.cons (gs ⟨i, Nat.lt_succ_self i⟩)
-    (fun j => gs ⟨i - 1 - j.1, by omega⟩)
-  invFun gs := fun j =>
-    if hji : j.1 = i then
-      gs 0
-    else
-      gs ⟨i - j.1, by omega⟩
-  left_inv := fun gs => by
-    funext j
-    by_cases hji : j.1 = i
-    · have hj : j = ⟨i, Nat.lt_succ_self i⟩ := Fin.ext hji
-      subst j
-      simp
-    · simp only [hji, ↓reduceDIte]
-      have hjlt : j.1 < i := by omega
-      rw [show (⟨i - (j : ℕ), by omega⟩ : Fin (i + 1)) =
-          Fin.succ ⟨i - 1 - (j : ℕ), by omega⟩ by
-        ext
-        change i - (j : ℕ) = i - 1 - (j : ℕ) + 1
-        omega]
-      simp only [Fin.cons_succ]
-      have hle : (j : ℕ) ≤ i - 1 := by omega
-      exact congrArg gs (Fin.ext (Nat.sub_sub_self hle))
-  right_inv := fun gs => by
-    funext j
-    cases j using Fin.cases with
-    | zero => simp
-    | succ j =>
-        have hne : ¬ i - 1 - j.1 = i := by omega
-        simp only [Fin.cons_succ, hne, ↓reduceDIte]
-        have hle : (j : ℕ) ≤ i - 1 := by omega
-        exact congrArg gs (Fin.ext (by
-          change i - (i - 1 - (j : ℕ)) = (j : ℕ) + 1
-          omega))
-
 /-- Split a completed-slice outcome tuple into the first `n` coordinates and the last one. -/
 def gHatTupleOutcomePrefixLastEquiv
     (params : Parameters) [FieldModel params.q] (n : ℕ) :
@@ -251,6 +173,5 @@ def gHatTupleOutcomePrefixLastEquiv
     · funext j
       simp [j.2]
     · simp
-
 
 end MIPStarRE.LDT.Pasting

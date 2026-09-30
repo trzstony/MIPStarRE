@@ -1,9 +1,4 @@
-import MIPStarRE.LDT.Basic.SubMeasurementFamilies
-import MIPStarRE.LDT.Basic.DistributionAvg
 import MIPStarRE.LDT.Preliminaries.PolynomialAgreement
-import MIPStarRE.LDT.Preliminaries.SelfConsistency.DataProcessing
-import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds.Final
-import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.CommonHelpers
 
 /-!
@@ -38,29 +33,6 @@ noncomputable def selfConsistencyAddInUSelection (params : Parameters)
     [FieldModel params.q] : AddInUSelection params (Polynomial params) :=
   fun _ => {hh | hh.1 = hh.2}
 
-private lemma addInULeftOperatorAtPoint_selfConsistencySelection
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (M : IdxSubMeas (Point params) (Polynomial params) ι)
-    (H : SubMeas (Polynomial params) ι)
-    (u : Point params) :
-    addInULeftOperatorAtPoint params strategy M H (selfConsistencyAddInUSelection params) u =
-      ∑ h : Polynomial params, opTensor ((M u).outcome h) (H.outcome h) := by
-  classical
-  unfold addInULeftOperatorAtPoint selfConsistencyAddInUSelection addInUSelectionPairs
-  symm
-  refine Finset.sum_bij (fun h _ => (h, h)) ?_ ?_ ?_ ?_
-  · intro h _
-    simp
-  · intro a _ _ _ hab
-    exact congrArg Prod.fst hab
-  · intro ah hah
-    refine ⟨ah.1, Finset.mem_univ _, ?_⟩
-    simp at hah
-    ext <;> simp [hah]
-  · intro h _
-    simp
-
 private lemma addInURightOperatorAtPoint_selfConsistencySelection
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
@@ -85,45 +57,6 @@ private lemma addInURightOperatorAtPoint_selfConsistencySelection
     ext <;> simp [hah]
   · intro h _
     simp
-
-/-- The left side of the diagonal `add-in-u` application in the helper
-strong-self-consistency proof is exactly the diagonal bipartite match mass of
-`Hhat = E_u H^u`.
-
-This formalizes the paper's identity
-`∑_h ⟪H_h, H_h⟫ = E_u ∑_h ⟪H^u_h, H_h⟫` used at
-`self_improvement.tex`, lines 455--468. -/
-lemma addInULeftQuantity_selfConsistencySelection_eq_matchMass
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (T : SubMeas (Polynomial params) ι) :
-    addInULeftQuantity params strategy
-        (sandwichedPolynomialSubMeasAt params strategy T)
-        (averagedSandwichedPolynomialSubMeas params strategy T)
-        (selfConsistencyAddInUSelection params) =
-      qBipartiteMatchMass strategy.state
-        (averagedSandwichedPolynomialSubMeas params strategy T)
-        (averagedSandwichedPolynomialSubMeas params strategy T) := by
-  classical
-  change avgOver (uniformDistribution (Point params)) (fun u =>
-      ev strategy.state (addInULeftOperatorAtPoint params strategy
-        (sandwichedPolynomialSubMeasAt params strategy T)
-        (averagedSandwichedPolynomialSubMeas params strategy T)
-        (selfConsistencyAddInUSelection params) u)) = _
-  rw [avgOver_congr (uniformDistribution (Point params)) _
-    (fun u => ∑ h : Polynomial params,
-      ev strategy.state (opTensor
-        ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h)
-        ((averagedSandwichedPolynomialSubMeas params strategy T).outcome h))) ?_]
-  · rw [avgOver_sum]
-    unfold qBipartiteMatchMass averagedSandwichedPolynomialSubMeas
-    refine Finset.sum_congr rfl ?_
-    intro h _
-    rw [ev_opTensor_averageOperatorOverDistribution_left]
-    simp [sandwichedPolynomialSubMeasAt]
-  · intro u
-    rw [addInULeftOperatorAtPoint_selfConsistencySelection]
-    exact ev_sum strategy.state _
 
 /-- The right side of the diagonal `add-in-u` application is the paper's
 "release-the-kraken" expression, with the two copies of
@@ -152,41 +85,6 @@ lemma addInURightQuantity_selfConsistencySelection_eq_release
   intro u
   rw [addInURightOperatorAtPoint_selfConsistencySelection]
   exact ev_sum strategy.state _
-
-/-- Specialization of the missing full `add-in-u` transfer to the diagonal
-selection needed for helper strong self-consistency.
-
-The hypothesis is exactly the scalar transfer inequality supplied by the paper's
-`lem:add-in-u` after choosing `M^u = H^u` and
-`S_u = {(h,h) : h ∈ \polyfunc{m}{q}{d}}`. The conclusion rewrites that
-transfer into the paper's displayed step `eq:release-the-kraken`.  The helper
-strong-self-consistency assembly now consumes this transfer internally; it is
-not a source-theorem hypothesis. -/
-lemma selfConsistencyDiagonalAddInU_of_transfer
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (eps delta : Error)
-    (T : SubMeas (Polynomial params) ι)
-    (htransfer :
-      |addInULeftQuantity params strategy
-          (sandwichedPolynomialSubMeasAt params strategy T)
-          (averagedSandwichedPolynomialSubMeas params strategy T)
-          (selfConsistencyAddInUSelection params) -
-        addInURightQuantity params strategy
-          (sandwichedPolynomialSubMeasAt params strategy T)
-          T
-          (selfConsistencyAddInUSelection params)| ≤ addInUError params eps delta) :
-    |qBipartiteMatchMass strategy.state
-        (averagedSandwichedPolynomialSubMeas params strategy T)
-        (averagedSandwichedPolynomialSubMeas params strategy T) -
-      avgOver (uniformDistribution (Point params)) (fun u =>
-        ∑ h : Polynomial params,
-          let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy h u
-          ev strategy.state
-            (opTensor (Au * (sandwichedPolynomialSubMeasAt params strategy T u).outcome h * Au)
-              (T.outcome h)))| ≤ addInUError params eps delta := by
-  simpa [addInULeftQuantity_selfConsistencySelection_eq_matchMass,
-    addInURightQuantity_selfConsistencySelection_eq_release] using htransfer
 
 /-- Projective sandwich collapse: if `A * A = A`, then `A * (A * X * A) * A = A * X * A`.
 
@@ -631,7 +529,6 @@ theorem polynomial_off_diagonal_swapped_indicator_sandwich_avg_le_mdq
       polynomial_collision_pointMeasurement_sandwichTensor_avg_le_mdq params strategy T
   exact havg_le_full.trans hfull
 
-
 /-- Projective simplification of the diagonal `add-in-u` right operator at a point.
 
 Combining `addInURightOperatorAtPoint_selfConsistencySelection` with the
@@ -709,6 +606,5 @@ lemma addInURightQuantity_selfConsistencySelection_eq_simplified
   intro u
   rw [addInURightOperatorAtPoint_selfConsistencySelection_proj_eq]
   exact ev_sum strategy.state _
-
 
 end MIPStarRE.LDT.SelfImprovement

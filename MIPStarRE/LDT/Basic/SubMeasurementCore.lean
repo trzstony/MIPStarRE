@@ -219,13 +219,6 @@ theorem Measurement.sum_eq {α : Type*} {ι : Type*}
     ∑ a, M.outcome a = 1 := by
   rw [M.sum_eq_total, M.total_eq_one]
 
-/-- A submeasurement is complete exactly when its outcome operators sum to `1`. -/
-theorem SubMeas.sum_eq_one_iff_total_eq_one {α : Type*} {ι : Type*}
-    [Fintype α] [Fintype ι] [DecidableEq ι]
-    (A : SubMeas α ι) :
-    (∑ a, A.outcome a = 1) ↔ A.total = 1 := by
-  simp [A.sum_eq_total]
-
 /-- Promote a complete submeasurement to a measurement.
 
 This is the explicit bridge from the paper's sub-measurement convention
@@ -444,6 +437,5 @@ theorem ProjMeas.outcome_commute {α : Type*}
   · subst hab; rfl
   · rw [P.outcome_orthogonal a b hab,
         P.outcome_orthogonal b a (Ne.symm hab)]
-
 
 end MIPStarRE.LDT
