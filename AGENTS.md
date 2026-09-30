@@ -24,9 +24,10 @@ A legacy 2111 tensor track exists under `blueprint/legacy/` — do not modify it
 
 **Canonical source hierarchy** (use in this order):
 
-1. `references/ldt-paper/` — TeX source of the paper
-2. `blueprint/src/chapter/` — active LaTeX blueprint
-3. `MIPStarRE/` — Lean scaffold
+1. `references/ldt-paper/` — TeX source of the paper (definitions, statements)
+2. `blueprint/src/low_degree_simplified.tex` — the simplified proof followed
+3. `blueprint/src/chapter/` — active LaTeX blueprint
+4. `MIPStarRE/` — Lean codebase
 
 Always read the paper source before formalizing or proving a statement. The
 paper contains the precise mathematical definitions, theorem statements, and
@@ -198,13 +199,13 @@ the cited statement, and state the plan for eliminating the restriction,
 deriving it internally, or moving the result out of the source-labelled route.
 
 This rule applies especially to declarations named after paper labels such as
-`mainFormal`, `selfImprovement`, `mainInduction`, or other theorem names linked
+`mainFormal`, `selfImprovementWithDilation`, `simplifiedMainInduction`, or other names linked
 from the blueprint by `\lean{...}` and `\leanok`.
 
 Before editing any theorem tagged with a paper label (`thm:*`, `lem:*`,
 `prop:*`):
 
-1. Read the corresponding statement in `references/ldt-paper/`.
+1. Read the statement in `references/ldt-paper/` or `low_degree_simplified.tex`.
 2. Preserve the public Lean theorem statement, except for hypotheses that are
    genuinely part of the faithful encoding of the paper's domain.
 3. Do not add bridge inputs, residual packages, repair hypotheses, producer

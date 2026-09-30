@@ -198,8 +198,8 @@ Lean keeps the feasible primal boundary explicit as a submeasurement, while the
 selected saturated optimum is exposed to the slackness-carrying statement as a
 measurement.  The construction supplied by \ghpr{1708} is the \textbf{producer}
 for this stronger statement.%
-\footnote{Representative declarations are \leanid{sdpStrictPrimalSubMeas},
-\leanid{sdpPrimalObjective}, \leanid{sdpComplementarySlacknessEquation}, and
+\footnote{Representative declarations are \leanid{sdpStrictPrimalWeight},
+\leanid{sdpComplementarySlacknessEquation}, and
 \leanid{averagedSandwichedPolynomialSubMeas} in
 \doclink{MIPStarRE/LDT/SelfImprovement/Defs.lean}.  The active source-facing
 interface is \leanid{SdpStatementWithSlackness} in

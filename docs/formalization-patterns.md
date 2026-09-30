@@ -138,21 +138,12 @@ and leave the missing proof as a tracked `sorry`.
    The former Section 9 bundle `SelfImprovementObligations` and the helper
    `selfImprovementFromObligations` were removed because they bundled
    helper strong self-consistency, orthonormalization, and final-field transport
-   into a single route to the full self-improvement conclusion.  The correct
-   boundary is now the theorem `selfImprovement`, whose missing
-   proof is an explicit `sorry`.
+   into a single route to the full self-improvement conclusion.  The
+   self-improvement theorem is now proved directly
+   (`selfImprovementWithDilation`).
 
-   The former induction-section helper
-   `selfImprovementInInductionSection_ofObligations` was removed because it
-   encouraged propagation of the Section 9 bundle into the Section 6 successor
-   constructors.  Those constructors now call the theorem
-   `selfImprovementInInductionSection` directly; its current proof gap is the
-   correct place for the missing work.
-
-3. **Propagation is a warning sign.**  The consumer of
-   `selfImprovementInInductionSection` — typically a
-   `MainInductionStep` theorem — should close the hypothesis with an internal
-   theorem as soon as possible.  If the hypothesis propagates upward toward a
+3. **Propagation is a warning sign.**  The consumer of a conditional helper
+   should close the hypothesis with an internal theorem as soon as possible.  If the hypothesis propagates upward toward a
    paper-labelled theorem, the PR should stop and either prove the obligation or
    restore the paper theorem with an explicit unfinished proof.
 
@@ -170,31 +161,11 @@ and leave the missing proof as a tracked `sorry`.
    domains.  Bridge, residual, repair, and proof-obligation inputs must be
    produced inside its proof rather than added to its statement.
 
-### Existing bridge-like declarations
+### Former bridge-like declarations
 
-Several older declarations still name proof obligations explicitly.  They are
-transitional proof debt, not a pattern to extend to paper theorem statements.
-When such a declaration remains useful, its role should be made explicit and
-kept away from source-labelled blueprint entries.
-
-| Declaration | Status to maintain |
-|-------------|--------------------|
-| `LdPastingNontrivialContext` | Nontrivial-regime context for `ldPastingNontrivial`; do not present it as the unrestricted `thm:ld-pasting` context |
-| `Pasting.ldPastingNontrivial` | Restricted nontrivial-regime form of `thm:ld-pasting`; link from a Lean-only remark, while `Pasting.ldPasting` remains the unrestricted source-facing theorem |
-
-The former same-carrier `mainFormal` transport-witness route has been retired.
-The former `SelfImprovement.HelperStrongSelfConsistencyInput`,
-`SelfImprovement.OrthonormalizationInput`, `SelfImprovement.FinalFieldsInput`, and
-`MakingMeasurementsProjective.OrthonormalizationInput` bundles have been removed.
-Useful proof content should be kept as named construction lemmas, while missing
-orthonormalization or final-field arguments remain direct proof gaps on the
-source-facing theorem until proved from the paper hypotheses.
-
-The former `MakingMeasurementsProjective.SpectralTruncationInput` abbreviation
-has likewise been retired.  The spectral-truncation step is represented by the
-source-shaped statement `SpectralTruncationStatement` and by direct construction
-theorems such as `spectralTruncationStatement_of_sourceAlmostProjective`,
-rather than by an `Input` wrapper passed through later theorems.
+No declaration on the proof of `mainFormal` names a proof obligation
+explicitly.  The former input bundles and restricted-regime forms of the
+original proof route were removed together with that route.
 
 ### Retiring auxiliary declarations
 
@@ -256,7 +227,7 @@ to link to Lean:
 | `\lean{Name}` | The corresponding Lean declaration exists | `\lean{MIPStarRE.LDT.Test.mainFormal}` |
 | `\leanok` (statement-level) | The Lean declaration compiles and its statement matches the source or blueprint statement; it does not certify proof closure | `\leanok` |
 | `\leanok` (proof-level) | The proof block is fully formalized — the theorem or lemma has a complete sorry-free proof | `\lean{...}` plus `\leanok` inside `\begin{proof}` |
-| `\uses{label}` | The statement or proof block depends on the cited result | `\uses{thm:orthonormalization, prop:completing-to-measurement}` |
+| `\uses{label}` | The statement or proof block depends on the cited result | `\uses{lem:state-dependent-orthogonalization, prop:simeq-for-measurements}` |
 
 Do not use statement-level `\leanok` for a source-labelled theorem whose Lean
 declaration is conditional on bridge, residual, repair, proof-obligation input,
@@ -281,24 +252,11 @@ build needs regeneration.
 
 ### Current `\leanok` status
 
-The former deliberate withholding cases for `thm:orthonormalization`,
-`thm:naimark`, `thm:main-induction`, and `thm:main-formal` have been resolved
-in the current blueprint under the documented statement corrections.  The
-project now treats the factor-\(400\) large-\(k\) condition and the nonzero
-sampling boundary \(0<k\) as corrections to the printed source statement, not
-as proof obligations.  Under those corrected statements, the relevant blueprint
-nodes carry proof-level `\leanok` and the linked declarations are checked by the
-standard axiom and proof-debt audits.
-
-- **`thm:ld-pasting`** (ch09) and
-  **`thm:ld-pasting-in-induction-section`** (ch10): The paper theorem in
-  `references/ldt-paper/ld-pasting.tex`, lines 12--50, assumes
-  `k >= 400md` but does not state the nontrivial-regime inequalities as
-  hypotheses.  The source-facing declaration `Pasting.ldPasting` keeps this
-  unrestricted statement visible, including the direct degree-zero branch
-  formerly tracked by issue #1622.  The restricted declaration
-  `Pasting.ldPastingNontrivial` belongs in Lean-only remarks because it assumes
-  `gamma <= 1`, `zeta <= 1`, `d <= q`, `0 < d`, and `1 <= k`.
+Every blueprint node carries proof-level `\leanok`.  The main theorem
+`thm:main-formal` follows `blueprint/src/low_degree_simplified.tex`, whose
+error has no sampling parameter.  The paper's statement with sampling
+parameter `k` is the corollary `cor:main-formal-sampling`, proved under the
+printed hypothesis `k >= md` together with the boundary correction `0 < k`.
 
 ### The `\uses{}` convention
 
@@ -450,8 +408,8 @@ The old Section 9 interface bundled helper strong self-consistency,
 orthonormalization, and final-field transport into a structure named
 `SelfImprovementObligations`, then used a conditional theorem to obtain the
 full self-improvement conclusion.  That made the formalization look more
-complete than it was.  The current code removes that bundle and leaves the
-proof gap in `MIPStarRE.LDT.SelfImprovement.selfImprovement`.
+complete than it was.  The bundle was removed, and self-improvement is now
+proved directly.
 
 ### Rules
 

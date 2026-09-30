@@ -2,19 +2,17 @@
 namespace MIPStarRE.LDT
 namespace Test
 
--- source: MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean:288-327  (MIPStarRE.LDT.Test.mainFormal)
-/--
-Corrected source statement of `thm:main-formal`.
+-- source: MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean:34-66  (MIPStarRE.LDT.Test.mainFormal)
+/-- Simplified statement of `thm:main-formal`.
 
-Paper origin: `references/ldt-paper/test_definition.tex:180-202`.
+The strategy and the three projective-measurement conclusions are those of the
+original theorem.  The simplified proof chooses the pasting length internally
+and gives the error `21000 K_{m,d} (ε^(1/64) + (d/q)^(1/64))`.
 
-This theorem records the two-space source theorem with the confirmed large-`k`
-correction `k ≥ 400 m d`.  The paper prints the weaker hypothesis `k ≥ m d`;
-the missing factor `400` is documented in
-`docs/paper-gaps/issue-906-main-formal-k-bound.tex`.  The additional condition
-`0 < k` corrects the zero-sampling boundary where the printed error collapses
-to zero; this boundary is documented in
-`docs/paper-gaps/issue-422-main-formal-zero-k-boundary.tex`. -/
+**Local fix:** This bound follows `blueprint/src/low_degree_simplified.tex`,
+`thm:main-formal`, which replaces the sampling parameter `k` of
+`references/ldt-paper/test_definition.tex:180-202`.  The original statement is
+recovered as the corollary `mainFormalWithK`. -/
 theorem mainFormal
     (params : Parameters)
     [FieldModel params.q]
@@ -23,24 +21,21 @@ theorem mainFormal
     [Fintype ιB] [DecidableEq ιB]
     (strategy : ProjStrat params ιA ιB)
     (eps : Error)
-    (hpass : strategy.lowIndividualDegreeFailureProbability ≤ eps)
-    (k : ℕ)
-    (hk : 400 * params.m * params.d ≤ k)
-    (hk0 : 0 < k) :
+    (hpass : strategy.lowIndividualDegreeFailureProbability ≤ eps) :
     ∃ G_A : ProjMeas (Polynomial params) ιA,
       ∃ G_B : ProjMeas (Polynomial params) ιB,
         ConsRel strategy.state (uniformDistribution (Point params))
             (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
             (polynomialEvaluationFamily params G_B.toSubMeas)
-            (mainFormalError params k eps) ∧
+            (simplifiedMainFormalError params eps) ∧
           ConsRel strategy.state (uniformDistribution (Point params))
             (polynomialEvaluationFamily params G_A.toSubMeas)
             (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
-            (mainFormalError params k eps) ∧
+            (simplifiedMainFormalError params eps) ∧
           ConsRel strategy.state (uniformDistribution Unit)
             (constSubMeasFamily G_A.toSubMeas)
             (constSubMeasFamily G_B.toSubMeas)
-            (mainFormalError params k eps) := by
+            (simplifiedMainFormalError params eps) := by
   sorry
 
 end Test

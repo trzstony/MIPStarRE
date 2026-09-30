@@ -21,8 +21,7 @@
   Lean; the note remains to record the faithful projective-submeasurement
   reading of the paper statement.
   \item \textbf{Estimated weight:} no remaining proof construction is expected
-  for Naimark itself.  Downstream work should cite the checked tensor-product
-  theorem or the questionwise adapter according to the required conclusion.
+  for Naimark itself.
   \item \textbf{Mathlib/project split:} approximately \textbf{60\% Mathlib} and
   \textbf{40\% project-local}.  The proof uses finite-dimensional matrix and
   trace algebra from Mathlib, with project-local packaging for measurements and
@@ -42,7 +41,7 @@
 
 \section{Key theorem forms}
 
-The formalization isolates two related but distinct theorem forms.
+The note distinguishes the following theorem forms.
 \begin{enumerate}
   \item \textbf{Source theorem form: Naimark dilation
   (\texttt{thm:naimark}, displayed at
@@ -64,39 +63,25 @@ The formalization isolates two related but distinct theorem forms.
   through the helper lemma at lines~121--159.  The helper produces a
   projective submeasurement on the original outcomes; the residual mass is the
   additional $\bot$ outcome in the auxiliary register.
-  \item \textbf{Adapter theorem form: per-question one-measurement
-  Naimark.}  For each question $x$ and submeasurement $A^x$ there exists a
-  one-measurement Naimark dilation on the enlarged space
-  $\mathcal H\otimes(\C\oplus\C^{|\textsf{Outcome}|})$ that preserves all
-  single-outcome expectations:
-  \[
-    \tau\bigl(\rho\,A^x_a\bigr)
-    =\widetilde\tau\bigl(\widetilde\rho\,\widetilde A^x_{(a,\mathrm{some})}\bigr).
-  \]
-  This questionwise interface is also formalized; see the Lean structure
-  \leanid{NaimarkStatement} and the Lean theorem
-  \leanid{questionwiseNaimark}.  The derived declaration
-  \leanid{OneMeasNaimarkData.toProjSubMeas} turns the checked
-  \(\mathrm{Option}\)-outcome dilation into the projective submeasurement on
-  the original outcomes.%
-  \footnote{Defined at
+  \item \textbf{Formalized form: one-measurement Naimark.}  For a single
+  submeasurement $A$ with outcomes $\mathcal A$ on $\mathcal H$, there is an
+  isometric embedding $\mathcal H\to\mathcal H\otimes\C^{\mathrm{Option}(\mathcal A)}$
+  and a projective measurement $\widetilde A$ indexed by
+  $\mathrm{Option}(\mathcal A)$ whose compression of the outcome
+  $(a,\mathrm{some})$ is $A_a$.  The declaration
+  \leanid{OneMeasNaimarkData.toProjSubMeas} restricts the completed
+  $\mathrm{Option}$-outcome measurement to a projective submeasurement on the
+  original outcomes, and
+  \leanid{OneMeasNaimarkData.twoSidedCorrelationPreservation} records the
+  four-register trace identity for a pair of such dilations.%
+  \footnote{See
   \doclink{MIPStarRE/LDT/MakingMeasurementsProjective/NaimarkOneMeas.lean}.}
-  The source-facing theorem
-  \leanid{naimarkTensorProductCorrelation} constructs the auxiliary spaces,
-  auxiliary product state, dilated state, and projective submeasurements from
-  the checked one-measurement theorem.  In Lean these auxiliary spaces are the
-  standard one-register spaces
-  \(\mathrm{Option}(\textsf{Outcome}_A)\) and
-  \(\mathrm{Option}(\textsf{Outcome}_B)\), with a separate Naimark unitary
-  chosen for each question; the theorem does not require different questions'
-  dilated measurements to commute.  The four-register trace identity
-  \leanid{OneMeasNaimarkData.twoSidedCorrelationPreservation} is proved.
-  \item \textbf{Downstream theorem form.}  The downstream uses inside the LDT
-  pipeline never call the bipartite tensor product of two Naimark dilations;
-  they call the per-question single-outcome marginal-preservation conclusion at
-  Alice or Bob separately, with the unmodified state on the unaffected side.
-  This is supplied directly by \leanid{leftMarginalPreservation} and
-  \leanid{rightMarginalPreservation}.
+  \item \textbf{Downstream use.}  The simplified proof of the main theorem
+  dilates the slice measurements produced by self-improvement simultaneously,
+  with one common ancilla and embedding for all slices, and compresses the
+  pasted measurement back to the original space.  Only compression of
+  individual effects is used, so neither the bipartite theorem form nor
+  preservation of the state-dependent distance is needed.
 \end{enumerate}
 
 \section{The source assertion}
@@ -146,36 +131,13 @@ far as the single-outcome marginals.
 
 \section{Comparison with the formalization}
 
-The blueprint and formal development record both the per-question
-one-measurement dilations and the global tensor-product assembly into one
-bipartite statement.  The source-facing Lean statement is stated in terms of
-projective submeasurements on the original outcome types.  Equivalently, one
-could state a completed version using projective measurements indexed by
-\(\mathrm{Option}(\mathsf{Outcome})\), but that is not the outcome type used in
-the source display.
-The checked assembly uses the standard one-register auxiliary space
-\(\mathrm{Option}(\mathsf{Outcome})\) on each side, with different unitaries
-for different questions.  This proves the same correlation statement as the
-paper's product-over-questions auxiliary construction because the theorem does
-not impose simultaneous commutation between dilated measurements for distinct
-questions.
-
-The formal development also proves the adapter form
-\[
-  \forall x,a,\rho,\;
-  \tau\bigl(\rho A^x_a\bigr)
-  =\widetilde\tau\bigl(\widetilde\rho_x\,(\widetilde A^x)_{(a,\mathrm{some})}\bigr),
-\]
-where $\widetilde\rho_x$ is the one-measurement-lifted density at question $x$.
-The corresponding statement for Bob is symmetric.  The bipartite identity of
-the source theorem form is now proved by the four-register trace identity
-\leanid{OneMeasNaimarkData.twoSidedCorrelationPreservation}.
-
-The questionwise interface is still sufficient for downstream LDT use: every
-consumer reduces to the per-side single-outcome marginal-preservation
-conclusion, applied either to Alice's submeasurements with $B$ left untouched or
-vice versa.  The source theorem is also available as an axiom-clean Lean
-theorem.
+The formal development proves the one-measurement Naimark theorem in the
+projective-submeasurement form on the original outcome types, together with
+its completed version indexed by \(\mathrm{Option}(\mathsf{Outcome})\).  The
+bipartite identity of the source theorem form follows from the four-register
+trace identity \leanid{OneMeasNaimarkData.twoSidedCorrelationPreservation}.
+The main theorem uses these dilations only through the compression of
+individual effects, as described in the simplified proof.
 
 \section{What remains documented}
 
@@ -199,18 +161,12 @@ records a genuine correction to the source wording:
 
 \section{Conclusion}
 
-The Lean structure \leanid{NaimarkStatement} and theorem
-\leanid{questionwiseNaimark} record the per-question one-measurement Naimark
-data and the single-outcome marginal-preservation conclusions used by
-downstream LDT lemmas.  The declaration
-\leanid{OneMeasNaimarkData.toProjSubMeas} proves the local passage from the
-completed \(\mathrm{Option}\)-outcome projective measurement to the projective
-submeasurement on the original outcomes.  The source-facing tensor theorem should be read in the
-projective-submeasurement form supplied by the paper's helper lemma; the
-complete-measurement form on the original outcome type would be false for
-submeasurements.  The simultaneous bipartite tensor-product assembly is now
-proved by \leanid{naimarkTensorProductCorrelation}; no Naimark-specific
-`sorryAx` remains.
+The Lean declaration \leanid{OneMeasNaimarkData.toProjSubMeas} proves the local
+passage from the completed \(\mathrm{Option}\)-outcome projective measurement
+to the projective submeasurement on the original outcomes.  The source-facing
+statement should be read in the projective-submeasurement form supplied by the
+paper's helper lemma; the complete-measurement form on the original outcome
+type would be false for submeasurements.
 
 \bibliographystyle{alpha}
 \bibliography{references}

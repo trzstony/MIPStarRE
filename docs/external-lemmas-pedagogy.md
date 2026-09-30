@@ -24,7 +24,7 @@ This document is intended for:
 6. [Matrix order and positive semidefinite operators](#6-matrix-order-and-psd-operators)
 7. [Continuous Functional Calculus (CFC)](#7-continuous-functional-calculus-for-matrices)
 8. [Chebyshev sum inequality](#8-chebyshev-sum-inequality)
-9. [External result statements (Polishchuk–Spielman, Raz–Safra)](#9-external-result-statements)
+9. [External result statements](#9-external-result-statements)
 
 ---
 
@@ -208,7 +208,7 @@ finite-dimensional complex matrices.  Tracked at [#1250].
 
 **Lean files**:
 - `MIPStarRE/Quantum/FiniteMatrix.lean` — `Op d`, `normalizedTrace`,
-  `tauNormSq`, `IsProj`, `sandwich_nonneg`, `sandwich_mono`
+  `IsProj`, `sandwich_nonneg`, `sandwich_mono`
 - `MIPStarRE/LDT/Basic/SubMeasurementCore.lean` — `SubMeas`, `Measurement`,
   `ProjSubMeas`, `ProjMeas`
 - `MIPStarRE/LDT/Basic/TensorPlacement.lean` — left/right tensor lifts
@@ -323,47 +323,9 @@ the `Finset` formulation.
 
 ## 9. External result statements
 
-Some lemmas in the Lean codebase take explicit `*Statement` hypotheses
-that represent external mathematical results the project does not plan
-to formalize.  These are **not** pedagogical gaps in the LDT paper —
-they are citations to other papers:
-
-### Polishchuk–Spielman classical test soundness
-
-**Paper**: Polishchuk–Spielman, "Nearly linear-size holographic proofs"
-(FOCS 1994 / 1997).
-
-**Lean declaration**: `MIPStarRE.LDT.Test.PolishchukSpielmanClassicalSoundnessStatement`
-
-This is a named `Prop` that says: "for a classical test with slack
-parameter `κ`, the error bound `poly(m)·(poly(ε)+poly(d/q))` holds."
-The project takes it as an unformalized hypothesis.  The paper's
-Section 2 (Overview) uses it to bootstrap the soundness analysis.
-
-**Pedagogical note**: Polishchuk–Spielman proves that the low-individual-degree
-test accepts with high probability only strategies that are close to
-passing.  It is a key building block in the paper's argument chain
-but is treated as a black box.
-
-### Matrix Chernoff bound
-
-**Lean declaration**: `chernoffBernoulliMatrix` (internal, in
-`MIPStarRE/LDT/Pasting/Bernoulli/MatrixChernoff.lean`).
-
-This is a fully proved lemma — the project supplies a local proof:
-`MIPStarRE/LDT/Pasting/Bernoulli/MatrixChernoff.lean:78`
-establishes `ChernoffBernoulliMatrixStatement` from explicit local hypotheses
-and without any unresolved statement-style (`*Statement`) hypothesis.  No
-pending external `*Statement` premise remains for this lemma.  There remains
-a Mathlib gap for a general matrix Chernoff inequality (beyond this
-project-specific formalization).
-
-**Pedagogical note**: The classical Chernoff bound says that the sum of
-independent Bernoulli random variables concentrates exponentially around
-its mean.  The matrix version replaces the scalar absolute value with
-the operator norm and uses the Golden–Thompson inequality instead of
-Markov's inequality.  This is a genuine Mathlib gap; see [#1250] for
-upstreaming tracking.
+The proof of `mainFormal` takes no external `*Statement` hypotheses.  The
+former Polishchuk–Spielman soundness statement and the matrix Chernoff bound
+belonged to the original proof route; the simplified proof uses neither.
 
 ---
 

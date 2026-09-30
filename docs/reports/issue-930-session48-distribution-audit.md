@@ -22,7 +22,7 @@ I compared these files with the paper's distribution conventions in:
 
 Scope check before the audit: the only open PR was draft #889, the Lean/Mathlib upgrade, and it does not touch the audited distribution files.  The open zhengfeng/deng work is #931 on self-improvement inputs and #888 on blueprint warning annotations; neither overlaps this distribution slice.  At the time of the original audit, issue #997 had introduced optional PMF/measure adapters; those adapters have since been removed because no downstream Lean module imported them.
 
-Verdict: I found one already-formalized paper boundary repair.  The paper writes the distinct-tuple distribution as a uniform probability distribution for every `k >= 1`, but that support is empty when `k > q`.  Lean extends this object to a finite nonnegative weight for all `k`, proves it is a probability distribution under `k <= q`, and treats the `k > q` total-variation bound as a trivial large-error case.  I documented this in `docs/paper-gaps/issue-930-distinct-tuple-support.tex`.  No Lean theorem statement or proof needs to change.
+Verdict: I found one already-formalized paper boundary repair.  The paper writes the distinct-tuple distribution as a uniform probability distribution for every `k >= 1`, but that support is empty when `k > q`.  Lean extends this object to a finite nonnegative weight for all `k`, proves it is a probability distribution under `k <= q`, and treats the `k > q` total-variation bound as a trivial large-error case.  I documented this in a paper-gap note on the distinct-tuple support (since removed together with the original pasting construction, which the simplified proof replaces by independent tuples).  No Lean theorem statement or proof needs to change.
 
 Apart from that boundary issue, I found no hidden change to constants or hypotheses.  The ordinary paper-facing test distributions remain genuine uniform probabilities.  The optional PMF and finite-measure adapters mentioned in the historical audit snapshot are no longer part of the live Lean tree.
 
@@ -69,7 +69,7 @@ The standard algebra of expectations is implemented without changing constants: 
 
 ## Follow-up
 
-I did not open a separate follow-up GitHub issue.  The only concrete discrepancy is now documented in `docs/paper-gaps/issue-930-distinct-tuple-support.tex`; the formal code already contains the needed repaired interpretation and no Lean or blueprint change is required in this PR.
+I did not open a separate follow-up GitHub issue.  The only concrete discrepancy is now documented in a paper-gap note on the distinct-tuple support (since removed together with the original pasting construction, which the simplified proof replaces by independent tuples); the formal code already contains the needed repaired interpretation and no Lean or blueprint change is required in this PR.
 
 ## Validation
 
@@ -84,7 +84,7 @@ lake env lean MIPStarRE/LDT/Pasting/Defs/Tuples.lean
 lake env lean MIPStarRE/LDT/Pasting/Core.lean
 lake env lean MIPStarRE/LDT/Pasting/BridgeLemmas/LineInterpolation/Averaging.lean
 rg -n "\b(sorry|axiom|admit)\b" MIPStarRE/LDT/Basic/Distribution.lean MIPStarRE/LDT/Pasting/Defs/Tuples.lean MIPStarRE/LDT/Pasting/Core.lean MIPStarRE/LDT/Pasting/BridgeLemmas/Common.lean MIPStarRE/LDT/Pasting/BridgeLemmas/LineInterpolation/Averaging.lean || true
-cd docs/paper-gaps && latexmk -pdf -interaction=nonstopmode issue-930-distinct-tuple-support.tex
+# (paper-gap note since removed)
 git diff --check
 ```
 

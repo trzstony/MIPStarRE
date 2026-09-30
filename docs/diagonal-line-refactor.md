@@ -96,7 +96,7 @@ In particular:
   transport-covariant pattern.
 - `SymStrat.IsGood` now contains exactly the three goodness bounds from the paper:
   `axisParallelTest`, `selfConsistencyTest`, and `diagonalLineTest`.
-- The Lean entry point `commutativityPoints` now has the intended paper-faithful
+- The Lean entry point `answerCommutativityPoints` now has the intended paper-faithful
   hypothesis shape: the rebasing covariance is structural data inside the
   strategy, not an extra theorem argument.
 

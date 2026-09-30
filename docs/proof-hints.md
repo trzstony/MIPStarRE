@@ -116,12 +116,6 @@ Prove small helper lemmas for single outcomes and reuse them. Examples that were
 - `liftLeft_mul_rightPlaced_outcome`
 - `liftRight_mul_leftPlaced_outcome`
 - `liftRight_mul_rightPlaced_outcome`
-- `pointMeasurementProductAlongSharedLine_outcome`
-- `pointMeasurementProductAlongSharedLineReversed_outcome`
-- `pointDiagonalLineMixedProductLeft_outcome`
-- `pointDiagonalLineMixedProductRight_outcome`
-- `diagonalLineProductOrdered_outcome`
-- `diagonalLineProductReversed_outcome`
 
 These helpers let `calc` blocks close equalities that `simpa` alone will not.
 

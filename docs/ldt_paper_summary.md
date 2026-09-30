@@ -15,6 +15,14 @@ This summary covers all requested files in `references/ldt-paper/`:
 
 It focuses on the mathematics that already maps, or is clearly intended to map, to `MIPStarRE/LDT/`.
 
+The formalization follows the simplified proof in
+`blueprint/src/low_degree_simplified.tex` rather than the original proof
+summarized here: it replaces the orthonormalization chapter by linear
+orthogonalization, the Bernoulli-tail pasting by first-success pasting, and
+the sampling parameter `k` of the induction by an internal choice.  The Lean
+mapping blocks below list only the files and declarations that survive in that
+development.
+
 Note: several chapters use the notion of an `(\epsilon,\delta,\gamma)`-good symmetric strategy for the low individual degree test. That test-level setup is defined outside the requested list, in `test_definition.tex`, and corresponds Lean-side to `MIPStarRE/LDT/Test/*`.
 
 ## Global proof architecture
@@ -261,18 +269,13 @@ Important Lean theorem names already scaffolded:
 
 - `MIPStarRE/LDT/MakingMeasurementsProjective/Defs.lean`
 - `MIPStarRE/LDT/MakingMeasurementsProjective/NaimarkFull.lean`
-- `MIPStarRE/LDT/MakingMeasurementsProjective/Orthonormalization.lean`
-- `MIPStarRE/LDT/MakingMeasurementsProjective/SpectralTruncation/ProjectiveNonMeasurement.lean`
 
 Key Lean theorem names:
 
 - `oneMeasNaimark`
-- `naimark`
-- `orthonormalization`
-- `orthonormalizationMainLemma`
 - `consistencyToAlmostProjective`
-- `spectralTruncationStatement_of_sourceAlmostProjective`
-- `leftLiftedProjectivizationRepair`
+- `exists_projective_measurement_linear_bound`
+- `consistent_measurement_linear_bound`
 
 **Key definitions**
 
@@ -362,12 +365,8 @@ Key Lean theorem names:
 
 Key Lean theorem names:
 
-- `laplacianRewrite`
 - `eigenvectors`
-- `laplacianSpectralGap`
 - `localToGlobal`
-- `localRewrite`
-- `globalRewrite`
 
 **Key definitions**
 
@@ -437,10 +436,9 @@ Key Lean theorem names:
 
 Key Lean theorem names:
 
-- `sdp`
 - `addInU`
-- `selfImprovementHelper`
-- `selfImprovement`
+- `self_improvement_helper_with_contraction`
+- `selfImprovementWithDilation`
 
 **Key definitions**
 
@@ -533,13 +531,11 @@ Key Lean theorem names:
 **Lean mapping**
 
 - `MIPStarRE/LDT/CommutativityPoints/Defs.lean`
-- `MIPStarRE/LDT/CommutativityPoints/BridgeTheorems/LiftBridges.lean`
-- `MIPStarRE/LDT/CommutativityPoints/BridgeTheorems/DropBridges.lean`
 - `MIPStarRE/LDT/CommutativityPoints/AnswerTheorems.lean`
 
-Key Lean theorem name:
+Key Lean theorem names:
 
-- `commutativityPoints`
+- `answerCommutativityPoints`
 
 **Key mathematical object**
 
@@ -573,9 +569,8 @@ Key Lean theorem name:
 
 Key Lean theorem names:
 
-- `commDataProcessedG`
-- `comMain`
-- `normalizationCondition`
+- `commDataProcessedG_of_commutativityPoints`
+- `comMain_of_commutativityPoints`
 
 **Key definitions**
 
@@ -630,30 +625,13 @@ Key Lean theorem names:
 
 **Lean mapping**
 
-- `MIPStarRE/LDT/Pasting/Defs.lean`
-- `MIPStarRE/LDT/Pasting/Statements.lean`
 - `MIPStarRE/LDT/Pasting/Sandwich/PastedFamilies.lean`
-- `MIPStarRE/LDT/Pasting/Bernoulli/Final.lean`
 
 Key Lean theorem names:
 
-- `ldPasting`
-- `ldPastingSubMeas`
 - `ldDnoteq`
-- `first_construction_scalar_inequality`
-- `gCompleteSelfConsistency`
-- `gBotSelfConsistency`
-- `commutativitySwitcheroo`
-- `commutingWithGComplete`
-- `commutingWithGIncomplete`
-- `gHatFacts`
-- `commuteGHalfSandwich`
-- `ldSandwichLineOnePoint`
-- `hBConsistency`
-- `overAllOutcomes`
-- `fromHToG`
-- `chernoffBernoulliMatrix`
-- `ldPastingNCompleteness`
+- `answerLdPastingSimplified`
+- `distinctSuccessPastedMeasurement_pointConsistency`
 
 **Key definitions**
 
@@ -785,15 +763,12 @@ Key Lean theorem names:
 **Lean mapping**
 
 - `MIPStarRE/LDT/MainInductionStep/Defs.lean`
-- `MIPStarRE/LDT/MainInductionStep/Statements.lean`
-- `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems/Successor.lean`
 
 Key Lean theorem names:
 
-- `mainInduction`
-- `selfImprovementInInductionSection`
-- `ldPastingInInductionSection`
-- `restrictedProbabilities`
+- `simplifiedMainInduction`
+- `simplifiedAnswerMainInduction`
+- `answerSuccessorRestrictedProbabilities`
 
 **Key definitions**
 
@@ -819,10 +794,9 @@ Key Lean theorem names:
   where
   `sigma = m^2 (nu + exp(-k/(80000 m^2)))`,
   `nu = 1000 k^2 m^2 (epsilon^(1/1024)+delta^(1/1024)+gamma^(1/1024)+(d/q)^(1/1024))`.
-  Issue #906 records that the proof later invokes pasting with the stronger
-  side condition `k >= 400md`; the current blueprint/Lean public statement uses
-  this stronger formal hypothesis rather than treating the intermediate range as
-  proved.
+  The formalization does not follow this induction; the statement with `k`
+  is derived from the simplified theorem as `mainFormalWithK` under the
+  printed hypothesis `k >= md` together with `0 < k`.
 
 - Section-level self-improvement theorem:
   restates the chapter-9 projective self-improvement theorem in the induction notation.
