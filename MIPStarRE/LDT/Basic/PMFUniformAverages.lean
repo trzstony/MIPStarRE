@@ -17,11 +17,6 @@ be carried out directly in the probability-mass-function language.
 * `PMF.realWeightedSum_uniformOfFintype_equiv_prod_swap`
 * `PMF.realWeightedSum_uniformOfFintype_equiv_fst`
 * `PMF.realWeightedSum_uniformOfFintype_equiv_snd`
-* `PMF.realWeightedSum_uniformOfFintype_fst`
-* `PMF.realWeightedSum_uniformOfFintype_snd`
-* `PMF.realWeightedSum_map_uniformOfFintype_factor_equiv`
-* `PMF.realWeightedSum_map_uniformOfFintype_factor_equiv_fst`
-* `PMF.realWeightedSum_map_uniformOfFintype_factor_equiv_snd`
 
 ## References
 
@@ -134,75 +129,5 @@ theorem realWeightedSum_uniformOfFintype_equiv_snd {γ α β M : Type*}
       realWeightedSum (PMF.uniformOfFintype β) f := by
   simpa [realWeightedSum] using
     uniformOfFintype_sum_equiv_snd_smul (e := e) (f := f)
-
-/-- A finite expectation against the uniform PMF on a product marginalizes a
-function depending only on the first coordinate. -/
-theorem realWeightedSum_uniformOfFintype_fst {α β M : Type*}
-    [Fintype α] [Nonempty α] [Fintype β] [Nonempty β]
-    [AddCommMonoid M] [Module MIPStarRE.LDT.Error M]
-    (f : α → M) :
-    realWeightedSum (PMF.uniformOfFintype (α × β)) (fun ab => f ab.1) =
-      realWeightedSum (PMF.uniformOfFintype α) f := by
-  simpa using
-    realWeightedSum_uniformOfFintype_equiv_fst
-      (e := Equiv.refl (α × β)) (f := f)
-
-/-- A finite expectation against the uniform PMF on a product marginalizes a
-function depending only on the second coordinate. -/
-theorem realWeightedSum_uniformOfFintype_snd {α β M : Type*}
-    [Fintype α] [Nonempty α] [Fintype β] [Nonempty β]
-    [AddCommMonoid M] [Module MIPStarRE.LDT.Error M]
-    (f : β → M) :
-    realWeightedSum (PMF.uniformOfFintype (α × β)) (fun ab => f ab.2) =
-      realWeightedSum (PMF.uniformOfFintype β) f := by
-  simpa using
-    realWeightedSum_uniformOfFintype_equiv_snd
-      (e := Equiv.refl (α × β)) (f := f)
-
-/-- A pushed-forward uniform PMF has the uniform expectation induced by an
-equivalent observed coordinate. -/
-theorem realWeightedSum_map_uniformOfFintype_factor_equiv {α β γ M : Type*}
-    [Fintype α] [Fintype β] [Nonempty α]
-    [Fintype γ] [Nonempty γ]
-    [AddCommMonoid M] [Module MIPStarRE.LDT.Error M]
-    (m : α → β) (g : β → γ) (e : α ≃ γ)
-    (h : ∀ a, g (m a) = e a) (f : γ → M) :
-    realWeightedSum ((PMF.uniformOfFintype α).map m) (fun b => f (g b)) =
-      realWeightedSum (PMF.uniformOfFintype γ) f := by
-  rw [realWeightedSum_map]
-  exact realWeightedSum_uniformOfFintype_factor_equiv
-    (m := m) (g := g) (e := e) (h := h) (f := f)
-
-/-- A pushed-forward uniform PMF has the first-coordinate uniform marginal when
-the seed is equivalent to a product. -/
-theorem realWeightedSum_map_uniformOfFintype_factor_equiv_fst
-    {α β γ δ M : Type*}
-    [Fintype α] [Fintype β] [Nonempty α]
-    [Fintype γ] [Nonempty γ]
-    [Finite δ] [Nonempty δ]
-    [AddCommMonoid M] [Module MIPStarRE.LDT.Error M]
-    (m : α → β) (g : β → γ) (e : α ≃ γ × δ)
-    (h : ∀ a, g (m a) = (e a).1) (f : γ → M) :
-    realWeightedSum ((PMF.uniformOfFintype α).map m) (fun b => f (g b)) =
-      realWeightedSum (PMF.uniformOfFintype γ) f := by
-  rw [realWeightedSum_map]
-  exact realWeightedSum_uniformOfFintype_factor_equiv_fst
-    (m := m) (g := g) (e := e) (h := h) (f := f)
-
-/-- A pushed-forward uniform PMF has the second-coordinate uniform marginal when
-the seed is equivalent to a product. -/
-theorem realWeightedSum_map_uniformOfFintype_factor_equiv_snd
-    {α β γ δ M : Type*}
-    [Fintype α] [Fintype β] [Nonempty α]
-    [Finite γ] [Nonempty γ]
-    [Fintype δ] [Nonempty δ]
-    [AddCommMonoid M] [Module MIPStarRE.LDT.Error M]
-    (m : α → β) (g : β → δ) (e : α ≃ γ × δ)
-    (h : ∀ a, g (m a) = (e a).2) (f : δ → M) :
-    realWeightedSum ((PMF.uniformOfFintype α).map m) (fun b => f (g b)) =
-      realWeightedSum (PMF.uniformOfFintype δ) f := by
-  rw [realWeightedSum_map]
-  exact realWeightedSum_uniformOfFintype_factor_equiv_snd
-    (m := m) (g := g) (e := e) (h := h) (f := f)
 
 end PMF

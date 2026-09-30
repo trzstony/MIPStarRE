@@ -22,13 +22,6 @@ inductive Role where
   | B
   deriving DecidableEq, Repr, Inhabited, Fintype
 
-def Role.other : Role → Role
-  | .A => .B
-  | .B => .A
-
-@[simp] theorem Role.other_other (r : Role) : r.other.other = r := by
-  cases r <;> rfl
-
 /-- Parameters for the `(m,q,d)` low individual degree test.
 
 Besides the usual positivity assumptions, we bundle the paper-faithful witness
@@ -44,54 +37,7 @@ structure Parameters where
   /-- Paper-faithful witness that `q` is a prime power. -/
   hqPrimePower : ∃ p n, Nat.Prime p ∧ 0 < n ∧ q = p ^ n
 
-deriving instance DecidableEq for Parameters
-
 namespace Parameters
-
-/-- Any number presented as a prime power is automatically positive. -/
-theorem q_pos_of_primePower {q : ℕ}
-    (hqPrimePower : ∃ p n, Nat.Prime p ∧ 0 < n ∧ q = p ^ n) : 0 < q := by
-  rcases hqPrimePower with ⟨p, n, hp, hn, rfl⟩
-  exact Nat.pow_pos hp.pos
-
-/-- Prime numbers are prime powers of exponent `1`. -/
-theorem prime_primePower {q : ℕ} (hqPrime : Nat.Prime q) :
-    ∃ p n, Nat.Prime p ∧ 0 < n ∧ q = p ^ n := by
-  exact ⟨q, 1, hqPrime, by decide, by simp⟩
-
-/-- Build parameters from explicit prime-power data `q = p^n`. -/
-def ofPrimePower (m q d p n : ℕ) (hm : 0 < m) (hp : Nat.Prime p) (hn : 0 < n)
-    (hq : q = p ^ n) : Parameters :=
-  { m := m
-    q := q
-    d := d
-    hm := hm
-    hq := q_pos_of_primePower ⟨p, n, hp, hn, hq⟩
-    hqPrimePower := ⟨p, n, hp, hn, hq⟩ }
-
-/-- Build parameters when `q` itself is prime. -/
-def ofPrime (m q d : ℕ) (hm : 0 < m) (hqPrime : Nat.Prime q) : Parameters :=
-  { m := m
-    q := q
-    d := d
-    hm := hm
-    hq := hqPrime.pos
-    hqPrimePower := prime_primePower hqPrime }
-
-/-- Convenience constructor for the ubiquitous binary field. -/
-def ofTwo (m d : ℕ) (hm : 0 < m) : Parameters :=
-  ofPrime m 2 d hm Nat.prime_two
-
-/-- Paper finite fields have at least two elements: `q = p^n` with `p` prime
-and `0 < n` (see `preliminaries.tex`, lines 17--19 and 89--93). -/
-theorem two_le_q (params : Parameters) : 2 ≤ params.q := by
-  obtain ⟨p, n, hp, hn, hq⟩ := params.hqPrimePower
-  rw [hq]
-  exact le_trans hp.two_le (Nat.le_self_pow (Nat.ne_of_gt hn) p)
-
-/-- The field-size parameter is strictly larger than `1`. -/
-theorem one_lt_q (params : Parameters) : 1 < params.q :=
-  lt_of_lt_of_le Nat.one_lt_two params.two_le_q
 
 /-- Positivity of the field-size parameter after casting to the repository's
 real-valued error scalar type. -/
@@ -99,9 +45,6 @@ theorem q_cast_pos (params : Parameters) : 0 < (params.q : Error) :=
   Nat.cast_pos.mpr params.hq
 
 end Parameters
-
-instance : Inhabited Parameters where
-  default := Parameters.ofTwo 1 0 (by decide)
 
 /-- The successor test obtained by appending one coordinate. -/
 def Parameters.next (params : Parameters) : Parameters :=
@@ -227,16 +170,6 @@ paper's finite-field convention `|F_q| = q` (`preliminaries.tex`, lines 17--19).
     Fintype.card (FieldModel.K q) = q := by
   simpa using Fintype.card_congr (FieldModel.equiv (q := q))
 
-/-- A bundled field model has a nonempty finite carrier. -/
-theorem card_pos (q : ℕ) [FieldModel q] :
-    0 < Fintype.card (FieldModel.K q) :=
-  Fintype.card_pos_iff.mpr ⟨0⟩
-
-/-- The finite cardinality of a bundled field model is nonzero. -/
-theorem card_ne_zero (q : ℕ) [FieldModel q] :
-    Fintype.card (FieldModel.K q) ≠ 0 :=
-  Nat.ne_of_gt (card_pos q)
-
 end FieldModel
 
 /-- Build the honest field model from prime-power data. -/
@@ -339,10 +272,6 @@ def subCoord {params : Parameters} [FieldModel params.q] (x y : Fq params) : Fq 
 /-- Coordinate multiplication transported through the `Fin q` coding. -/
 def mulCoord {params : Parameters} [FieldModel params.q] (x y : Fq params) : Fq params :=
   encodeScalar (decodeScalar x * decodeScalar y)
-
-/-- Coordinate inversion transported through the `Fin q` coding. -/
-def invCoord {params : Parameters} [FieldModel params.q] (x : Fq params) : Fq params :=
-  encodeScalar ((decodeScalar x)⁻¹)
 
 /-- Pointwise addition in the coded ambient space. -/
 def addPoint {params : Parameters} [FieldModel params.q] (u v : Point params) : Point params :=

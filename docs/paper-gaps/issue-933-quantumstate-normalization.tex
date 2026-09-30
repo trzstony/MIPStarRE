@@ -140,9 +140,7 @@ or strong self-consistency defects are at most $1$ under the same hypothesis.
 103--114; \path{qBipartiteConsDefect_le_one_of_isNormalized},
 \path{bipartiteConsError_le_one_of_isProbability}, and
 \path{bipartiteConsError_uniform_le_one} in \path{MIPStarRE/LDT/Test/Defs.lean},
-lines 352--414; and \path{qBipartiteSSCDefect_le_one} and
-\path{bipartiteSSCError_uniform_le_one} in
-\path{MIPStarRE/LDT/Pasting/ComparisonLemmas/Common.lean}, lines 179--212.}
+lines 352--414.}
 These lemmas are the formal versions of the paper's repeated use of the fact
 that a bounded measurement probability is at most $1$.
 
@@ -151,13 +149,12 @@ $\sqrt\delta$-scale estimates carry an explicit normalization hypothesis.
 This includes the transfer of consistency using state-dependent distance, the
 easy approximation lemma, and both left and right clauses of the inner-product
 transport proposition.
-\footnote{Representative declarations are \path{triangleSub} in
+\footnote{Representative declarations are \path{triangleSub_right} in
 \path{MIPStarRE/LDT/Preliminaries/Triangles/Core.lean};
-\path{easyApproxFromApproxDelta}, \path{closenessOfIP}, and
-\path{closenessOfIPAdjoint} in \path{MIPStarRE/LDT/Preliminaries/CauchySchwarz.lean},
-lines 148--218; and the underlying pointwise bounds
-\path{question_easyApproxFromApproxDelta}, \path{closenessOfInnerProduct_left},
-and \path{closenessOfInnerProduct_right}.}
+\path{closenessOfIP} and \path{closenessOfIPAdjoint} in
+\path{MIPStarRE/LDT/Preliminaries/CauchySchwarz.lean}; and the underlying
+pointwise bounds \path{closenessOfInnerProduct_left} and
+\path{closenessOfInnerProduct_right}.}
 Not every distance manipulation needs normalization. For example, a purely
 operator-order contraction of a state-dependent squared distance may scale
 linearly on both sides. The normalization hypothesis is needed precisely when a
@@ -180,27 +177,18 @@ These lemmas feed directly into the commutativity transport estimates, such as
 the scalar marginalization bounds for full slices.
 \footnote{For example, see \path{fullSlice_scalar_marginalize_x} and
 \path{fullSlice_scalar_marginalize_y} in
-\path{MIPStarRE/LDT/Commutativity/Main/Auxiliary.lean}, lines 350--413 and
-460--500, and the evaluated-side transport bound
+\path{MIPStarRE/LDT/Commutativity/Main/Auxiliary/ScalarMarginalization.lean},
+and the evaluated-side transport bound
 \path{fullSlice_closenessOfIP_CAB_hEval_sqrt} in
 \path{MIPStarRE/LDT/Commutativity/Main/Auxiliary/HEvalTransport.lean}.}
 
-Fourth, the completion and projectivization chain uses normalization when the
-paper writes that the total mass of a completed measurement is $1$, or when a
-truncation error is stated at the paper's scale. The formal completion theorem,
-the missing-mass estimate, the spectral-truncation statement construction, and
-the orthonormalization theorem all expose the normalized-state hypothesis.
-\footnote{See \path{completionMissingMassBound} in
-\path{MIPStarRE/LDT/Preliminaries/SelfConsistency/Core.lean}, lines 66--149;
-\path{completingToMeasurement} in
-\path{MIPStarRE/LDT/Preliminaries/CompletionTransfer.lean}, lines 234--254;
-\path{spectralTruncationStatement_of_sourceAlmostProjective} in
-\path{MIPStarRE/LDT/MakingMeasurementsProjective/SpectralTruncation/ProjectiveNonMeasurement.lean};
-\path{leftLiftedProjectivizationRepair} in
-\path{MIPStarRE/LDT/MakingMeasurementsProjective/LocalityPreservingRepair.lean}; and
-\path{orthonormalization} in
-\path{MIPStarRE/LDT/MakingMeasurementsProjective/Orthonormalization.lean}, lines
-587--610.}
+Fourth, the rounding step uses normalization when the paper writes that the
+total mass of a measurement is $1$.  The state-dependent orthogonalization
+lemma and its bipartite consequence expose the normalized-state hypothesis.
+\footnote{See \path{exists_projective_measurement_linear_bound} in
+\path{MIPStarRE/LDT/MakingMeasurementsProjective/SimplifiedOrthogonalization/LinearOrthogonalization.lean}
+and \path{consistent_measurement_linear_bound} in
+\path{MIPStarRE/LDT/MakingMeasurementsProjective/SimplifiedOrthogonalization/ConsistentMeasurements.lean}.}
 This is the correct formal counterpart of the paper's pure-state convention.
 
 \section{Relation with the blueprint and Lean}
@@ -209,21 +197,18 @@ The blueprint preliminaries follow the paper's vector-state convention.  They
 write $|\psi\rangle$ in the definitions of consistency and state-dependent
 distance, and in the statements of the transfer lemmas, without introducing a
 separate predicate for normalization.
-\footnote{See \path{blueprint/src/chapter/ch03_preliminaries.tex}, lines
-209--265 for \path{def:simeq} and \path{def:approx_delta}, lines 274--280 for
-\path{prop:triangle-sub}, lines 316--376 for \path{prop:closeness-of-ip} and
-\path{prop:easy-approx-from-approx-delta}, lines 508--536 for
-\path{prop:switch-sandwich}, and lines 698--730 for
-\path{prop:completing-to-measurement}.}
+\footnote{See \path{blueprint/src/chapter/ch03_preliminaries.tex} for
+\path{def:simeq}, \path{def:approx_delta}, \path{prop:triangle-sub},
+\path{prop:closeness-of-ip}, and \path{prop:switch-sandwich}.}
 This matches the paper as mathematical prose: a state vector is understood to be
 unit normalized.  The blueprint therefore inherits the paper convention rather
 than displaying an additional normalization hypothesis.
 
 The corresponding Lean declarations make the suppressed convention explicit.
 For example, the blueprint statements for the triangle transfer, inner-product
-transport, switch-sandwich lemma, completion theorem, spectral truncation
-statement, and orthonormalization theorem all link to declarations whose
-signatures include an explicit normalized-state hypothesis.  Thus the blueprint
+transport, switch-sandwich lemma, and state-dependent orthogonalization all
+link to declarations whose signatures include an explicit normalized-state
+hypothesis.  Thus the blueprint
 and Lean are compatible, but they place the convention at different levels: the
 blueprint uses the standard mathematical meaning of $|\psi\rangle$ as a
 normalized state, while Lean records the hypothesis as data because its base

@@ -1,4 +1,5 @@
-import MIPStarRE.LDT.Commutativity.GCommStability.OverlapTwo
+import MIPStarRE.LDT.Commutativity.ScalarApproximation.Pointwise
+import MIPStarRE.LDT.Preliminaries.CompletionTransfer
 import MIPStarRE.LDT.CommutativityPoints.SharedHelpers.Core
 
 /-!

@@ -1,4 +1,3 @@
-import MIPStarRE.Quantum.FiniteMatrix.TracePairing
 import MIPStarRE.LDT.SelfImprovement.MatrixRealization.CanonicalPrimal
 
 /-!
@@ -52,23 +51,6 @@ noncomputable def matrixSdpCanonicalObjectiveOperator (params : Parameters)
       matrixAveragedPointOperator params model g :=
   rfl
 
-@[simp] theorem matrixSdpCanonicalDiagonalBlock_objectiveOperator_none
-    (params : Parameters) [FieldModel params.q]
-    (model : MatrixSdpRealization params) :
-    matrixSdpCanonicalDiagonalBlock params model
-        (matrixSdpCanonicalObjectiveOperator params model) none =
-      0 := by
-  simp [matrixSdpCanonicalObjectiveOperator]
-
-@[simp] theorem matrixSdpCanonicalDiagonalBlock_objectiveOperator_some
-    (params : Parameters) [FieldModel params.q]
-    (model : MatrixSdpRealization params)
-    (g : Polynomial params) :
-    matrixSdpCanonicalDiagonalBlock params model
-        (matrixSdpCanonicalObjectiveOperator params model) (some g) =
-      matrixAveragedPointOperator params model g := by
-  simp [matrixSdpCanonicalObjectiveOperator]
-
 /-- The block family representing the canonical dual operator associated to a
 paper dual variable `Z`.
 
@@ -98,16 +80,6 @@ noncomputable def matrixSdpCanonicalDualOperator (params : Parameters)
     (b : MatrixSdpCanonicalBlockIndex params) :
     matrixSdpCanonicalDualOperatorBlockFamily params model Z b = Z :=
   rfl
-
-@[simp] theorem matrixSdpCanonicalDiagonalBlock_dualOperator
-    (params : Parameters) [FieldModel params.q]
-    (model : MatrixSdpRealization params)
-    (Z : MatrixOperator model.space)
-    (b : MatrixSdpCanonicalBlockIndex params) :
-    matrixSdpCanonicalDiagonalBlock params model
-        (matrixSdpCanonicalDualOperator params model Z) b =
-      Z := by
-  simp [matrixSdpCanonicalDualOperator]
 
 /-- The block family for the canonical dual slack operator.
 
@@ -241,51 +213,6 @@ theorem matrixSdpDualFeasible_of_canonicalDualConstraint_nonneg
       0 ≤ matrixSdpDualSlackOperator params model Z g :=
   (matrixSdpCanonicalDualConstraint_nonneg_iff_dualFeasible params model Z).mp hcanonical
 
-/-- The paper's strict dual witness `Z = 2I` is feasible for the canonical dual
-constraint. -/
-theorem matrixSdpCanonicalStrictDualConstraint_nonneg
-    (params : Parameters) [FieldModel params.q]
-    (model : MatrixSdpRealization params) :
-    0 ≤ matrixSdpCanonicalDualOperator params model (matrixSdpStrictDualWitness model) -
-        matrixSdpCanonicalObjectiveOperator params model :=
-  matrixSdpCanonicalDualConstraint_nonneg_of_dualFeasible params model
-    (matrixSdpStrictDualWitness model)
-    (matrixSdpStrictDualWitness_dualFeasible params model)
-
-/-- Every canonical dual-slack block of the strict dual witness dominates the
-identity. -/
-theorem one_le_matrixSdpCanonicalStrictDualSlackBlockFamily
-    (params : Parameters) [FieldModel params.q]
-    (model : MatrixSdpRealization params)
-    (b : MatrixSdpCanonicalBlockIndex params) :
-    (1 : MatrixOperator model.space) ≤
-      matrixSdpCanonicalDualSlackBlockFamily params model
-        (matrixSdpStrictDualWitness model) b := by
-  cases b with
-  | none =>
-      exact one_le_matrixSdpStrictDualWitness model
-  | some g =>
-      exact one_le_matrixSdpStrictDualWitness_dualSlack params model g
-
-/-- The canonical strict dual slack dominates the identity on the block Hilbert
-space. -/
-theorem one_le_matrixSdpCanonicalStrictDualConstraint
-    (params : Parameters) [FieldModel params.q]
-    (model : MatrixSdpRealization params) :
-    (1 : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)) ≤
-      matrixSdpCanonicalDualOperator params model (matrixSdpStrictDualWitness model) -
-        matrixSdpCanonicalObjectiveOperator params model := by
-  rw [← sub_nonneg]
-  rw [matrixSdpCanonicalDualOperator_sub_objectiveOperator]
-  let B :=
-    matrixSdpCanonicalDualSlackBlockFamily params model (matrixSdpStrictDualWitness model)
-  rw [matrixSdpCanonicalBlockDiagonal_sub_one]
-  refine matrixSdpCanonicalBlockDiagonal_nonneg params model
-    (fun b => B b - (1 : MatrixOperator model.space)) ?_
-  intro b
-  exact sub_nonneg.mpr
-    (one_le_matrixSdpCanonicalStrictDualSlackBlockFamily params model b)
-
 /-- The canonical block matrix associated to the strict primal witness is
 feasible for the canonical primal SDP. -/
 theorem matrixSdpCanonicalStrictPrimalBlockMatrix_feasible
@@ -297,125 +224,11 @@ theorem matrixSdpCanonicalStrictPrimalBlockMatrix_feasible
   matrixSdpCanonicalPrimalBlockMatrix_feasible params model
     (matrixSdpStrictPrimalSubmeasurement params model)
 
-/-- The slack block of the strict primal canonical matrix is `(1/2)I`. -/
-theorem matrixSdpCanonicalStrictPrimalBlockMatrix_slack_half
-    (params : Parameters) [FieldModel params.q]
-    (model : MatrixSdpRealization params) :
-    matrixSdpCanonicalDiagonalBlock params model
-        (matrixSdpCanonicalPrimalBlockMatrix params model
-          (matrixSdpStrictPrimalSubmeasurement params model)) none =
-      ((1 / 2 : Error) • (1 : MatrixOperator model.space)) := by
-  rw [matrixSdpCanonicalDiagonalBlock_primalBlockMatrix_none,
-    matrixSdpCanonicalSlackOperator,
-    matrixSdpStrictPrimalSubmeasurement_sum_effect]
-  ext i j
-  by_cases hij : i = j
-  · subst hij
-    simp
-    norm_num
-  · simp [hij]
-
-/-- Canonical block-SDP feasible bounds supplied by the explicit paper
-Slater-type witnesses.
-
-This is not an optimality statement.  It records the primal canonical
-feasibility of the uniform family, the strict slack block `(1/2)I`, the
-canonical dual constraint for `Z = 2I`, and the corresponding paper dual
-feasibility data. -/
-structure MatrixSdpCanonicalFeasibleBounds (params : Parameters) [FieldModel params.q]
-    (model : MatrixSdpRealization params) : Prop where
-  primalFeasible :
-    MatrixSdpCanonicalPrimalFeasible params model
-      (matrixSdpCanonicalPrimalBlockMatrix params model
-        (matrixSdpStrictPrimalSubmeasurement params model))
-  primalSlackHalf :
-    matrixSdpCanonicalDiagonalBlock params model
-        (matrixSdpCanonicalPrimalBlockMatrix params model
-          (matrixSdpStrictPrimalSubmeasurement params model)) none =
-      ((1 / 2 : Error) • (1 : MatrixOperator model.space))
-  canonicalDualFeasible :
-    0 ≤ matrixSdpCanonicalDualOperator params model (matrixSdpStrictDualWitness model) -
-        matrixSdpCanonicalObjectiveOperator params model
-  paperDualFeasible :
-    ∀ g : Polynomial params,
-      0 ≤ matrixSdpDualSlackOperator params model (matrixSdpStrictDualWitness model) g
-  paperDualSlackDominatesIdentity :
-    ∀ g : Polynomial params,
-      (1 : MatrixOperator model.space) ≤
-        matrixSdpDualSlackOperator params model (matrixSdpStrictDualWitness model) g
-  dualDominatesIdentity :
-    (1 : MatrixOperator model.space) ≤ matrixSdpStrictDualWitness model
-  canonicalDualSlackDominatesIdentity :
-    (1 : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)) ≤
-      matrixSdpCanonicalDualOperator params model (matrixSdpStrictDualWitness model) -
-        matrixSdpCanonicalObjectiveOperator params model
-
-/-- The explicit uniform primal witness and `Z=2I` give the canonical feasible
-bounds used before applying finite-dimensional SDP strong duality. -/
-theorem matrixSdpCanonicalFeasibleBounds_canonical
-    (params : Parameters) [FieldModel params.q]
-    (model : MatrixSdpRealization params) :
-    MatrixSdpCanonicalFeasibleBounds params model where
-  primalFeasible := matrixSdpCanonicalStrictPrimalBlockMatrix_feasible params model
-  primalSlackHalf := matrixSdpCanonicalStrictPrimalBlockMatrix_slack_half params model
-  canonicalDualFeasible := matrixSdpCanonicalStrictDualConstraint_nonneg params model
-  paperDualFeasible := matrixSdpStrictDualWitness_dualFeasible params model
-  paperDualSlackDominatesIdentity :=
-    one_le_matrixSdpStrictDualWitness_dualSlack params model
-  dualDominatesIdentity := one_le_matrixSdpStrictDualWitness model
-  canonicalDualSlackDominatesIdentity :=
-    one_le_matrixSdpCanonicalStrictDualConstraint params model
-
-/-- The canonical block objective evaluated on the block matrix associated to a
-paper primal submeasurement is the paper primal objective.
-
-The paper writes this as `Tr(C† X)`.  In the present canonical model the
-objective blocks are the averaged point operators, hence Hermitian measurement
-effects averaged over points; the without-dagger trace pairing used here is the
-same expression in this Hermitian case. -/
-theorem matrixSdpCanonicalObjective_trace_primalBlockMatrix
-    (params : Parameters) [FieldModel params.q]
-    (model : MatrixSdpRealization params)
-    (T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space) :
-    Complex.re (Matrix.trace
-        (matrixSdpCanonicalObjectiveOperator params model *
-          matrixSdpCanonicalPrimalBlockMatrix params model T)) =
-      matrixSdpPrimalObjective params model T := by
-  rw [matrixSdpCanonicalObjectiveOperator, matrixSdpCanonicalPrimalBlockMatrix]
-  rw [matrixSdpCanonicalBlockDiagonal_trace_mul]
-  rw [Fintype.sum_option]
-  simp only [matrixSdpCanonicalObjectiveBlockFamily_none,
-    matrixSdpCanonicalPrimalBlockFamily_none, zero_mul, Matrix.trace_zero,
-    matrixSdpCanonicalObjectiveBlockFamily_some, matrixSdpCanonicalPrimalBlockFamily_some,
-    zero_add, Complex.re_sum]
-  unfold matrixSdpPrimalObjective matrixSdpPrimalContributionOperator
-  rw [Matrix.trace_sum]
-  simp only [Complex.re_sum]
-  refine Finset.sum_congr rfl ?_
-  intro g _
-  rw [Matrix.trace_mul_comm]
-
-/-- The strict primal canonical matrix has the paper primal objective of the
-strict primal submeasurement. -/
-theorem matrixSdpCanonicalStrictPrimalBlockMatrix_objective
-    (params : Parameters) [FieldModel params.q]
-    (model : MatrixSdpRealization params) :
-    Complex.re (Matrix.trace
-        (matrixSdpCanonicalObjectiveOperator params model *
-          matrixSdpCanonicalPrimalBlockMatrix params model
-            (matrixSdpStrictPrimalSubmeasurement params model))) =
-      matrixSdpPrimalObjective params model
-        (matrixSdpStrictPrimalSubmeasurement params model) :=
-  matrixSdpCanonicalObjective_trace_primalBlockMatrix params model
-    (matrixSdpStrictPrimalSubmeasurement params model)
-
 /-- The canonical block objective evaluated on an arbitrary feasible canonical
 primal matrix is the paper primal objective of its extracted submeasurement.
 
-This is the converse objective identity to
-`matrixSdpCanonicalObjective_trace_primalBlockMatrix`: once a canonical feasible
-matrix `X` is given, reading the polynomial diagonal blocks as `T_g = X_{gg}`
-preserves the SDP objective value. -/
+Once a canonical feasible matrix `X` is given, reading the polynomial
+diagonal blocks as `T_g = X_{gg}` preserves the SDP objective value. -/
 theorem matrixSdpCanonicalObjective_trace_extractedPrimalSubmeasurement
     (params : Parameters) [FieldModel params.q]
     (model : MatrixSdpRealization params)
@@ -437,22 +250,6 @@ theorem matrixSdpCanonicalObjective_trace_extractedPrimalSubmeasurement
   intro g _
   rw [matrixSdpCanonicalExtractedPrimalSubmeasurement_effect]
   rw [Matrix.trace_mul_comm]
-
-/-- Replacing a feasible canonical matrix by the canonical block matrix of the
-extracted paper submeasurement preserves the canonical objective value. -/
-theorem matrixSdpCanonicalObjective_trace_primalBlockMatrix_extracted
-    (params : Parameters) [FieldModel params.q]
-    (model : MatrixSdpRealization params)
-    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model))
-    (hX : MatrixSdpCanonicalPrimalFeasible params model X) :
-    Complex.re (Matrix.trace
-        (matrixSdpCanonicalObjectiveOperator params model *
-          matrixSdpCanonicalPrimalBlockMatrix params model
-            (matrixSdpCanonicalExtractedPrimalSubmeasurement params model X hX))) =
-      Complex.re (Matrix.trace
-        (matrixSdpCanonicalObjectiveOperator params model * X)) := by
-  rw [matrixSdpCanonicalObjective_trace_primalBlockMatrix]
-  rw [matrixSdpCanonicalObjective_trace_extractedPrimalSubmeasurement]
 
 /-- Pairing the canonical dual operator with a feasible canonical primal
 matrix gives the paper dual objective.
@@ -714,54 +511,6 @@ theorem matrixSdpComplementarySlacknessDefect_of_canonical
   rw [matrixSdpCanonicalPrimalBlockMatrix_mul_dualSlack] at hblock
   rw [hzero] at hblock
   simpa [matrixSdpComplementarySlacknessDefect] using hblock
-
-/-- Canonical complementary slackness for a feasible canonical matrix gives
-the paper-form defect equation for the extracted paper primal submeasurement. -/
-theorem matrixSdpComplementarySlacknessDefect_extracted_of_canonical
-    (params : Parameters) [FieldModel params.q]
-    (model : MatrixSdpRealization params)
-    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model))
-    (hX : MatrixSdpCanonicalPrimalFeasible params model X)
-    (Z : MatrixOperator model.space)
-    (hcanonical :
-      X * (matrixSdpCanonicalDualOperator params model Z -
-            matrixSdpCanonicalObjectiveOperator params model) =
-        0)
-    (g : Polynomial params) :
-    matrixSdpComplementarySlacknessDefect params model
-        (matrixSdpCanonicalExtractedPrimalSubmeasurement params model X hX) Z g =
-      0 :=
-  matrixSdpComplementarySlacknessDefect_of_canonical params model
-    (matrixSdpCanonicalExtractedPrimalSubmeasurement params model X hX) Z
-    (matrixSdpCanonicalPrimalBlockMatrix_extracted_mul_dualSlack_of_canonical
-      params model X hX Z hcanonical) g
-
-/-- Canonical complementary slackness also gives the slack-block equation
-`S Z = 0`, where `S = I - ∑_g T_g`. -/
-theorem matrixSdpCanonicalSlack_mul_dual_of_complementarySlackness
-    (params : Parameters) [FieldModel params.q]
-    (model : MatrixSdpRealization params)
-    (T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
-    (Z : MatrixOperator model.space)
-    (hcanonical :
-      matrixSdpCanonicalPrimalBlockMatrix params model T *
-          (matrixSdpCanonicalDualOperator params model Z -
-            matrixSdpCanonicalObjectiveOperator params model) =
-        0) :
-    matrixSdpCanonicalSlackOperator params model T * Z = 0 := by
-  have hblock :=
-    congrArg
-      (fun X => matrixSdpCanonicalDiagonalBlock params model X none)
-      hcanonical
-  have hzero :
-      matrixSdpCanonicalDiagonalBlock params model
-          (0 : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)) none =
-        0 := by
-    ext i j
-    rfl
-  rw [matrixSdpCanonicalPrimalBlockMatrix_mul_dualSlack] at hblock
-  rw [hzero] at hblock
-  simpa using hblock
 
 /-- Vanishing of the canonical slack block is exactly saturation of the paper
 primal submeasurement. -/

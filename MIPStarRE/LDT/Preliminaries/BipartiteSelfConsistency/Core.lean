@@ -20,19 +20,6 @@ namespace MIPStarRE.LDT.Preliminaries
 
 open MIPStarRE.LDT
 
-/-- The self-distance `sddError ψ 𝒟 A A` is zero. -/
-lemma sddError_self {Question Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (ψ : QuantumState ι) (𝒟 : Distribution Question)
-    (A : IdxSubMeas Question Outcome ι) :
-    sddError ψ 𝒟 A A = 0 := by
-  unfold sddError
-  have : (fun q => qSDD ψ (A q) (A q)) = fun _ => 0 :=
-    funext (fun q => qSDD_self ψ (A q))
-  rw [this]
-  exact avgOver_zero 𝒟
-
 /-- On a permutation-invariant bipartite state, the `qSDDCore` distance between
 right-tensor placements of two local operator families equals the corresponding
 left-tensor distance.

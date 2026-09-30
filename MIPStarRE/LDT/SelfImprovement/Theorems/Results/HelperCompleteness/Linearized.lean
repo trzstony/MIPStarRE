@@ -166,28 +166,6 @@ theorem helper_linearized_completeness_quantity_eq_dual_mass_of_complementary_sl
     helper_linearized_completeness_eq_dual_mass_of_complementary_slackness
       params strategy T Z hTtotal hslack
 
-/-- Complementary-slackness conversion specialized to the SDP witness packaged
-inside `SelfImprovementHelperConclusion`. -/
-theorem helper_sdp_complementary_slackness_sum_eq_dual_mass
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (eps delta : Error)
-    {T : Measurement (Polynomial params) ι}
-    {Hhat : SubMeas (Polynomial params) ι}
-    {Z : MIPStarRE.Quantum.Op ι}
-    (hhelper : SelfImprovementHelperConclusion params strategy T Hhat Z eps delta)
-    (hcomp :
-      ∀ h : Polynomial params,
-        sdpComplementarySlacknessEquation params strategy T.toSubMeas Z h) :
-    (∑ h : Polynomial params,
-        ev strategy.state
-          (leftTensor (ι₂ := ι)
-            (T.toSubMeas.outcome h * averagedPointOperator params strategy h))) =
-      ev strategy.state (leftTensor (ι₂ := ι) Z) :=
-  sdp_complementary_slackness_sum_eq_dual_mass params strategy T.toSubMeas Z
-    hhelper.sdpWitness.primalTotalOperator hcomp
-
 /-- The bracketed scalar expression before the first Cauchy--Schwarz move in
 helper completeness.
 
@@ -218,8 +196,7 @@ differs from
 `E_u Σ_a ⟨ψ, (T_[h(u)=a] A^u_a) ⊗ A^u_a ψ⟩`
 by at most `2 sqrt delta`.  The proof is the paper's
 `eq:yet-another-move-a`: `twoNotionsOfSelfConsistency` supplies the first
-square-root factor, while `helper_first_move_second_factor_le_one` supplies
-the second. -/
+square-root factor, and the second factor is at most one. -/
 theorem helper_first_move_abs_sub_bracketed_le_two_sqrt_delta
     (params : Parameters)
     [FieldModel params.q]
@@ -443,45 +420,4 @@ theorem helper_completeness_of_input_consistency
     input_consistency_dual_mass_lower_bound params strategy G Z nu
       hhelper.sdpWitness.dualPositive hhelper.sdpWitness.dualFeasible hcons
 
-/-- Helper-stage completeness from the two Cauchy--Schwarz scalar bounds,
-complementary slackness, and input consistency.
-
-This theorem is the completeness paragraph with the `Hhat`-versus-`Z`
-comparison assembled internally from its two analytic estimates and the exact
-SDP rewrite.  The remaining external hypotheses are therefore the two
-Cauchy--Schwarz estimates themselves and the complementary-slackness equation. -/
-theorem helper_completeness_of_cauchy_schwarz_input_consistency
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (G : Measurement (Polynomial params) ι)
-    (eps delta nu : Error)
-    (heps : 0 ≤ eps) (hdelta : 0 ≤ delta)
-    {T : Measurement (Polynomial params) ι}
-    {Hhat : SubMeas (Polynomial params) ι}
-    {Z : MIPStarRE.Quantum.Op ι}
-    (hhelper : SelfImprovementHelperConclusion params strategy T Hhat Z eps delta)
-    (hmove_left :
-      |helperFirstMovedCompletenessQuantity params strategy T.toSubMeas -
-        subMeasMass strategy.state Hhat.liftLeft| ≤
-        2 * Real.sqrt delta)
-    (hremove_right :
-      |helperLinearizedCompletenessQuantity params strategy T.toSubMeas -
-        helperFirstMovedCompletenessQuantity params strategy T.toSubMeas| ≤
-        Real.sqrt delta)
-    (hslack :
-      ∀ h : Polynomial params,
-        T.toSubMeas.outcome h * averagedPointOperator params strategy h =
-          T.toSubMeas.outcome h * Z)
-    (hcons : ConsRel strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-      (polynomialEvaluationFamily params G.toSubMeas) nu) :
-    CompletenessAtLeast strategy.state Hhat.liftLeft
-      ((1 - nu) - selfImprovementHelperError params eps delta) := by
-  refine
-    helper_completeness_of_input_consistency params strategy G eps delta nu
-      heps hdelta hhelper ?_ hcons
-  exact
-    helper_hhat_vs_z_of_cauchy_schwarz_and_complementary_slackness
-      params strategy eps delta hhelper hmove_left hremove_right hslack
 end MIPStarRE.LDT.SelfImprovement

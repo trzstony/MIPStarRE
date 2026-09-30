@@ -1,5 +1,4 @@
 import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation.Averages
-import MIPStarRE.LDT.Commutativity.Scaffold.Products
 import MIPStarRE.LDT.Commutativity.Transport.Pullback
 import MIPStarRE.LDT.Preliminaries.PolynomialAgreement
 
@@ -208,37 +207,7 @@ noncomputable def fullSliceBABAtensorAvg
             rightTensor (ι₁ := ι)
               ((family.meas xy.1).toSubMeas.outcome gh.1)))
 
-/-- Full-slice `ABA ⊗ B` tensor average (y-side analogue):
-`E_{x,y} ∑_{g,h} ⟨ψ| G^x_g G^y_h G^x_g ⊗ G^y_h |ψ⟩`.
-
-Naming convention (consistent with the sibling `fullSliceBABAtensorAvg` for
-`BAB ⊗ A`): the four-letter operator string `ABAB` decomposes as left register
-`ABA` followed by right register `B`. This is *not* the same operator as the
-scalar `fullSliceABABAvg`, whose left register is the full quartic
-`G^x_g G^y_h G^x_g G^y_h`; the `tensorAvg` suffix marks the tensor split.
-
-The manifestly-PSD tensor-form partner of `fullSliceABABAvg` reached from it by
-`closenessOfIP` (moving the trailing `G^y_h` factor from the left register to
-the right). Each summand factors as `V† V` with
-`V = (G^y_h G^x_g) ⊗ √(G^y_h)`. Internal per #713.
-
-The evaluated-side analogue is `evaluatedSliceABABtensorAvg` below. -/
-noncomputable def fullSliceABABtensorAvg
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) : Error :=
-  avgOver (uniformDistribution (FullSliceQuestion params))
-    (fun xy =>
-      ∑ gh : FullSliceOutcome params,
-        ev strategy.state
-          (leftTensor (ι₂ := ι)
-              ((family.meas xy.1).toSubMeas.outcome gh.1 *
-                (family.meas xy.2).toSubMeas.outcome gh.2 *
-                (family.meas xy.1).toSubMeas.outcome gh.1) *
-            rightTensor (ι₁ := ι)
-              ((family.meas xy.2).toSubMeas.outcome gh.2)))
-
-/-- Evaluated-slice `ABA ⊗ B` tensor average (evaluated-side analogue of
-`fullSliceABABtensorAvg`):
+/-- Evaluated-slice `ABA ⊗ B` tensor average:
 `E_{u,v,x,y} ∑_{a,b} ⟨ψ|
    G^x_[g(u)=a] G^y_[h(v)=b] G^x_[g(u)=a]
      ⊗ G^y_[h(v)=b] |ψ⟩`.
@@ -263,7 +232,6 @@ noncomputable def evaluatedSliceABABtensorAvg
                 (evaluatedSliceFirstFactor params family q).outcome ab.1) *
             rightTensor (ι₁ := ι)
               ((evaluatedSliceSecondFactor params family q).outcome ab.2)))
-
 
 /-- X-evaluated `BAB ⊗ A` tensor average.
 

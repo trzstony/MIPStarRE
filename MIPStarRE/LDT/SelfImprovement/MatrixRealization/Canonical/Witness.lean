@@ -75,17 +75,6 @@ def matrixSdpComplementarySlacknessEquation (params : Parameters)
 
 namespace MatrixSdpOptimalWitness
 
-/-- The dual operator in an optimal matrix SDP witness is positive
-semidefinite.  This follows from dual feasibility, because the averaged point
-operators are positive. -/
-theorem dualPositive {params : Parameters} [FieldModel params.q]
-    {model : MatrixSdpRealization params}
-    {T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space}
-    {Z : MatrixOperator model.space}
-    (h : MatrixSdpOptimalWitness params model T Z) :
-    0 ≤ Z :=
-  matrixSdpDualPositive_of_dualFeasible params model Z h.dualFeasible
-
 /-- An optimal matrix SDP witness whose primal total is the identity determines
 a complete matrix measurement. -/
 noncomputable def primalMeasurement {params : Parameters} [FieldModel params.q]
@@ -115,28 +104,5 @@ theorem complementarySlacknessEquation {params : Parameters} [FieldModel params.
   exact h.complementarySlackness g
 
 end MatrixSdpOptimalWitness
-
-namespace MatrixSdpStatementWithSlackness
-
-/-- A matrix strong-duality statement gives a complete primal measurement, a
-dual operator, dual feasibility, equality of objective values, and the
-complementary-slackness equations in the displayed `T_g Z = T_g A_g` form. -/
-theorem exists_measurement_witness {params : Parameters} [FieldModel params.q]
-    {model : MatrixSdpRealization params}
-    (h : MatrixSdpStatementWithSlackness params model) :
-    ∃ T : MatrixMeasurement (DegreeBoundedPolynomialAnswer params) model.space,
-      ∃ Z : MatrixOperator model.space,
-        0 ≤ Z ∧
-        (∀ g : Polynomial params, 0 ≤ matrixSdpDualSlackOperator params model Z g) ∧
-        matrixSdpPrimalObjective params model T.toSubmeasurement =
-          matrixSdpDualObjective model Z ∧
-        ∀ g : Polynomial params,
-          T.effect g * Z = T.effect g * matrixAveragedPointOperator params model g := by
-  obtain ⟨T, Z, hopt⟩ := h.witness
-  refine ⟨T, Z, hopt.dualPositive, hopt.dualFeasible, hopt.strongDuality, ?_⟩
-  intro g
-  exact hopt.complementarySlacknessEquation g
-
-end MatrixSdpStatementWithSlackness
 
 end MIPStarRE.LDT.SelfImprovement

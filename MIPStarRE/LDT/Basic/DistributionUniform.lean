@@ -34,23 +34,4 @@ theorem totalVariationDistance_uniformDistribution_uniformOnFinset_eq
   rw [uniformDistribution_toPMF, Distribution.uniformOnFinset_toPMF]
   exact PMF.totalVariationDistance_uniformOfFintype_uniformOfFinset_eq s hs
 
-/-- A `[0,1]`-valued function averaged over a nonempty finite subset is bounded
-by its ambient uniform average plus the total variation distance between the
-two uniform distributions. -/
-theorem avgOver_uniformOnFinset_le_uniformDistribution_add_totalVariationDistance
-    {α : Type*} [Fintype α] [DecidableEq α] [Nonempty α]
-    (s : Finset α) (hs : s.Nonempty)
-    (f : α → Error)
-    (hf_nonneg : ∀ a, 0 ≤ f a)
-    (hf_le_one : ∀ a, f a ≤ 1) :
-    avgOver (Distribution.uniformOnFinset s) f
-      ≤ avgOver (uniformDistribution α) f
-        + totalVariationDistance (uniformDistribution α) (Distribution.uniformOnFinset s) := by
-  exact
-    avgOver_le_avgOver_add_totalVariationDistance
-      (uniformDistribution α) (Distribution.uniformOnFinset s)
-      (uniformDistribution_isProbability α)
-      (Distribution.uniformOnFinset_isProbability s hs)
-      f hf_nonneg hf_le_one
-
 end MIPStarRE.LDT

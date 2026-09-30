@@ -1,7 +1,9 @@
 # Comparator verification of `mainFormal`
 
-The headline theorem `MIPStarRE.LDT.Test.mainFormal` (the corrected source
-statement of `thm:main-formal` from the low individual degree test paper) is
+The headline theorem `MIPStarRE.LDT.Test.mainFormal` (`thm:main-formal` of the
+low individual degree test, in the form of
+`blueprint/src/low_degree_simplified.tex`, with error
+`21000 K_{m,d} (ε^(1/64) + (d/q)^(1/64))`) is
 independently verifiable with the official
 [leanprover/comparator](https://github.com/leanprover/comparator), the
 top level of the escalating checks in the Lean reference manual's
@@ -17,7 +19,7 @@ which requires this library as a lake dependency pinned by commit:
 
 - `Challenge.lean` there imports **only Mathlib** and re-declares, verbatim
   and in dependency order, every declaration in the comparator-relevant
-  closure of the statement of `mainFormal` (111 declarations, ~1200 lines),
+  closure of the statement of `mainFormal` (76 declarations, ~800 lines),
   then states the theorem with `sorry`.  It is the entire human audit
   surface.
 - `Solution.lean` there imports this library, which proves the theorem under

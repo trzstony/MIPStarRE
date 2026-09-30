@@ -1,4 +1,3 @@
-import MIPStarRE.Quantum.FiniteMatrix
 import MIPStarRE.LDT.ExpansionHypercubeGraph.MatrixRealization.TraceForms
 import MIPStarRE.LDT.SelfImprovement.Defs
 
@@ -61,16 +60,6 @@ noncomputable def matrixSdpStrictPrimalSubmeasurement (params : Parameters)
   sum_le_one := (le_of_eq (matrixSdpStrictPrimalConstantSum params model)).trans
     (errorHalf_smul_one_le_one model.space)
 
-/-- The matrix-level strict-feasible primal witness has total mass `(1/2) I`. -/
-theorem matrixSdpStrictPrimalSubmeasurement_sum_effect (params : Parameters)
-    [FieldModel params.q]
-    (model : MatrixSdpRealization params) :
-    ∑ g : Polynomial params,
-        (matrixSdpStrictPrimalSubmeasurement params model).effect g =
-      ((1 / 2 : Error) • (1 : MatrixOperator model.space)) := by
-  simpa [matrixSdpStrictPrimalSubmeasurement] using
-    matrixSdpStrictPrimalConstantSum params model
-
 /-- Paper origin: `references/ldt-paper/self_improvement.tex:168-176`
 (`\label{lem:sdp}` strict feasible dual witness `Z = 2I`);
 blueprint `\label{lem:sdp-matrix-feasible-bounds}`.
@@ -79,15 +68,6 @@ The paper's matrix-level strict-feasible dual witness `Z = 2I`. -/
 noncomputable def matrixSdpStrictDualWitness {params : Parameters} [FieldModel params.q]
     (model : MatrixSdpRealization params) : MatrixOperator model.space :=
   (2 : Error) • (1 : MatrixOperator model.space)
-
-/-- The matrix-level strict-feasible dual witness is positive semidefinite. -/
-theorem matrixSdpStrictDualWitness_nonneg {params : Parameters} [FieldModel params.q]
-    (model : MatrixSdpRealization params) :
-    0 ≤ matrixSdpStrictDualWitness model := by
-  unfold matrixSdpStrictDualWitness
-  exact smul_nonneg (by norm_num)
-    (Matrix.PosSemidef.one.nonneg :
-      0 ≤ (1 : MIPStarRE.Quantum.Op model.space.carrier))
 
 /-- The matrix-level strict-feasible dual witness dominates the identity. -/
 theorem one_le_matrixSdpStrictDualWitness {params : Parameters} [FieldModel params.q]
@@ -185,31 +165,6 @@ theorem matrixSdpStrictDualWitness_dualFeasible (params : Parameters)
     (le_trans (matrixAveragedPointOperator_le_one params model g)
       (one_le_matrixSdpStrictDualWitness model))
 
-/-- For the strict dual witness `Z = 2I`, every paper dual slack
-`Z - A_g` dominates the identity. -/
-theorem one_le_matrixSdpStrictDualWitness_dualSlack (params : Parameters)
-    [FieldModel params.q]
-    (model : MatrixSdpRealization params)
-    (g : Polynomial params) :
-    (1 : MatrixOperator model.space) ≤
-      matrixSdpDualSlackOperator params model (matrixSdpStrictDualWitness model) g := by
-  calc
-    (1 : MatrixOperator model.space) =
-        matrixSdpStrictDualWitness model - (1 : MatrixOperator model.space) := by
-          unfold matrixSdpStrictDualWitness
-          ext i j
-          by_cases hij : i = j
-          · subst j
-            simp
-            norm_num
-          · simp [hij]
-    _ ≤ matrixSdpStrictDualWitness model -
-          matrixAveragedPointOperator params model g := by
-        exact sub_le_sub_left (matrixAveragedPointOperator_le_one params model g)
-          (matrixSdpStrictDualWitness model)
-    _ = matrixSdpDualSlackOperator params model (matrixSdpStrictDualWitness model) g := by
-        rfl
-
 /-- Dual feasibility already implies that the dual operator is positive
 semidefinite, since every averaged point operator `A_g` is positive. -/
 theorem matrixSdpDualPositive_of_dualFeasible (params : Parameters)
@@ -228,41 +183,5 @@ theorem matrixSdpDualPositive_of_dualFeasible (params : Parameters)
   have hAg_le_Z : matrixAveragedPointOperator params model g0 ≤ Z :=
     sub_nonneg.mp (by simpa [matrixSdpDualSlackOperator] using hdual g0)
   exact hAg_nonneg.trans hAg_le_Z
-
-/-- Matrix-level record of the explicit feasible bounds used in the SDP argument.
-
-The uniform primal family has total `(1/2)I`, while the dual witness `2I`
-dominates the identity and is dual feasible. Positivity of the dual witness is
-derivable from dual feasibility and the positivity of the averaged point
-operators. These are the non-strict matrix inequalities currently recorded in
-Lean; the structure is not an optimality statement and does not include
-complementary slackness. -/
-structure MatrixSdpFeasibleBounds (params : Parameters) [FieldModel params.q]
-    (model : MatrixSdpRealization params)
-    (T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
-    (Z : MatrixOperator model.space) : Prop where
-  primalTotalHalf :
-    ∑ g : Polynomial params, T.effect g =
-      ((1 / 2 : Error) • (1 : MatrixOperator model.space))
-  dualDominatesIdentity : (1 : MatrixOperator model.space) ≤ Z
-  dualFeasible :
-    ∀ g : Polynomial params,
-      0 ≤ matrixSdpDualSlackOperator params model Z g
-  dualSlackDominatesIdentity :
-    ∀ g : Polynomial params,
-      (1 : MatrixOperator model.space) ≤ matrixSdpDualSlackOperator params model Z g
-
-/-- The canonical explicit matrix feasible bounds used in the SDP argument. -/
-theorem matrixSdpFeasibleBounds_canonical (params : Parameters) [FieldModel params.q]
-    (model : MatrixSdpRealization params) :
-    MatrixSdpFeasibleBounds params model
-      (matrixSdpStrictPrimalSubmeasurement params model)
-      (matrixSdpStrictDualWitness model) where
-  primalTotalHalf := matrixSdpStrictPrimalSubmeasurement_sum_effect params model
-  dualDominatesIdentity := one_le_matrixSdpStrictDualWitness model
-  dualFeasible := matrixSdpStrictDualWitness_dualFeasible params model
-  dualSlackDominatesIdentity :=
-    one_le_matrixSdpStrictDualWitness_dualSlack params model
-
 
 end MIPStarRE.LDT.SelfImprovement

@@ -133,29 +133,24 @@ special case where the total is exactly $I$.
 \footnote{These are the declarations
 \leanid{MIPStarRE.LDT.SubMeas} and \leanid{MIPStarRE.LDT.Measurement} in
 \path{MIPStarRE/LDT/Basic/SubMeasurementCore.lean}, lines 13--28.}
-The self-improvement SDP definitions now use the submeasurement type for the
-primal variable. In particular, the primal contribution, primal objective, and
-complementary-slackness equation all take $T$ to be a submeasurement, not a
-measurement.
+The self-improvement SDP definitions use the submeasurement type for the
+primal variable. In particular, the complementary-slackness equation takes $T$
+to be a submeasurement, not a measurement.
 \footnote{See
-\leanid{MIPStarRE.LDT.SelfImprovement.sdpPrimalContributionOperator},
-\leanid{MIPStarRE.LDT.SelfImprovement.sdpPrimalObjectiveOperator},
-\leanid{MIPStarRE.LDT.SelfImprovement.sdpPrimalObjective}, and
 \leanid{MIPStarRE.LDT.SelfImprovement.sdpComplementarySlacknessEquation} in
-\path{MIPStarRE/LDT/SelfImprovement/Defs.lean}, lines 139--184. The same file
-also defines the sandwiched family \path{sandwichedPolynomialSubMeasAt} and the
-averaged family \path{averagedSandwichedPolynomialSubMeas} with
-$T$ a submeasurement, in lines 198--333.}
+\path{MIPStarRE/LDT/SelfImprovement/Defs.lean}. The same file also defines the
+sandwiched family \path{sandwichedPolynomialSubMeasAt} and the averaged family
+\path{averagedSandwichedPolynomialSubMeas} with $T$ a submeasurement.}
 The proof that the sandwiched family is a submeasurement uses the inequality
 $\sum_g T_g\le I$: after grouping the summands by the value of $h(u)$, the
 filtered sum is bounded by the total mass of $T$, and hence by $I$.
 
-The strict primal witness from the paper is represented before completion as a
-submeasurement. The declaration \path{sdpStrictPrimalSubMeas} has outcomes
-$T_g=(2|\cP|)^{-1}I$, and the theorem
-\path{sdpStrictPrimalSubMeas_total} proves that its total is $\frac12 I$.
+The strict primal witness from the paper has outcomes $T_g=(2|\cP|)^{-1}I$,
+whose total is $\frac12 I$.  The weight is
+\path{sdpStrictPrimalWeight}, and \path{sdpStrictPrimalConstantSum} computes
+the total.
 \footnote{These are in
-\path{MIPStarRE/LDT/SelfImprovement/Defs.lean}, lines 37--97.}
+\path{MIPStarRE/LDT/SelfImprovement/Defs.lean}.}
 This is the formal counterpart of the paper's Slater witness. Earlier Lean
 versions also exposed a declaration \leanid{sdpPrimalWitness}, which completed
 this submeasurement at the zero polynomial for a reduced theorem named

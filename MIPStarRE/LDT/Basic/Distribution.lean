@@ -1,6 +1,5 @@
 import MIPStarRE.LDT.Basic.ParametersBase
 import MIPStarRE.Quantum.FiniteMatrix
-import Mathlib
 
 /-!
 # Distribution infrastructure for the low individual degree test
@@ -62,15 +61,6 @@ theorem map_weight {α β : Type*} [DecidableEq β]
     (𝒟.map e).weight b =
       ∑ a ∈ 𝒟.support.filter (fun a => e a = b), 𝒟.weight a := rfl
 
-/-- Push-forward preserves total mass. -/
-theorem map_totalWeight {α β : Type*} [DecidableEq β]
-    (𝒟 : Distribution α) (e : α → β) :
-    (𝒟.map e).totalWeight = 𝒟.totalWeight := by
-  simpa [totalWeight, map] using
-    (Finset.sum_fiberwise_of_maps_to
-      (s := 𝒟.support) (t := 𝒟.support.image e) (g := e)
-      (fun a ha => Finset.mem_image.mpr ⟨a, ha, rfl⟩) 𝒟.weight)
-
 /-- A finite weighted sum over a push-forward distribution is the corresponding
 weighted sum of the pulled-back family.  This is the `Distribution` analogue of
 the finite-sum form of `PMF.map`. -/
@@ -123,29 +113,11 @@ theorem weight_sum_eq_one {α : Type*}
     ∑ a ∈ 𝒟.support, 𝒟.weight a = 1 := by
   simpa [Distribution.IsProbability, Distribution.totalWeight] using h𝒟
 
-/-- On a finite ambient type, a probabilistic `Distribution` has total weight `1` even
-when its weights are summed over the whole ambient type.
-
-This packages the explicit-support bookkeeping in `Distribution` for downstream Lean
-statements that follow the paper's notation `𝔼_{x ∼ 𝒟}` over the question set rather
-than over a stored support finset. -/
-theorem weight_sum_univ_eq_one {α : Type*} [Fintype α]
-    {𝒟 : Distribution α} (h𝒟 : 𝒟.IsProbability) :
-    (∑ a : α, 𝒟.weight a) = 1 := by
-  rw [Distribution.sum_univ_eq_sum_support 𝒟 𝒟.weight 𝒟.outsideSupport]
-  exact h𝒟.weight_sum_eq_one
-
 /-- A probability distribution has total weight at most `1`. -/
 theorem weight_sum_le_one {α : Type*}
     {𝒟 : Distribution α} (h𝒟 : 𝒟.IsProbability) :
     ∑ a ∈ 𝒟.support, 𝒟.weight a ≤ 1 :=
   le_of_eq h𝒟.weight_sum_eq_one
-
-/-- Push-forward preserves the probability invariant. -/
-theorem map {α β : Type*} [DecidableEq β]
-    {𝒟 : Distribution α} (h𝒟 : 𝒟.IsProbability) (e : α → β) :
-    (𝒟.map e).IsProbability := by
-  simpa [Distribution.IsProbability, Distribution.map_totalWeight] using h𝒟
 
 end Distribution.IsProbability
 
@@ -187,31 +159,6 @@ theorem toPMF_apply_of_notMem {α : Type*} (𝒟 : Distribution α)
     𝒟.toPMF h𝒟 a = 0 := by
   rw [toPMF_apply, 𝒟.outsideSupport a ha]
   simp
-
-/-- The project push-forward agrees with Mathlib's push-forward of the
-associated probability mass function. -/
-theorem toPMF_map {α β : Type*} [DecidableEq β]
-    (𝒟 : Distribution α) (h𝒟 : 𝒟.IsProbability) (e : α → β) :
-    (𝒟.map e).toPMF (h𝒟.map e) = (𝒟.toPMF h𝒟).map e := by
-  classical
-  ext b
-  rw [toPMF_apply, PMF.map_apply, map_weight]
-  rw [ENNReal.ofReal_sum_of_nonneg
-    (s := 𝒟.support.filter (fun a => e a = b))
-    (fun a _ => 𝒟.nonnegative a)]
-  rw [tsum_eq_sum (s := 𝒟.support)]
-  · rw [Finset.sum_filter]
-    refine Finset.sum_congr rfl ?_
-    intro a ha
-    by_cases hea : e a = b
-    · have hba : b = e a := hea.symm
-      rw [if_pos hea, if_pos hba, toPMF_apply]
-    · have hba : b ≠ e a := fun hba => hea hba.symm
-      rw [if_neg hea, if_neg hba]
-  · intro a ha
-    by_cases hba : b = e a
-    · rw [if_pos hba, toPMF_apply_of_notMem 𝒟 h𝒟 ha]
-    · rw [if_neg hba]
 
 end Distribution
 
@@ -289,18 +236,6 @@ theorem averageOperatorOverDistribution_eq_weightedSumLinearMap {α : Type*}
       𝒟.weightedSumLinearMap (MIPStarRE.Quantum.Op ι) f :=
   rfl
 
-/-- Operator-valued averaging against a pushed-forward distribution is
-operator-valued averaging of the pulled-back family against the original
-distribution. -/
-theorem averageOperatorOverDistribution_map {α β : Type*} [DecidableEq β]
-    (𝒟 : Distribution α) (e : α → β)
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (f : β → MIPStarRE.Quantum.Op ι) :
-    averageOperatorOverDistribution (𝒟.map e) f =
-      averageOperatorOverDistribution 𝒟 (fun a => f (e a)) := by
-  simpa [averageOperatorOverDistribution] using
-    Distribution.map_sum_smul (𝒟 := 𝒟) e f
-
 end Distribution
 
 /-- If two operator-valued families agree pointwise, their averages agree. -/
@@ -319,18 +254,6 @@ theorem averageOperatorOverDistribution_sum {α β : Type*} [Fintype β]
     averageOperatorOverDistribution 𝒟 (fun a => ∑ b : β, f a b) =
       ∑ b : β, averageOperatorOverDistribution 𝒟 (fun a => f a b) := by
   rw [show (fun a => ∑ b : β, f a b) = ∑ b : β, fun a => f a b by
-    ext a
-    simp]
-  simp [Distribution.averageOperatorOverDistribution_eq_weightedSumLinearMap]
-
-/-- Pull a finite-set outcome sum through an operator-valued average. -/
-theorem averageOperatorOverDistribution_finset_sum {α β : Type*}
-    (𝒟 : Distribution α) (s : Finset β)
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (f : α → β → MIPStarRE.Quantum.Op ι) :
-    averageOperatorOverDistribution 𝒟 (fun a => ∑ b ∈ s, f a b) =
-      ∑ b ∈ s, averageOperatorOverDistribution 𝒟 (fun a => f a b) := by
-  rw [show (fun a => ∑ b ∈ s, f a b) = ∑ b ∈ s, fun a => f a b by
     ext a
     simp]
   simp [Distribution.averageOperatorOverDistribution_eq_weightedSumLinearMap]
@@ -445,17 +368,6 @@ theorem uniformOnFinset_isProbability {α : Type*} (s : Finset α) (hs : s.Nonem
     simp [ha]
   rw [hsum]
   simp [Finset.sum_const, hcard]
-
-/-- The uniform distribution on any finite support is a sub-probability
-distribution.  It has mass `1` on nonempty support and mass `0` on empty
-support. -/
-theorem uniformOnFinset_weight_sum_le_one {α : Type*} (s : Finset α) :
-    ∑ a ∈ (uniformOnFinset s).support, (uniformOnFinset s).weight a ≤ 1 := by
-  classical
-  by_cases hs : s.Nonempty
-  · exact (uniformOnFinset_isProbability s hs).weight_sum_le_one
-  · have hsempty : s = ∅ := Finset.not_nonempty_iff_eq_empty.mp hs
-    simp [hsempty]
 
 /-- The project uniform distribution on a nonempty finite support is Mathlib's
 uniform probability mass function on that support. -/

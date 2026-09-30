@@ -242,62 +242,10 @@ theorem OneMeasNaimarkData.lifted_pos {α : Type*} [Fintype α] [DecidableEq α]
     0 ≤ data.liftedEffect a :=
   (data.lifted_isProj a).nonneg
 
-/-! ### Questionwise Naimark data
-
-The current Lean data applies one-measurement Naimark independently to each
-question on each side. -/
-
-/-- Questionwise Naimark data for the prospective full assembly.
-
-Given submeasurements on space `ι`, this carries the questionwise
-one-measurement Naimark dilations used as the local building blocks for the
-full tensor-product assembly. -/
-structure NaimarkData (QuestionA OutcomeA QuestionB OutcomeB : Type*)
-    (ι : Type*)
-    [Fintype QuestionA] [DecidableEq QuestionA]
-    [Fintype OutcomeA] [DecidableEq OutcomeA]
-    [Fintype QuestionB] [DecidableEq QuestionB]
-    [Fintype OutcomeB] [DecidableEq OutcomeB]
-    [Fintype ι] [DecidableEq ι] where
-  /-- Alice's questionwise one-measurement Naimark dilations. -/
-  left : (x : QuestionA) → OneMeasNaimarkData OutcomeA ι
-  /-- Bob's questionwise one-measurement Naimark dilations. -/
-  right : (y : QuestionB) → OneMeasNaimarkData OutcomeB ι
-
--- NOTE: no global `Inhabited` instance for `NaimarkData`:
--- constructing defaults for projective measurements is mathematically non-canonical
--- and would require additional assumptions on outcome types.
-
 /-! ### Error functions for orthonormalization -/
-
-/-- The explicit error in `thm:orthonormalization`. -/
-noncomputable def orthonormalizationError (ζ : Error) : Error :=
-  100 * Real.rpow ζ (1 / (4 : Error))
-
-/-- Error bound of the direct completion-route orthonormalization theorem.
-
-The paper proves the sharper `orthonormalizationError ζ`.  The direct completion
-route first converts the completed measurement's `2ζ` self-consistency estimate
-into a `4ζ` source-almost-projective estimate, and therefore uses this weaker
-named envelope. -/
-noncomputable def orthonormalizationCompletionRouteError (ζ : Error) : Error :=
-  120 * Real.rpow ζ (1 / (4 : Error))
-
-/-- The explicit error in the measurement version of the lemma. -/
-noncomputable def orthonormalizationMainLemmaError (ζ : Error) : Error :=
-  84 * Real.rpow ζ (1 / (4 : Error))
 
 /-- The almost-projective error extracted from a consistency hypothesis. -/
 def consistencyToAlmostProjectiveError (ζ : Error) : Error :=
   2 * ζ
-
-/-- The spectral-truncation error when rounding one almost-projective effect to a
-    projection via eigenvalue truncation. Dominated by `√ζ`. -/
-noncomputable def spectralTruncationError (ζ : Error) : Error :=
-  Real.rpow ζ (1 / (2 : Error))
-
-/-- The rounding error when converting an almost-projective POVM to a projective submeasurement. -/
-noncomputable def roundingToProjectiveError (ζ : Error) : Error :=
-  12 * Real.rpow ζ (1 / (2 : Error))
 
 end MIPStarRE.LDT.MakingMeasurementsProjective

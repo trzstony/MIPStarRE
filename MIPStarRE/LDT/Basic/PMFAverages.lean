@@ -14,9 +14,6 @@ low individual degree test averaging layer.
 
 * `PMF.map_apply_toReal`
 * `PMF.realWeightedSum`
-* `PMF.realWeightedSumLinearMap`
-* `PMF.realWeightedSum_map`
-* `PMF.realWeightedSum_bind`
 * `PMF.map_sum_smul`
 * `PMF.bind_apply_toReal`
 * `PMF.bind_sum_smul`
@@ -25,11 +22,9 @@ low individual degree test averaging layer.
 * `PMF.totalVariationDistance`
 * `PMF.totalVariationDistance_eq_sum_max_sub`
 * `PMF.totalVariationDistance_uniformOfFintype_uniformOfFinset_eq`
-* `PMF.sum_le_sum_add_totalVariationDistance`
 * `PMF.sum_rpow_one_div_le_rpow_sum`
 * `PMF.realWeightedSum_rpow_one_div_le_rpow`
 * `PMF.uniformOfFintype_map_equiv`
-* `PMF.uniformOfFintype_prod_apply_toReal`
 * `PMF.uniformOfFintype_prod_eq_bind`
 * `PMF.uniformOfFintype_sum_equiv_smul`
 * `PMF.uniformOfFintype_prod_sum_smul`
@@ -37,7 +32,6 @@ low individual degree test averaging layer.
 * `PMF.uniformOfFintype_sum_equiv_snd_smul`
 * `PMF.uniformOfFintype_sum_factor_equiv_smul`
 * `PMF.uniformOfFintype_sum_factor_equiv_fst_smul`
-* `PMF.uniformOfFintype_sum_factor_equiv_snd_smul`
 
 ## References
 
@@ -56,36 +50,6 @@ noncomputable def realWeightedSum {α M : Type*} [Fintype α]
     [AddCommMonoid M] [Module MIPStarRE.LDT.Error M]
     (p : PMF α) (f : α → M) : M :=
   ∑ a : α, (p a).toReal • f a
-
-/-- The finite PMF-weighted expectation as a linear map in the averaged family.
-
-This is the linear form of `PMF.realWeightedSum`; it records that the
-probability weights are fixed and the averaged object varies linearly. -/
-noncomputable def realWeightedSumLinearMap {α M : Type*} [Fintype α]
-    [AddCommMonoid M] [Module MIPStarRE.LDT.Error M]
-    (p : PMF α) : (α → M) →ₗ[MIPStarRE.LDT.Error] M where
-  toFun := fun f => realWeightedSum p f
-  map_add' := by
-    intro f g
-    simp only [realWeightedSum, Pi.add_apply, smul_add, Finset.sum_add_distrib]
-  map_smul' := by
-    intro c f
-    simp only [realWeightedSum, Pi.smul_apply]
-    calc
-      ∑ a : α, (p a).toReal • c • f a =
-          ∑ a : α, c • ((p a).toReal • f a) := by
-            refine Finset.sum_congr rfl ?_
-            intro a _
-            rw [smul_smul, smul_smul, mul_comm]
-      _ = c • ∑ a : α, (p a).toReal • f a := by
-            rw [Finset.smul_sum]
-
-@[simp]
-theorem realWeightedSumLinearMap_apply {α M : Type*} [Fintype α]
-    [AddCommMonoid M] [Module MIPStarRE.LDT.Error M]
-    (p : PMF α) (f : α → M) :
-    realWeightedSumLinearMap p f = realWeightedSum p f :=
-  rfl
 
 /-- The finite total-variation distance between two probability mass functions,
 written as half the `L^1` distance between their real weights.
@@ -194,21 +158,6 @@ theorem bind_sum_smul {α β M : Type*}
           refine Finset.sum_congr rfl ?_
           intro a _
           rw [Finset.smul_sum]
-
-/-- The uniform probability mass on a product is the product of the two
-coordinate uniform masses, after coercion to real weights. -/
-theorem uniformOfFintype_prod_apply_toReal
-    {α β : Type*} [Fintype α] [Nonempty α] [Fintype β] [Nonempty β]
-    (a : α) (b : β) :
-    (PMF.uniformOfFintype (α × β) (a, b)).toReal =
-      (PMF.uniformOfFintype α a).toReal *
-        (PMF.uniformOfFintype β b).toReal := by
-  have hα : ((Fintype.card α : ℕ) : MIPStarRE.LDT.Error) ≠ 0 := by
-    exact_mod_cast Fintype.card_ne_zero
-  have hβ : ((Fintype.card β : ℕ) : MIPStarRE.LDT.Error) ≠ 0 := by
-    exact_mod_cast Fintype.card_ne_zero
-  simp [PMF.uniformOfFintype_apply, Fintype.card_prod]
-  field_simp [hα, hβ]
 
 /-- The uniform probability mass function on a product is the monadic
 composition of the two coordinate-uniform probability mass functions. -/
@@ -459,58 +408,9 @@ theorem uniformOfFintype_sum_factor_equiv_fst_smul {α β γ δ M : Type*}
     _ = ∑ c : γ, (PMF.uniformOfFintype γ c).toReal • f c := by
           exact uniformOfFintype_sum_equiv_fst_smul (e := e) (f := f)
 
-/-- A uniform PMF-weighted sum pushed forward through a map has the second
-coordinate uniform marginal when the seed is equivalent to a product. -/
-theorem uniformOfFintype_sum_factor_equiv_snd_smul {α β γ δ M : Type*}
-    [Fintype α] [Nonempty α]
-    [Finite γ] [Nonempty γ]
-    [Fintype δ] [Nonempty δ]
-    [AddCommMonoid M] [Module MIPStarRE.LDT.Error M]
-    (m : α → β) (g : β → δ) (e : α ≃ γ × δ)
-    (h : ∀ a, g (m a) = (e a).2) (f : δ → M) :
-    ∑ a : α, (PMF.uniformOfFintype α a).toReal • f (g (m a)) =
-      ∑ d : δ, (PMF.uniformOfFintype δ d).toReal • f d := by
-  calc
-    ∑ a : α, (PMF.uniformOfFintype α a).toReal • f (g (m a))
-        = ∑ a : α, (PMF.uniformOfFintype α a).toReal • f (e a).2 := by
-          refine Finset.sum_congr rfl ?_
-          intro a _
-          rw [h a]
-    _ = ∑ d : δ, (PMF.uniformOfFintype δ d).toReal • f d := by
-          exact uniformOfFintype_sum_equiv_snd_smul (e := e) (f := f)
-
 end PMF
 
 namespace PMF
-
-/-- A finite PMF-weighted sum against a push-forward is the corresponding
-PMF-weighted sum of the pulled-back family. -/
-theorem realWeightedSum_map {α β M : Type*}
-    [Fintype α] [Fintype β]
-    [AddCommMonoid M] [Module MIPStarRE.LDT.Error M]
-    (p : PMF α) (e : α → β) (f : β → M) :
-    realWeightedSum (p.map e) f = realWeightedSum p (fun a => f (e a)) := by
-  simpa [realWeightedSum] using
-    map_sum_smul (p := p) (e := e) (f := f)
-
-/-- A finite PMF-weighted sum against a monadic composition is the corresponding
-iterated PMF-weighted sum. -/
-theorem realWeightedSum_bind {α β M : Type*}
-    [Fintype α] [Fintype β]
-    [AddCommMonoid M] [Module MIPStarRE.LDT.Error M]
-    (p : PMF α) (q : α → PMF β) (f : β → M) :
-    realWeightedSum (p.bind q) f =
-      realWeightedSum p (fun a => realWeightedSum (q a) f) := by
-  simpa [realWeightedSum] using
-    bind_sum_smul (p := p) (q := q) (f := f)
-
-/-- The finite PMF-weighted sum of a constant family is the constant value. -/
-theorem realWeightedSum_const {α M : Type*}
-    [Fintype α] [AddCommMonoid M] [Module MIPStarRE.LDT.Error M]
-    (p : PMF α) (x : M) :
-    realWeightedSum p (fun _ : α => x) = x := by
-  simpa [realWeightedSum] using
-    sum_const_smul (p := p) (x := x)
 
 /-- Reindex a finite expectation against Mathlib's uniform PMF along an
 equivalence. -/
@@ -562,21 +462,6 @@ theorem realWeightedSum_uniformOfFintype_factor_equiv_fst {α β γ δ M : Type*
       realWeightedSum (PMF.uniformOfFintype γ) f := by
   simpa [realWeightedSum] using
     uniformOfFintype_sum_factor_equiv_fst_smul
-      (m := m) (g := g) (e := e) (h := h) (f := f)
-
-/-- A uniform finite expectation pushed forward through a map has the second
-coordinate uniform marginal when the seed is equivalent to a product. -/
-theorem realWeightedSum_uniformOfFintype_factor_equiv_snd {α β γ δ M : Type*}
-    [Fintype α] [Nonempty α]
-    [Finite γ] [Nonempty γ]
-    [Fintype δ] [Nonempty δ]
-    [AddCommMonoid M] [Module MIPStarRE.LDT.Error M]
-    (m : α → β) (g : β → δ) (e : α ≃ γ × δ)
-    (h : ∀ a, g (m a) = (e a).2) (f : δ → M) :
-    realWeightedSum (PMF.uniformOfFintype α) (fun a => f (g (m a))) =
-      realWeightedSum (PMF.uniformOfFintype δ) f := by
-  simpa [realWeightedSum] using
-    uniformOfFintype_sum_factor_equiv_snd_smul
       (m := m) (g := g) (e := e) (h := h) (f := f)
 
 /-- For finite probability mass functions, total variation is the total positive
@@ -697,65 +582,6 @@ theorem totalVariationDistance_uniformOfFintype_uniformOfFinset_eq
     _ = 1 - (s.card : MIPStarRE.LDT.Error) /
           (Fintype.card α : MIPStarRE.LDT.Error) := by
           field_simp [hs_card_ne, hα_card_ne]
-
-/-- A `[0,1]`-valued function has expectations over two finite probability mass
-functions differing by at most their total-variation distance.
-
-This is the finite PMF comparison estimate used after Proposition
-`prop:ld-dnoteq` in `references/ldt-paper/ld-pasting.tex`. -/
-theorem sum_le_sum_add_totalVariationDistance {α : Type*}
-    [Fintype α] (p q : PMF α) (f : α → MIPStarRE.LDT.Error)
-    (hf_nonneg : ∀ a, 0 ≤ f a)
-    (hf_le_one : ∀ a, f a ≤ 1) :
-    ∑ a : α, (q a).toReal * f a ≤
-      ∑ a : α, (p a).toReal * f a + totalVariationDistance p q := by
-  classical
-  have hpoint :
-      ∀ a : α, (q a).toReal * f a ≤
-        (p a).toReal * f a + max 0 ((q a).toReal - (p a).toReal) := by
-    intro a
-    by_cases hle : (q a).toReal ≤ (p a).toReal
-    · have hmul : (q a).toReal * f a ≤ (p a).toReal * f a := by
-        exact mul_le_mul_of_nonneg_right hle (hf_nonneg a)
-      have hmax : max 0 ((q a).toReal - (p a).toReal) = 0 := by
-        rw [max_eq_left]
-        linarith
-      rw [hmax]
-      linarith
-    · have hpq : (p a).toReal ≤ (q a).toReal := le_of_not_ge hle
-      have hdiff_nonneg : 0 ≤ (q a).toReal - (p a).toReal := by linarith
-      have hmul :
-          ((q a).toReal - (p a).toReal) * f a ≤
-            (q a).toReal - (p a).toReal := by
-        have := mul_le_mul_of_nonneg_left (hf_le_one a) hdiff_nonneg
-        simpa [one_mul] using this
-      have hsplit :
-          (q a).toReal * f a =
-            (p a).toReal * f a + ((q a).toReal - (p a).toReal) * f a := by
-        ring
-      have hmax : max 0 ((q a).toReal - (p a).toReal) =
-          (q a).toReal - (p a).toReal := max_eq_right hdiff_nonneg
-      rw [hsplit, hmax]
-      linarith
-  have hsum :
-      ∑ a : α, (q a).toReal * f a ≤
-        ∑ a : α, ((p a).toReal * f a +
-          max 0 ((q a).toReal - (p a).toReal)) :=
-    Finset.sum_le_sum fun a _ => hpoint a
-  have htv :
-      totalVariationDistance p q =
-        ∑ a : α, max 0 ((q a).toReal - (p a).toReal) :=
-    totalVariationDistance_eq_sum_max_sub p q
-  calc
-    ∑ a : α, (q a).toReal * f a
-        ≤ ∑ a : α, ((p a).toReal * f a +
-            max 0 ((q a).toReal - (p a).toReal)) :=
-          hsum
-    _ = ∑ a : α, (p a).toReal * f a +
-          ∑ a : α, max 0 ((q a).toReal - (p a).toReal) := by
-          rw [Finset.sum_add_distrib]
-    _ = ∑ a : α, (p a).toReal * f a + totalVariationDistance p q := by
-          rw [← htv]
 
 /-- Jensen's inequality for the concave power `x ↦ x ^ (1 / n)`, stated for the
 finite expectation associated to a probability mass function. -/

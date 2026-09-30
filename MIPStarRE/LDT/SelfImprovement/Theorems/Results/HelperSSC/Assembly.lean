@@ -516,39 +516,6 @@ theorem helperOffDiagonalBareQuantity_le_paper_chain_of_scalar_transports
   rw [helper_mass_sub_release_eq_polynomial_off_diagonal] at hresidual
   simpa [release, ζsqrt, sqrtTwoDelta, mdq, helperOffDiagonalBareQuantity] using hresidual
 
-/-- Construct the helper-stage bounds from local variance and a named
-off-diagonal residual estimate.
-
-This produces the same named bounds as
-`helper_strong_self_consistency_bounds_of_selfConsistency_localVariance`,
-but its final input is the concrete off-diagonal polynomial-pair bound obtained
-after expanding the released residual. -/
-lemma helper_strong_self_consistency_bounds_of_selfConsistency_localVariance_offDiagonal
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (eps delta : Error)
-    {T : Measurement (Polynomial params) ι}
-    {Hhat : SubMeas (Polynomial params) ι}
-    {Z : MIPStarRE.Quantum.Op ι}
-    (hhelper : SelfImprovementHelperConclusion params strategy T Hhat Z eps delta)
-    (hssc : BipartiteSSCRel strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) delta)
-    (hlocal :
-      (∑ g : Polynomial params,
-        localVarianceDeviationAtPolynomial params strategy strategy.state T.toSubMeas g) ≤
-        localVarianceOfPointsError params eps delta)
-    (hoffdiag :
-      helperOffDiagonalBareQuantity params strategy T.toSubMeas ≤
-        (11 * Real.sqrt (selfImprovementVarianceError params eps delta) +
-            Real.sqrt (2 * delta) +
-            ((params.m : Error) * (params.d : Error) / (params.q : Error))) -
-          addInUError params eps delta) :
-    HelperStrongSelfConsistencyBounds params strategy T Hhat eps delta := by
-  exact helper_strong_self_consistency_bounds_of_selfConsistency_localVariance
-    params strategy eps delta hssc hlocal
-    (helper_residualLowerBound_of_offDiagonal_bound
-      params strategy eps delta hhelper hoffdiag)
-
 /-- Construct the helper-stage bounds from the paper's final residual
 chain estimate.
 

@@ -41,7 +41,7 @@ dependencies, use the mathematical leaves:
   - the linear-map form of `Matrix.blockDiagonal`, block-diagonal positivity,
     and the corresponding block trace identity.
 - `MIPStarRE.Quantum.FiniteMatrix.NormalizedTrace`
-  - normalized trace, `tauNormSq`, projections, and spectral truncation.
+  - normalized trace and projections.
 
 - `abbrev MIPStarRE.Quantum.Op (d : Type*) := Matrix d d ℂ`
   - The operator type used everywhere in `SubMeas`.
@@ -68,10 +68,7 @@ dependencies, use the mathematical leaves:
 - `theorem normalizedTrace_mul_comm (A B : Op d) : normalizedTrace (A * B) = normalizedTrace (B * A)`
   - Trace linearity/cyclicity tools used downstream for scalarized sum arguments.
 
-- `noncomputable def tauNormSq (A : Op d) : ℂ`
 - `structure IsProj (P : Op d) : Prop`
-- `structure SpectralTruncation (source target : Op d) : Prop`
-  - Less direct for basic `SubMeas` obligations, but part of the operator API.
 
 ### From `MIPStarRE.Quantum.Measurement`
 
@@ -238,14 +235,6 @@ lemmas when the statement is naturally about a genuine finite probability law.
   - Finite expectation of a module-valued family against the real weights of a
     finite probability mass function.
 
-- `noncomputable def PMF.realWeightedSumLinearMap (p : PMF α) :
-  (α → M) →ₗ[Error] M`
-  - Linear-map form of `PMF.realWeightedSum`; use `map_add`, `map_sub`,
-    `map_smul`, and `map_sum` for expectation algebra.
-
-- `theorem PMF.realWeightedSum_map`
-- `theorem PMF.realWeightedSum_bind`
-
 - `theorem PMF.sum_toReal_eq_one (p : PMF α) : ∑ a : α, (p a).toReal = 1`
 
 - `theorem PMF.map_sum_smul (p : PMF α) (e : α → β) (f : β → M) :
@@ -277,11 +266,6 @@ high-level finite-expectation identities for uniform PMFs.
 - `theorem PMF.realWeightedSum_uniformOfFintype_equiv_prod_swap`
 - `theorem PMF.realWeightedSum_uniformOfFintype_equiv_fst`
 - `theorem PMF.realWeightedSum_uniformOfFintype_equiv_snd`
-- `theorem PMF.realWeightedSum_uniformOfFintype_fst`
-- `theorem PMF.realWeightedSum_uniformOfFintype_snd`
-- `theorem PMF.realWeightedSum_map_uniformOfFintype_factor_equiv`
-- `theorem PMF.realWeightedSum_map_uniformOfFintype_factor_equiv_fst`
-- `theorem PMF.realWeightedSum_map_uniformOfFintype_factor_equiv_snd`
 
 - `noncomputable def PMF.totalVariationDistance (p q : PMF α) : Error`
 
@@ -294,24 +278,8 @@ high-level finite-expectation identities for uniform PMFs.
   PMF.totalVariationDistance (PMF.uniformOfFintype α) (PMF.uniformOfFinset s hs)
     = 1 - (s.card : Error) / (Fintype.card α : Error)`
 
-- `theorem PMF.sum_le_sum_add_totalVariationDistance (p q : PMF α)
-  (f : α → Error) (hf_nonneg : ∀ a, 0 ≤ f a) (hf_le_one : ∀ a, f a ≤ 1) :
-  ∑ a : α, (q a).toReal * f a ≤
-  ∑ a : α, (p a).toReal * f a + PMF.totalVariationDistance p q`
-
 `MIPStarRE/LDT/Basic/DistributionPMF.lean` contains the comparison between
 `Distribution` notation and this PMF expectation layer.
-
-- `theorem Distribution.weightedSumLinearMap_eq_toPMF_realWeightedSum`
-  - Module-valued comparison between a probabilistic `Distribution` and its
-    associated `PMF`.
-
-- `theorem Distribution.weightedSumLinearMap_eq_toPMF_realWeightedSumLinearMap`
-  - Linear-map equality between `Distribution.weightedSumLinearMap` and the
-    PMF expectation linear map.
-
-- `theorem avgOver_eq_toPMF_realWeightedSum`
-- `theorem averageOperatorOverDistribution_eq_toPMF_realWeightedSum`
 
 ### Module-valued uniform averages
 
@@ -329,7 +297,6 @@ to return to the paper-facing `uniformDistribution` notation.
 - `theorem uniformDistribution_sum_smul_equiv_snd`
 - `theorem uniformDistribution_map_sum_smul_eq_uniform_of_factor_equiv`
 - `theorem uniformOnFinset_sum_smul_eq_subtype`
-- `theorem uniformOnFinset_sum_smul_equiv`
 - `theorem uniformOnFinset_filter_sum_smul_eq_subtype`
 - `theorem uniformOnFinset_filter_sum_smul_equiv`
 
@@ -384,12 +351,3 @@ finite-dimensional linear-algebra formulation of an SDP.
   - The complex-linear projection onto one diagonal block of a canonical primal
     matrix.
 
-- `matrixSdpCanonicalConstraintOperatorLinearMap`
-  - The complex-linear equality-constraint operator
-    `X ↦ ∑_b X_{bb}`.
-
-- `matrixSdpCanonicalDiagonalBlock_zero`, `_add`, `_neg`, `_sub`, `_smul`
-  - Linearity lemmas for diagonal-block extraction.
-
-- `matrixSdpCanonicalConstraintOperator_zero`, `_add`, `_neg`, `_sub`, `_smul`
-  - Linearity lemmas for the canonical equality-constraint operator.

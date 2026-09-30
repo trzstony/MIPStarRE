@@ -24,34 +24,6 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 def hypercubeVertexCount (params : Parameters) : ℕ :=
   params.q ^ params.m
 
-/-- The set of coordinates on which two points disagree. -/
-def coordinateDisagreementSet (params : Parameters)
-    (u v : Point params) : Finset (Fin params.m) :=
-  Finset.univ.filter (fun i => u i ≠ v i)
-
-/-- The number of coordinates on which two points disagree. -/
-def coordinateDisagreementCount (params : Parameters)
-    (u v : Point params) : ℕ :=
-  (coordinateDisagreementSet params u v).card
-
-/-- The hypercube edge relation: two points differ in at most one coordinate. -/
-def IsHypercubeEdge (params : Parameters) (u v : Point params) : Prop :=
-  coordinateDisagreementCount params u v ≤ 1
-
-/-- Decidability of the hypercube edge relation, obtained from the finite
-coordinate disagreement count. -/
-instance instDecidableIsHypercubeEdge (params : Parameters) (u v : Point params) :
-    Decidable (IsHypercubeEdge params u v) := by
-  unfold IsHypercubeEdge
-  infer_instance
-
-/-- Decidable predicate form of the hypercube edge relation on ordered pairs of
-vertices. -/
-instance instDecidablePredHypercubeEdgePair (params : Parameters) :
-    DecidablePred (fun uv : Point params × Point params => IsHypercubeEdge params uv.1 uv.2) := by
-  intro uv
-  infer_instance
-
 /-- Edge sampling by rerandomizing a single coordinate.
 This is the Section 7.1 distribution:
 pick `u ∈ F_q^m`, `i ∈ {1, ..., m}`, and `x ∈ F_q` uniformly,
@@ -79,29 +51,6 @@ noncomputable def rerandomizeCoord (params : Parameters) :
     Distribution (Point params × Point params) :=
   Distribution.map (uniformDistribution (RerandomizeCoordSample params))
     (rerandomizeCoordSampleToPair params)
-
-/-- The rerandomized-coordinate edge distribution is a probability distribution. -/
-theorem rerandomizeCoord_isProbability (params : Parameters) :
-    (rerandomizeCoord params).IsProbability := by
-  simpa [rerandomizeCoord] using
-    (uniformDistribution_isProbability (RerandomizeCoordSample params)).map
-      (rerandomizeCoordSampleToPair params)
-
-/-- The rerandomized-coordinate distribution is the Mathlib push-forward of the
-uniform PMF on its finite sample space. -/
-theorem rerandomizeCoord_toPMF (params : Parameters) :
-    (rerandomizeCoord params).toPMF (rerandomizeCoord_isProbability params) =
-      (PMF.uniformOfFintype (RerandomizeCoordSample params)).map
-        (rerandomizeCoordSampleToPair params) := by
-  simpa [rerandomizeCoord, uniformDistribution_toPMF] using
-    Distribution.toPMF_map (uniformDistribution (RerandomizeCoordSample params))
-      (uniformDistribution_isProbability (RerandomizeCoordSample params))
-      (rerandomizeCoordSampleToPair params)
-
-/-- The rerandomized-coordinate edge distribution has total mass one. -/
-theorem rerandomizeCoord_mass_eq_one (params : Parameters) :
-    ∑ uv ∈ (rerandomizeCoord params).support, (rerandomizeCoord params).weight uv = 1 := by
-  exact (rerandomizeCoord_isProbability params).weight_sum_eq_one
 
 /-- Averaging over `rerandomizeCoord` is the same as averaging over the uniform
 sample space of a point, a coordinate, and a replacement coordinate value. -/
@@ -224,10 +173,9 @@ def pointHilbertSpace (params : Parameters) : FiniteHilbertSpace where
   instNonempty := inferInstance
 
 /-- The paper's normalized adjacency weight for an ordered pair of vertices.
-This update-sum is equivalent to the older case-split via
-`coordinateDisagreementCount`: when `u ≠ v`, each differing coordinate
-contributes the unique update sending `u i` to `v i`, while when `u = v`
-the `q` self-loop updates contribute once for each coordinate. -/
+When `u ≠ v`, a coordinate update contributes exactly when it sends `u` to
+`v`, while when `u = v` the `q` self-loop updates contribute once for each
+coordinate. -/
 noncomputable def hypercubeAdjacencyWeight (params : Parameters)
     (u v : Point params) : ℂ :=
   (((params.m : ℂ) * (params.q : ℂ) * (hypercubeVertexCount params : ℂ))⁻¹) *
@@ -245,23 +193,12 @@ noncomputable def matrixLaplacianOperator (params : Parameters) :
   ((hypercubeVertexCount params : ℂ)⁻¹) • (1 : MatrixOperator (pointHilbertSpace params)) -
     matrixAdjacencyOperator params
 
-/-- The normalized adjacency matrix `K` of the hypercube graph on `F_q^m`,
-as a matrix indexed by `Point params` directly. -/
-noncomputable def adjacency (params : Parameters) : MIPStarRE.Quantum.Op (Point params) :=
-  matrixAdjacencyOperator params
-
-/-- The Laplacian `L = (1/M) I - K` on the hypercube vertex space,
-as a matrix indexed by `Point params` directly. -/
-noncomputable def laplacian (params : Parameters) : MIPStarRE.Quantum.Op (Point params) :=
-  matrixLaplacianOperator params
-
 /-- The edge-difference form of the Laplacian from `prop:laplacian-rewrite`:
 `L = (1/2) · 𝔼_{(u,v)∼C} (|u⟩-|v⟩)(⟨u|-⟨v|)`.
 
 Defined entrywise via the `rerandomizeCoordWeight` distribution on ordered
 vertex pairs: at index `(a, b)` the projector `|u⟩⟨v|` becomes the
-indicator `[a = u][v = b]`.  The equality with `laplacian` is proved in
-`MIPStarRE.LDT.ExpansionHypercubeGraph.laplacian_eq_edgeDifferenceForm`. -/
+indicator `[a = u][v = b]`. -/
 noncomputable def laplacianDifferenceForm (params : Parameters) :
     MIPStarRE.Quantum.Op (Point params) :=
   fun a b => (1/2 : ℂ) *
@@ -288,21 +225,5 @@ noncomputable def globalVariance (params : Parameters)
   (1 / (2 : Error)) *
     avgOver (independentPointPair params)
       (fun uv => ev ψ (pointDifferenceSquaredOperator A uv.1 uv.2))
-
-/-- Combined accessor for the local and global variances. -/
-noncomputable def localAndVariance (params : Parameters)
-    (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) : Error × Error :=
-  (localVariance params A ψ, globalVariance params A ψ)
-
-/-- The column-space indices for `A_combine`. -/
-abbrev combinedColumnIndex (params : Parameters) (ι : Type*) := Point params × ι
-
-/-- The combined column operator used for the trace rewrites.
-Its `u`-th block is `(A^u)ᴴ`, so that the resulting trace expands to
-`τ(ρ · (A^u - A^v)ᴴ (A^u - A^v))` for arbitrary operator families. -/
-noncomputable def combinedOperator (params : Parameters)
-    (A : Point params → MIPStarRE.Quantum.Op ι) :
-    Matrix (combinedColumnIndex params ι) ι ℂ :=
-  fun ui j => star (A ui.1 j ui.2)
 
 end MIPStarRE.LDT.ExpansionHypercubeGraph

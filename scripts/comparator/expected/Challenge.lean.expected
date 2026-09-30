@@ -32,7 +32,7 @@ namespace MIPStarRE.LDT
 -- source: MIPStarRE/LDT/Basic/ParametersBase.lean:18-18  (MIPStarRE.LDT.Error)
 abbrev Error := ℝ
 
--- source: MIPStarRE/LDT/Basic/ParametersBase.lean:32-45  (MIPStarRE.LDT.Parameters)
+-- source: MIPStarRE/LDT/Basic/ParametersBase.lean:25-38  (MIPStarRE.LDT.Parameters)
 /-- Parameters for the `(m,q,d)` low individual degree test.
 
 Besides the usual positivity assumptions, we bundle the paper-faithful witness
@@ -50,27 +50,27 @@ structure Parameters where
 end MIPStarRE.LDT
 namespace MIPStarRE.Quantum
 
--- source: MIPStarRE/Quantum/FiniteMatrix/Basic.lean:78-79  (MIPStarRE.Quantum.Op)
+-- source: MIPStarRE/Quantum/FiniteMatrix/Basic.lean:69-70  (MIPStarRE.Quantum.Op)
 /-- Square complex matrices as the finite-dimensional operator algebra. -/
 abbrev Op (d : Type*) := Matrix d d ℂ
 end MIPStarRE.Quantum
 namespace MIPStarRE.LDT
 
--- source: MIPStarRE/LDT/Basic/ParametersBase.lean:170-170  (MIPStarRE.LDT.Fq)
+-- source: MIPStarRE/LDT/Basic/ParametersBase.lean:113-113  (MIPStarRE.LDT.Fq)
 abbrev Fq (params : Parameters) := Fin params.q
 
--- source: MIPStarRE/LDT/Basic/ParametersBase.lean:171-171  (MIPStarRE.LDT.Point)
+-- source: MIPStarRE/LDT/Basic/ParametersBase.lean:114-114  (MIPStarRE.LDT.Point)
 abbrev Point (params : Parameters) := Fin params.m → Fq params
 
--- source: MIPStarRE/LDT/Basic/ParametersBase.lean:174-175  (MIPStarRE.LDT.instInhabitedFinM)
+-- source: MIPStarRE/LDT/Basic/ParametersBase.lean:117-118  (MIPStarRE.LDT.instInhabitedFinM)
 instance {params : Parameters} : Inhabited (Fin params.m) :=
   ⟨⟨0, params.hm⟩⟩
 
--- source: MIPStarRE/LDT/Basic/ParametersBase.lean:177-178  (MIPStarRE.LDT.instInhabitedFq)
+-- source: MIPStarRE/LDT/Basic/ParametersBase.lean:120-121  (MIPStarRE.LDT.instInhabitedFq)
 instance {params : Parameters} : Inhabited (Fq params) :=
   ⟨⟨0, params.hq⟩⟩
 
--- source: MIPStarRE/LDT/Basic/ParametersBase.lean:210-217  (MIPStarRE.LDT.FieldModel)
+-- source: MIPStarRE/LDT/Basic/ParametersBase.lean:153-160  (MIPStarRE.LDT.FieldModel)
 /-- A bundled field model for the paper's `F_q`, together with a coding equivalence
 to the repository's finite carrier `Fin q`. -/
 class FieldModel (q : ℕ) where
@@ -84,66 +84,66 @@ class FieldModel (q : ℕ) where
 attribute [instance_reducible, instance] FieldModel.instField FieldModel.instFintype
   FieldModel.instDecidableEq
 
--- source: MIPStarRE/LDT/Basic/ParametersBase.lean:277-277  (MIPStarRE.LDT.Scalar)
+-- source: MIPStarRE/LDT/Basic/ParametersBase.lean:210-210  (MIPStarRE.LDT.Scalar)
 abbrev Scalar (params : Parameters) [FieldModel params.q] := FieldModel.K params.q
 
--- source: MIPStarRE/LDT/Basic/ParametersBase.lean:278-279  (MIPStarRE.LDT.PolynomialModel)
+-- source: MIPStarRE/LDT/Basic/ParametersBase.lean:211-212  (MIPStarRE.LDT.PolynomialModel)
 abbrev PolynomialModel (params : Parameters) [FieldModel params.q] :=
   MvPolynomial (Fin params.m) (Scalar params)
 
--- source: MIPStarRE/LDT/Basic/ParametersBase.lean:280-281  (MIPStarRE.LDT.LinePolynomialModel)
+-- source: MIPStarRE/LDT/Basic/ParametersBase.lean:213-214  (MIPStarRE.LDT.LinePolynomialModel)
 abbrev LinePolynomialModel (params : Parameters) [FieldModel params.q] :=
   _root_.Polynomial (Scalar params)
 
--- source: MIPStarRE/LDT/Basic/ParametersBase.lean:289-291  (MIPStarRE.LDT.decodeScalar)
+-- source: MIPStarRE/LDT/Basic/ParametersBase.lean:222-224  (MIPStarRE.LDT.decodeScalar)
 /-- Interpret a coded coordinate in `Fin q` as a scalar in the chosen field model. -/
 def decodeScalar {params : Parameters} [FieldModel params.q] (x : Fq params) : Scalar params :=
   (FieldModel.equiv (q := params.q)).symm x
 
--- source: MIPStarRE/LDT/Basic/ParametersBase.lean:293-295  (MIPStarRE.LDT.encodeScalar)
+-- source: MIPStarRE/LDT/Basic/ParametersBase.lean:226-228  (MIPStarRE.LDT.encodeScalar)
 /-- Re-encode a field-model scalar as its canonical representative in `Fin q`. -/
 def encodeScalar {params : Parameters} [FieldModel params.q] (x : Scalar params) : Fq params :=
   FieldModel.equiv (q := params.q) x
 
--- source: MIPStarRE/LDT/Basic/ParametersBase.lean:306-308  (MIPStarRE.LDT.zeroCoord)
+-- source: MIPStarRE/LDT/Basic/ParametersBase.lean:239-241  (MIPStarRE.LDT.zeroCoord)
 /-- The zero coordinate. -/
 def zeroCoord {params : Parameters} [FieldModel params.q] : Fq params :=
   encodeScalar 0
 
--- source: MIPStarRE/LDT/Basic/ParametersBase.lean:310-312  (MIPStarRE.LDT.addCoord)
+-- source: MIPStarRE/LDT/Basic/ParametersBase.lean:243-245  (MIPStarRE.LDT.addCoord)
 /-- Coordinate addition transported through the `Fin q` coding. -/
 def addCoord {params : Parameters} [FieldModel params.q] (x y : Fq params) : Fq params :=
   encodeScalar (decodeScalar x + decodeScalar y)
 
--- source: MIPStarRE/LDT/Basic/ParametersBase.lean:339-341  (MIPStarRE.LDT.mulCoord)
+-- source: MIPStarRE/LDT/Basic/ParametersBase.lean:272-274  (MIPStarRE.LDT.mulCoord)
 /-- Coordinate multiplication transported through the `Fin q` coding. -/
 def mulCoord {params : Parameters} [FieldModel params.q] (x y : Fq params) : Fq params :=
   encodeScalar (decodeScalar x * decodeScalar y)
 
--- source: MIPStarRE/LDT/Basic/ParametersBase.lean:347-349  (MIPStarRE.LDT.addPoint)
+-- source: MIPStarRE/LDT/Basic/ParametersBase.lean:276-278  (MIPStarRE.LDT.addPoint)
 /-- Pointwise addition in the coded ambient space. -/
 def addPoint {params : Parameters} [FieldModel params.q] (u v : Point params) : Point params :=
   fun i => addCoord (u i) (v i)
 
--- source: MIPStarRE/LDT/Basic/ParametersBase.lean:351-354  (MIPStarRE.LDT.smulPoint)
+-- source: MIPStarRE/LDT/Basic/ParametersBase.lean:280-283  (MIPStarRE.LDT.smulPoint)
 /-- Scalar multiplication in the coded ambient space. -/
 def smulPoint {params : Parameters} [FieldModel params.q] (t : Fq params) (u : Point params) :
     Point params :=
   fun i => mulCoord t (u i)
 
--- source: MIPStarRE/LDT/Basic/ParametersBase.lean:406-409  (MIPStarRE.LDT.decodePoint)
+-- source: MIPStarRE/LDT/Basic/ParametersBase.lean:335-338  (MIPStarRE.LDT.decodePoint)
 /-- Decode a coded point as a tuple of scalars in the chosen field model. -/
 def decodePoint {params : Parameters} [FieldModel params.q] (u : Point params) :
     Fin params.m → Scalar params :=
   fun i => decodeScalar (u i)
 
--- source: MIPStarRE/LDT/Basic/ParametersBase.lean:411-414  (MIPStarRE.LDT.evalPolynomialModel)
+-- source: MIPStarRE/LDT/Basic/ParametersBase.lean:340-343  (MIPStarRE.LDT.evalPolynomialModel)
 /-- Evaluate a multivariate polynomial over the chosen field model on a coded point. -/
 noncomputable def evalPolynomialModel (params : Parameters) [FieldModel params.q]
     (p : PolynomialModel params) (u : Point params) : Fq params :=
   encodeScalar (MvPolynomial.eval (decodePoint u) p)
 
--- source: MIPStarRE/LDT/Basic/ParametersBase.lean:416-419  (MIPStarRE.LDT.evalLinePolynomialModel)
+-- source: MIPStarRE/LDT/Basic/ParametersBase.lean:345-348  (MIPStarRE.LDT.evalLinePolynomialModel)
 /-- Evaluate a univariate polynomial over the chosen field model on a coded point. -/
 noncomputable def evalLinePolynomialModel (params : Parameters) [FieldModel params.q]
     (p : LinePolynomialModel params) (t : Fq params) : Fq params :=
@@ -163,7 +163,7 @@ open scoped Matrix.Norms.Elementwise
 open WithLp
 variable {d : Type*} [Fintype d]
 
--- source: MIPStarRE/Quantum/FiniteMatrix/NormalizedTrace.lean:20-22  (MIPStarRE.Quantum.normalizedTrace)
+-- source: MIPStarRE/Quantum/FiniteMatrix/NormalizedTrace.lean:19-21  (MIPStarRE.Quantum.normalizedTrace)
 /-- The normalized trace `τ(A) = tr(A) / |d|`. -/
 noncomputable def normalizedTrace (A : Op d) : ℂ :=
   A.trace / (Fintype.card d : ℂ)
@@ -203,23 +203,8 @@ namespace DiagonalLine
 def pointAt {params : Parameters} [FieldModel params.q]
     (ℓ : DiagonalLine params) : Fq params → Point params :=
   fun t => addPoint ℓ.base (smulPoint t ℓ.direction)
-end DiagonalLine
-namespace Test
 
--- source: MIPStarRE/LDT/Test/MainTheorem/ScalarBounds/Definitions.lean:28-36  (MIPStarRE.LDT.Test.mainFormalError)
-/-- The formal final error envelope for `thm:main-formal`.
-
-The sharper pre-completion line-169 repair keeps the point-transport scale at
-the original `1/40000` exponent used by the surrounding Step 8 cascade. -/
-noncomputable def mainFormalError (params : Parameters) (k : ℕ) (eps : Error) : Error :=
-  100000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (4 : ℕ)) *
-    (Real.rpow eps (1 / (40000 : Error)) +
-      Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (40000 : Error)) +
-      Real.exp (-((k : Error) / (2560000 * ((params.m : Error) ^ (2 : ℕ))))))
-end Test
-namespace DiagonalLine
-
--- source: MIPStarRE/LDT/Basic/DiagonalLine.lean:100-104  (MIPStarRE.LDT.DiagonalLine.rebaseAt)
+-- source: MIPStarRE/LDT/Basic/DiagonalLine.lean:30-34  (MIPStarRE.LDT.DiagonalLine.rebaseAt)
 /-- Rebase a diagonal line so that the old point `ℓ.pointAt t` becomes the new base point. -/
 def rebaseAt {params : Parameters} [FieldModel params.q]
     (ℓ : DiagonalLine params) (t : Fq params) : DiagonalLine params where
@@ -227,7 +212,7 @@ def rebaseAt {params : Parameters} [FieldModel params.q]
   direction := ℓ.direction
 end DiagonalLine
 
--- source: MIPStarRE/LDT/Basic/LinePolynomials.lean:33-41  (MIPStarRE.LDT.natDegree_comp_C_add_X_le)
+-- source: MIPStarRE/LDT/Basic/LinePolynomials.lean:16-24  (MIPStarRE.LDT.natDegree_comp_C_add_X_le)
 /-- Composing with the degree-one translation `C a + X` preserves `natDegree`
 bounds.  Shared degree bookkeeping for the `reparamAt` reparametrizations
 below. -/
@@ -238,14 +223,14 @@ theorem natDegree_comp_C_add_X_le {params : Parameters} [FieldModel params.q]
   le_trans (_root_.Polynomial.natDegree_comp_le)
     (by rw [add_comm, _root_.Polynomial.natDegree_X_add_C, Nat.mul_one]; exact hp)
 
--- source: MIPStarRE/LDT/Basic/LinePolynomials.lean:43-46  (MIPStarRE.LDT.AxisLinePolynomial)
+-- source: MIPStarRE/LDT/Basic/LinePolynomials.lean:26-29  (MIPStarRE.LDT.AxisLinePolynomial)
 /-- Axis-parallel line answers are genuine univariate degree-`d` polynomials. -/
 structure AxisLinePolynomial (params : Parameters) [FieldModel params.q] where
   poly : LinePolynomialModel params
   degreeBounded : poly.natDegree ≤ params.d
 namespace AxisLinePolynomial
 
--- source: MIPStarRE/LDT/Basic/LinePolynomials.lean:55-58  (MIPStarRE.LDT.AxisLinePolynomial.toFun)
+-- source: MIPStarRE/LDT/Basic/LinePolynomials.lean:38-41  (MIPStarRE.LDT.AxisLinePolynomial.toFun)
 /-- Evaluation of an axis-line answer on the line parameter. -/
 noncomputable def toFun {params : Parameters} [FieldModel params.q]
     (f : AxisLinePolynomial params) : Fq params → Fq params :=
@@ -256,7 +241,7 @@ noncomputable instance {params : Parameters} [FieldModel params.q] :
     CoeFun (AxisLinePolynomial params) (fun _ => Fq params → Fq params) :=
   ⟨AxisLinePolynomial.toFun⟩
 
--- source: MIPStarRE/LDT/Basic/LinePolynomials.lean:86-93  (MIPStarRE.LDT.AxisLinePolynomial.ext)
+-- source: MIPStarRE/LDT/Basic/LinePolynomials.lean:69-76  (MIPStarRE.LDT.AxisLinePolynomial.ext)
 @[ext] theorem ext {params : Parameters} [FieldModel params.q]
     {f g : AxisLinePolynomial params} (hpoly : f.poly = g.poly) : f = g := by
   cases f with
@@ -266,7 +251,7 @@ noncomputable instance {params : Parameters} [FieldModel params.q] :
           cases hpoly
           congr
 
--- source: MIPStarRE/LDT/Basic/LinePolynomials.lean:95-99  (MIPStarRE.LDT.AxisLinePolynomial.reparamAt)
+-- source: MIPStarRE/LDT/Basic/LinePolynomials.lean:78-82  (MIPStarRE.LDT.AxisLinePolynomial.reparamAt)
 /-- Reparametrize an axis-line answer by translating the line parameter. -/
 noncomputable def reparamAt {params : Parameters} [FieldModel params.q]
     (f : AxisLinePolynomial params) (t : Fq params) : AxisLinePolynomial params where
@@ -274,14 +259,14 @@ noncomputable def reparamAt {params : Parameters} [FieldModel params.q]
   degreeBounded := natDegree_comp_C_add_X_le f.poly (decodeScalar t) f.degreeBounded
 end AxisLinePolynomial
 
--- source: MIPStarRE/LDT/Basic/LinePolynomials.lean:194-197  (MIPStarRE.LDT.DiagonalLinePolynomial)
+-- source: MIPStarRE/LDT/Basic/LinePolynomials.lean:156-159  (MIPStarRE.LDT.DiagonalLinePolynomial)
 /-- Diagonal-line answers are genuine univariate degree-`md` polynomials. -/
 structure DiagonalLinePolynomial (params : Parameters) [FieldModel params.q] where
   poly : LinePolynomialModel params
   degreeBounded : poly.natDegree ≤ params.m * params.d
 namespace DiagonalLinePolynomial
 
--- source: MIPStarRE/LDT/Basic/LinePolynomials.lean:206-209  (MIPStarRE.LDT.DiagonalLinePolynomial.toFun)
+-- source: MIPStarRE/LDT/Basic/LinePolynomials.lean:168-171  (MIPStarRE.LDT.DiagonalLinePolynomial.toFun)
 /-- Evaluation of a diagonal-line answer on the line parameter. -/
 noncomputable def toFun {params : Parameters} [FieldModel params.q]
     (f : DiagonalLinePolynomial params) : Fq params → Fq params :=
@@ -292,7 +277,7 @@ noncomputable instance {params : Parameters} [FieldModel params.q] :
     CoeFun (DiagonalLinePolynomial params) (fun _ => Fq params → Fq params) :=
   ⟨DiagonalLinePolynomial.toFun⟩
 
--- source: MIPStarRE/LDT/Basic/LinePolynomials.lean:215-222  (MIPStarRE.LDT.DiagonalLinePolynomial.ext)
+-- source: MIPStarRE/LDT/Basic/LinePolynomials.lean:177-184  (MIPStarRE.LDT.DiagonalLinePolynomial.ext)
 @[ext] theorem ext {params : Parameters} [FieldModel params.q]
     {f g : DiagonalLinePolynomial params} (hpoly : f.poly = g.poly) : f = g := by
   cases f with
@@ -302,7 +287,7 @@ noncomputable instance {params : Parameters} [FieldModel params.q] :
           cases hpoly
           congr
 
--- source: MIPStarRE/LDT/Basic/LinePolynomials.lean:224-240  (MIPStarRE.LDT.DiagonalLinePolynomial.reparamAt)
+-- source: MIPStarRE/LDT/Basic/LinePolynomials.lean:186-202  (MIPStarRE.LDT.DiagonalLinePolynomial.reparamAt)
 /-- Reparametrize a diagonal-line answer by translating the line parameter.
 
 Concretely, the underlying univariate polynomial `f.poly` (over `Scalar params` in
@@ -338,13 +323,13 @@ structure QuantumState (ι : Type*) [Fintype ι] [DecidableEq ι] where
   density : MIPStarRE.Quantum.Op ι := 0
   density_psd : 0 ≤ density := by positivity
 
--- source: MIPStarRE/LDT/Basic/LowDegreePolynomial.lean:17-20  (MIPStarRE.LDT.Polynomial)
+-- source: MIPStarRE/LDT/Basic/LowDegreePolynomial.lean:16-19  (MIPStarRE.LDT.Polynomial)
 /-- Global low-individual-degree polynomial outcomes. -/
 structure Polynomial (params : Parameters) [FieldModel params.q] where
   poly : PolynomialModel params
   lowIndividualDegree : ∀ i, MvPolynomial.degreeOf i poly ≤ params.d
 
--- source: MIPStarRE/LDT/Basic/Distribution.lean:22-27  (MIPStarRE.LDT.Distribution)
+-- source: MIPStarRE/LDT/Basic/Distribution.lean:21-26  (MIPStarRE.LDT.Distribution)
 /-- A finite-support weighted distribution with nonnegative real-valued weights. -/
 structure Distribution (α : Type*) where
   support : Finset α := ∅
@@ -359,7 +344,7 @@ def QuantumState.IsNormalized {ι : Type*} [Fintype ι] [DecidableEq ι]
   MIPStarRE.Quantum.normalizedTrace ψ.density = 1
 namespace Polynomial
 
--- source: MIPStarRE/LDT/Basic/LowDegreePolynomial.lean:36-39  (MIPStarRE.LDT.Polynomial.toFun)
+-- source: MIPStarRE/LDT/Basic/LowDegreePolynomial.lean:35-38  (MIPStarRE.LDT.Polynomial.toFun)
 /-- Evaluation of the stored multivariate polynomial on a coded point. -/
 noncomputable def toFun {params : Parameters} [FieldModel params.q] (g : Polynomial params) :
     Point params → Fq params :=
@@ -371,26 +356,26 @@ noncomputable instance {params : Parameters} [FieldModel params.q] :
   ⟨Polynomial.toFun⟩
 end Polynomial
 
--- source: MIPStarRE/LDT/Basic/QuantumState.lean:173-176  (MIPStarRE.LDT.ev)
+-- source: MIPStarRE/LDT/Basic/QuantumState.lean:122-125  (MIPStarRE.LDT.ev)
 /-- The expectation `Re τ(ψ X)`. Dimensions match by construction. -/
 noncomputable def ev {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (X : MIPStarRE.Quantum.Op ι) : Error :=
   Complex.re <| MIPStarRE.Quantum.normalizedTrace (ψ.density * X)
 
--- source: MIPStarRE/LDT/Basic/QuantumState.lean:185-189  (MIPStarRE.LDT.opTensor)
+-- source: MIPStarRE/LDT/Basic/QuantumState.lean:127-131  (MIPStarRE.LDT.opTensor)
 /-- Tensor product of two operators via Kronecker product. -/
 abbrev opTensor {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
     (A : MIPStarRE.Quantum.Op ι₁) (B : MIPStarRE.Quantum.Op ι₂) :
     MIPStarRE.Quantum.Op (ι₁ × ι₂) :=
   Matrix.kronecker A B
 
--- source: MIPStarRE/LDT/Basic/Distribution.lean:218-220  (MIPStarRE.LDT.avgOver)
+-- source: MIPStarRE/LDT/Basic/Distribution.lean:165-167  (MIPStarRE.LDT.avgOver)
 /-- Average a scalar function against the stored finite support of a distribution. -/
 def avgOver {α : Type*} (𝒟 : Distribution α) (f : α → Error) : Error :=
   ∑ a ∈ 𝒟.support, 𝒟.weight a * f a
 namespace Distribution
 
--- source: MIPStarRE/LDT/Basic/Distribution.lean:404-417  (MIPStarRE.LDT.Distribution.uniformOnFinset)
+-- source: MIPStarRE/LDT/Basic/Distribution.lean:327-340  (MIPStarRE.LDT.Distribution.uniformOnFinset)
 /-- The uniform distribution on a specified finite support.
 
 The stored support is `s`, and the weight of a point is the elementary finite
@@ -407,7 +392,7 @@ noncomputable def uniformOnFinset {α : Type*} (s : Finset α) : Distribution α
       simp [ha] }
 end Distribution
 
--- source: MIPStarRE/LDT/Basic/Distribution.lean:479-482  (MIPStarRE.LDT.uniformDistribution)
+-- source: MIPStarRE/LDT/Basic/Distribution.lean:391-394  (MIPStarRE.LDT.uniformDistribution)
 /-- The uniform distribution on a nonempty finite type. -/
 noncomputable def uniformDistribution (α : Type*)
     [Fintype α] [DecidableEq α] [Nonempty α] : Distribution α :=
@@ -495,20 +480,20 @@ structure ProjMeas (α : Type*) (ι : Type*) [Fintype α] [Fintype ι] [Decidabl
     extends Measurement α ι where
   proj : ∀ a, outcome a * outcome a = outcome a
 
--- source: MIPStarRE/LDT/Basic/SubMeasurementFamilies.lean:16-19  (MIPStarRE.LDT.IdxSubMeas)
+-- source: MIPStarRE/LDT/Basic/SubMeasurementFamilies.lean:15-18  (MIPStarRE.LDT.IdxSubMeas)
 /-- Question-indexed family of submeasurements. -/
 abbrev IdxSubMeas (Question Outcome : Type*) (ι : Type*)
     [Fintype Outcome] [Fintype ι] [DecidableEq ι] :=
   Question → SubMeas Outcome ι
 
--- source: MIPStarRE/LDT/Basic/SubMeasurementFamilies.lean:31-34  (MIPStarRE.LDT.IdxProjMeas)
+-- source: MIPStarRE/LDT/Basic/SubMeasurementFamilies.lean:30-33  (MIPStarRE.LDT.IdxProjMeas)
 /-- Question-indexed family of projective measurements. -/
 abbrev IdxProjMeas (Question Outcome : Type*) (ι : Type*)
     [Fintype Outcome] [Fintype ι] [DecidableEq ι] :=
   Question → ProjMeas Outcome ι
 namespace IdxProjMeas
 
--- source: MIPStarRE/LDT/Basic/SubMeasurementFamilies.lean:67-72  (MIPStarRE.LDT.IdxProjMeas.toIdxSubMeas)
+-- source: MIPStarRE/LDT/Basic/SubMeasurementFamilies.lean:66-71  (MIPStarRE.LDT.IdxProjMeas.toIdxSubMeas)
 /-- Forget both projectivity and completeness from an indexed projective measurement family. -/
 def toIdxSubMeas {Question Outcome : Type*} {ι : Type*}
     [Fintype Outcome] [Fintype ι] [DecidableEq ι]
@@ -517,7 +502,7 @@ def toIdxSubMeas {Question Outcome : Type*} {ι : Type*}
   fun q => (A q).toSubMeas
 end IdxProjMeas
 
--- source: MIPStarRE/LDT/Basic/SubMeasurementFamilies.lean:76-88  (MIPStarRE.LDT.postprocess)
+-- source: MIPStarRE/LDT/Basic/SubMeasurementFamilies.lean:75-87  (MIPStarRE.LDT.postprocess)
 open scoped Classical in
 /-- Post-process the outcomes of a submeasurement. The processed operator at `b` is the
 sum of the operators of all `a` with `f a = b`. -/
@@ -532,7 +517,7 @@ noncomputable def postprocess {α β : Type*} {ι : Type*} [Fintype ι] [Decidab
   sum_eq_total := (Finset.sum_fiberwise Finset.univ f A.outcome).trans A.sum_eq_total
   total_le_one := A.total_le_one
 
--- source: MIPStarRE/LDT/Basic/SubMeasurementFamilies.lean:420-424  (MIPStarRE.LDT.constSubMeasFamily)
+-- source: MIPStarRE/LDT/Basic/SubMeasurementFamilies.lean:411-415  (MIPStarRE.LDT.constSubMeasFamily)
 /-- Constant indexed family taking the same submeasurement on every question. -/
 def constSubMeasFamily {α : Type*} {ι : Type*} [Fintype α] [Fintype ι] [DecidableEq ι]
     (A : SubMeas α ι) :
@@ -546,7 +531,7 @@ noncomputable def evaluateAt {ι : Type*} [Fintype ι] [DecidableEq ι]
     (G : SubMeas (Polynomial params) ι) : SubMeas (Fq params) ι :=
   postprocess G (fun g => g u)
 
--- source: MIPStarRE/LDT/Test/Defs.lean:40-45  (MIPStarRE.LDT.polynomialEvaluationFamily)
+-- source: MIPStarRE/LDT/Test/Defs.lean:24-29  (MIPStarRE.LDT.polynomialEvaluationFamily)
 /-- View a global polynomial submeasurement as a point-indexed answer family. -/
 noncomputable def polynomialEvaluationFamily {ι : Type*} [Fintype ι] [DecidableEq ι]
     (params : Parameters) [FieldModel params.q]
@@ -554,7 +539,7 @@ noncomputable def polynomialEvaluationFamily {ι : Type*} [Fintype ι] [Decidabl
     IdxSubMeas (Point params) (Fq params) ι :=
   fun u => evaluateAt params u G
 
--- source: MIPStarRE/LDT/Test/Defs.lean:175-182  (MIPStarRE.LDT.qBipartiteMatchMass)
+-- source: MIPStarRE/LDT/Test/Defs.lean:145-152  (MIPStarRE.LDT.qBipartiteMatchMass)
 /-- Bipartite matching mass `∑_a ⟨ψ, (A_a ⊗ B_a) ψ⟩`, with `A` on the left
 register and `B` on the right register of a tensor-product state. -/
 noncomputable def qBipartiteMatchMass {Outcome : Type*}
@@ -564,7 +549,7 @@ noncomputable def qBipartiteMatchMass {Outcome : Type*}
     (A : SubMeas Outcome ιA) (B : SubMeas Outcome ιB) : Error :=
   ∑ a, ev ψ (opTensor (A.outcome a) (B.outcome a))
 
--- source: MIPStarRE/LDT/Test/Defs.lean:184-197  (MIPStarRE.LDT.qBipartiteConsDefect)
+-- source: MIPStarRE/LDT/Test/Defs.lean:154-167  (MIPStarRE.LDT.qBipartiteConsDefect)
 /-- Bipartite questionwise consistency defect.
 
 In the paper (Definition 4.8), the consistency of `A` on `H_A` and `B` on
@@ -580,7 +565,7 @@ noncomputable def qBipartiteConsDefect {Outcome : Type*}
   let totalOverlap := ev ψ (opTensor A.total B.total)
   max 0 (totalOverlap - qBipartiteMatchMass ψ A B)
 
--- source: MIPStarRE/LDT/Test/Defs.lean:199-206  (MIPStarRE.LDT.bipartiteConsError)
+-- source: MIPStarRE/LDT/Test/Defs.lean:169-176  (MIPStarRE.LDT.bipartiteConsError)
 /-- Averaged bipartite off-diagonal mass for consistency statements. -/
 noncomputable def bipartiteConsError {Question Outcome : Type*}
     {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
@@ -590,7 +575,7 @@ noncomputable def bipartiteConsError {Question Outcome : Type*}
     (B : IdxSubMeas Question Outcome ιB) : Error :=
   avgOver 𝒟 (fun q => qBipartiteConsDefect ψ (A q) (B q))
 
--- source: MIPStarRE/LDT/Test/Defs.lean:238-250  (MIPStarRE.LDT.ConsRel)
+-- source: MIPStarRE/LDT/Test/Defs.lean:208-220  (MIPStarRE.LDT.ConsRel)
 /-- Consistency relation (bipartite, paper Definition 4.8).
 
 The state `ψ` lives on `H_A ⊗ H_B`, Alice's submeasurement `A` acts on
@@ -605,7 +590,7 @@ structure ConsRel {Question Outcome : Type*}
     (δ : Error) : Prop where
   offDiagonalBound : bipartiteConsError ψ 𝒟 A B ≤ δ
 
--- source: MIPStarRE/LDT/Test/StrategyCore.lean:162-171  (MIPStarRE.LDT.AxisParallelMeasurementReparamInvariant)
+-- source: MIPStarRE/LDT/Test/StrategyCore.lean:154-163  (MIPStarRE.LDT.AxisParallelMeasurementReparamInvariant)
 /-- Direct outcome-level covariance for axis-parallel-line measurements.
 
 Rebasing a line question by `t` and reparametrizing an outcome polynomial by
@@ -617,7 +602,7 @@ def AxisParallelMeasurementReparamInvariant (params : Parameters)
     (M (ℓ.rebaseAt t)).outcome (AxisLinePolynomial.reparamAt f t) =
       (M ℓ).outcome f
 
--- source: MIPStarRE/LDT/Test/StrategyCore.lean:173-182  (MIPStarRE.LDT.DiagonalMeasurementReparamInvariant)
+-- source: MIPStarRE/LDT/Test/StrategyCore.lean:165-174  (MIPStarRE.LDT.DiagonalMeasurementReparamInvariant)
 /-- Direct outcome-level covariance for diagonal-line measurements.
 
 Rebasing a line question by `t` and reparametrizing an outcome polynomial by
@@ -629,7 +614,7 @@ def DiagonalMeasurementReparamInvariant (params : Parameters)
     (M (ℓ.rebaseAt t)).outcome (DiagonalLinePolynomial.reparamAt f t) =
       (M ℓ).outcome f
 
--- source: MIPStarRE/LDT/Test/StrategyCore.lean:761-808  (MIPStarRE.LDT.ProjStrat)
+-- source: MIPStarRE/LDT/Test/StrategyCore.lean:632-679  (MIPStarRE.LDT.ProjStrat)
 /-- Paper-faithful two-space projective strategy data.
 
 This matches the paper's `def:general-projective-strategy`
@@ -687,7 +672,7 @@ variable {params : Parameters} [FieldModel params.q]
 variable {ιA : Type*} [Fintype ιA] [DecidableEq ιA]
 variable {ιB : Type*} [Fintype ιB] [DecidableEq ιB]
 
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:455-519  (MIPStarRE.LDT.ProjStrat.lowIndividualDegreeFailureProbability)
+-- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:443-507  (MIPStarRE.LDT.ProjStrat.lowIndividualDegreeFailureProbability)
 /-- Trace-based failure surrogate for the full low-individual-degree test for a
 paper-faithful two-space projective strategy.
 
@@ -756,23 +741,40 @@ noncomputable def lowIndividualDegreeFailureProbability
 end  -- module scope
 end ProjStrat
 end MIPStarRE.LDT
+namespace MIPStarRE.LDT.Test
+
+-- source: MIPStarRE/LDT/Test/MainTheorem/Simplified/Statements.lean:19-24  (MIPStarRE.LDT.Test.simplifiedFinalScale)
+/-- `K_{m,d}` in the simplified final theorem. -/
+def simplifiedFinalScale (params : Parameters) : Error :=
+  if params.d = 0 then
+    (params.m : Error) ^ (4 : ℕ)
+  else
+    (params.d : Error) ^ (2 : ℕ) * (params.m : Error) ^ (4 : ℕ)
+
+-- source: MIPStarRE/LDT/Test/MainTheorem/Simplified/Statements.lean:26-32  (MIPStarRE.LDT.Test.simplifiedMainFormalError)
+/-- The simplified final error `21000 K_{m,d}
+(ε^(1/64) + (d/q)^(1/64))`. -/
+noncomputable def simplifiedMainFormalError
+    (params : Parameters) (eps : Error) : Error :=
+  21000 * simplifiedFinalScale params *
+    (Real.rpow eps (1 / (64 : Error)) +
+      Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (64 : Error)))
+end MIPStarRE.LDT.Test
 
 namespace MIPStarRE.LDT
 namespace Test
 
--- source: MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean:288-327  (MIPStarRE.LDT.Test.mainFormal)
-/--
-Corrected source statement of `thm:main-formal`.
+-- source: MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean:34-66  (MIPStarRE.LDT.Test.mainFormal)
+/-- Simplified statement of `thm:main-formal`.
 
-Paper origin: `references/ldt-paper/test_definition.tex:180-202`.
+The strategy and the three projective-measurement conclusions are those of the
+original theorem.  The simplified proof chooses the pasting length internally
+and gives the error `21000 K_{m,d} (ε^(1/64) + (d/q)^(1/64))`.
 
-This theorem records the two-space source theorem with the confirmed large-`k`
-correction `k ≥ 400 m d`.  The paper prints the weaker hypothesis `k ≥ m d`;
-the missing factor `400` is documented in
-`docs/paper-gaps/issue-906-main-formal-k-bound.tex`.  The additional condition
-`0 < k` corrects the zero-sampling boundary where the printed error collapses
-to zero; this boundary is documented in
-`docs/paper-gaps/issue-422-main-formal-zero-k-boundary.tex`. -/
+**Local fix:** This bound follows `blueprint/src/low_degree_simplified.tex`,
+`thm:main-formal`, which replaces the sampling parameter `k` of
+`references/ldt-paper/test_definition.tex:180-202`.  The original statement is
+recovered as the corollary `mainFormalWithK`. -/
 theorem mainFormal
     (params : Parameters)
     [FieldModel params.q]
@@ -781,24 +783,21 @@ theorem mainFormal
     [Fintype ιB] [DecidableEq ιB]
     (strategy : ProjStrat params ιA ιB)
     (eps : Error)
-    (hpass : strategy.lowIndividualDegreeFailureProbability ≤ eps)
-    (k : ℕ)
-    (hk : 400 * params.m * params.d ≤ k)
-    (hk0 : 0 < k) :
+    (hpass : strategy.lowIndividualDegreeFailureProbability ≤ eps) :
     ∃ G_A : ProjMeas (Polynomial params) ιA,
       ∃ G_B : ProjMeas (Polynomial params) ιB,
         ConsRel strategy.state (uniformDistribution (Point params))
             (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
             (polynomialEvaluationFamily params G_B.toSubMeas)
-            (mainFormalError params k eps) ∧
+            (simplifiedMainFormalError params eps) ∧
           ConsRel strategy.state (uniformDistribution (Point params))
             (polynomialEvaluationFamily params G_A.toSubMeas)
             (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
-            (mainFormalError params k eps) ∧
+            (simplifiedMainFormalError params eps) ∧
           ConsRel strategy.state (uniformDistribution Unit)
             (constSubMeasFamily G_A.toSubMeas)
             (constSubMeasFamily G_B.toSubMeas)
-            (mainFormalError params k eps) := by
+            (simplifiedMainFormalError params eps) := by
   sorry
 
 end Test

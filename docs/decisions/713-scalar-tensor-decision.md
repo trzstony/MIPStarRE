@@ -68,7 +68,7 @@ where `familyA` and `familyB` carry the full bipartite operator structure
 **Pro**: The `closenessOfIP` machinery and Schwartz–Zippel PSD argument apply
 directly; no scalar/tensor bridges needed.
 **Con**: The public API no longer matches the paper's displayed scalar equations.
-The final `comMain` theorem would need to produce an operator-level conclusion and
+The final `comMain_of_commutativityPoints` theorem would need to produce an operator-level conclusion and
 then translate it back to a scalar bound for the wider soundness cascade, which
 adds a top-level translation step that isn't in the paper.  The operator-level API
 is also more verbose for downstream consumers that only need the scalar estimate.
@@ -124,7 +124,6 @@ of the downstream scalar API.
 | Quantity | Lean Declaration | Location | Paper Anchor |
 |---|---|---|---|
 | Full BAB⊗A tensor average | `fullSliceBABAtensorAvg` | `Transport/FullSlice/Averages.lean` | `eq:gcom4` RHS |
-| Full ABA⊗B tensor average | `fullSliceABABtensorAvg` | `Transport/FullSlice/Averages.lean` | paper line 387 |
 | X-eval BAB⊗A tensor avg | `xEvaluatedSliceBABAtensorAvg` | `Transport/FullSlice/Averages.lean` | line 359 bridge |
 | X-eval ABAB scalar bridge endpoint | `xEvaluatedFullSliceABABAvg` | `Transport/FullSlice/Averages.lean` | line 359 bridge |
 | X-eval ABA⊗B tensor avg | `xEvaluatedFullSliceABABtensorAvg` | `Transport/FullSlice/Averages.lean` | line 360 bridge |
@@ -181,4 +180,4 @@ cubic endpoints are compared to a common `G ⊗ G` switch-sandwich center, costi
 - Source: `MIPStarRE/LDT/Commutativity/Transport/FullSlice/Bridges/ClosenessXEval.lean`
 - Source: `MIPStarRE/LDT/Commutativity/Main/Auxiliary/ScalarMarginalization.lean`
 - Source: `MIPStarRE/LDT/Commutativity/Main/EvaluatedQuestions.lean`
-- Source: `MIPStarRE/LDT/Commutativity/Main/Results.lean` (`comMain`)
+- Source: `MIPStarRE/LDT/Commutativity/Main/Results.lean` (`comMain_of_commutativityPoints`)

@@ -44,12 +44,6 @@ noncomputable def localDirectSumMeasurement {Outcome ιA ιB : Type*}
       localDirectSumBlock (MA.outcome a) (MB.outcome a) :=
   rfl
 
-@[simp] theorem localDirectSumMeasurement_total {Outcome ιA ιB : Type*}
-    [Fintype Outcome] [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    (MA : Measurement Outcome ιA) (MB : Measurement Outcome ιB) :
-    (localDirectSumMeasurement MA MB).total = 1 := by
-  simp [localDirectSumMeasurement, MA.total_eq_one, MB.total_eq_one]
-
 /-- Direct-sum projective measurement obtained by block-diagonalizing two
 projective measurements with the same outcome type. -/
 noncomputable def localDirectSumProjMeas {Outcome ιA ιB : Type*}
@@ -90,12 +84,6 @@ noncomputable def roleBlockMeasurement {Outcome ιA ιB : Type*}
     (MA MB : Measurement Outcome (LocalCarrierSum ιA ιB)) (a : Outcome) :
     (roleBlockMeasurement MA MB).outcome a = roleBlock (MA.outcome a) (MB.outcome a) :=
   rfl
-
-@[simp] theorem roleBlockMeasurement_total {Outcome ιA ιB : Type*}
-    [Fintype Outcome] [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    (MA MB : Measurement Outcome (LocalCarrierSum ιA ιB)) :
-    (roleBlockMeasurement MA MB).total = 1 := by
-  simp [roleBlockMeasurement, MA.total_eq_one, MB.total_eq_one]
 
 /-- Role-register projective measurement obtained by block-diagonalizing two
 complete direct-sum projective measurements. -/
@@ -526,7 +514,6 @@ theorem lowIndividualDegreeFailureProbability_eq_role_averages
       (strategy.axisParallelRoleAverage + strategy.pointAgreementFailureProbability +
         strategy.diagonalRoleAverage) / 3 := by
   rfl
-
 
 /-- Passing the full low-individual-degree test with error `ε`, for the
 paper-faithful two-space strategy container. -/

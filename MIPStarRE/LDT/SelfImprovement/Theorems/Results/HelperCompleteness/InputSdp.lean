@@ -1,8 +1,3 @@
-import MIPStarRE.LDT.Basic.SubMeasurementFamilies
-import MIPStarRE.LDT.GlobalVariance.Defs.Families
-import MIPStarRE.LDT.Preliminaries.SelfConsistency.DataProcessing
-import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds.Final
-import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.CommonHelpers
 
 /-!

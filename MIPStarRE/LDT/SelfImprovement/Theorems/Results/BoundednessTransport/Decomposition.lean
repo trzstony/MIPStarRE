@@ -1,10 +1,3 @@
-import MIPStarRE.LDT.Basic.QuantumState
-import MIPStarRE.LDT.Basic.ParametersFiniteAnswers
-import MIPStarRE.LDT.Basic.SubMeasurementFamilies
-import MIPStarRE.LDT.Preliminaries.SelfConsistency.DataProcessing
-import MIPStarRE.LDT.Preliminaries.Triangles.SimEq
-import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds.Final
-import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUPointConsistency
 
 /-!
@@ -19,7 +12,6 @@ come from the helper-stage agreement average in the proof of self-improvement.
 - `references/ldt-paper/self_improvement.tex` lines 435 and 612--613
 - `blueprint/src/chapter/ch07_self_improvement.tex`
 -/
-
 
 namespace MIPStarRE.LDT.SelfImprovement
 
@@ -315,6 +307,5 @@ theorem helper_boundedness_slack_average_ev_eq_off_diagonal_avg
       refine avgOver_congr (uniformDistribution (Point params)) _ _ ?_
       intro u
       exact h_ev_pointwise u
-
 
 end MIPStarRE.LDT.SelfImprovement

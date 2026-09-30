@@ -124,22 +124,4 @@ lemma normalizedTrace_re_mono {H : FiniteHilbertSpace}
   let ψ : QuantumState H.carrier := { density := 1 }
   simpa [ψ, ev] using (ev_mono ψ A B hAB)
 
-/-- Paper origin: `references/ldt-paper/expansion.tex:145-178`
-(`\label{lem:local-rewrite}`); matrix realization of `LocalRewriteStatement`.
-
-Matrix-level rewrite identity for the local variance. -/
-structure MatrixLocalRewriteStatement (params : Parameters)
-    (model : MatrixOperatorFamilyRealization params) : Prop where
-  traceFormula :
-    matrixLocalVariance params model = matrixLocalVarianceTraceForm params model
-
-/-- Paper origin: `references/ldt-paper/expansion.tex:179-269`
-(`\label{lem:global-rewrite}`); matrix realization of `GlobalRewriteStatement`.
-
-Matrix-level rewrite identity for the global variance. -/
-structure MatrixGlobalRewriteStatement (params : Parameters)
-    (model : MatrixOperatorFamilyRealization params) : Prop where
-  traceFormula :
-    matrixGlobalVariance params model = matrixGlobalVarianceTraceForm params model
-
 end MIPStarRE.LDT.ExpansionHypercubeGraph

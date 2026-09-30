@@ -231,7 +231,7 @@ paper statement unless a separate construction supplies that data.
    whose `note` field carries the published PDF URL as `\url{...}` (the
    alpha style of the PDF build drops `url` fields for techreport entries).
    `texra-blueprint bbl` renders such entries with slug-shaped citation
-   labels (e.g. `[issue-906-main-formal-k-bound]`) in the web bibliography,
+   labels (e.g. `[issue-422-main-formal-zero-k-boundary]`) in the web bibliography,
    while ordinary entries keep alpha labels. Lean docstrings and comments
    keep the repository path form.
 

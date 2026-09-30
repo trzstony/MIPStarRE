@@ -30,14 +30,6 @@ lemma swapDensity_eq_reindex {ι : Type*}
   rcases y with ⟨j₁, j₂⟩
   rfl
 
-@[simp] lemma swapDensity_swapDensity {ι : Type*}
-    (X : MIPStarRE.Quantum.Op (ι × ι)) :
-    swapDensity (swapDensity X) = X := by
-  ext x y
-  rcases x with ⟨i₁, i₂⟩
-  rcases y with ⟨j₁, j₂⟩
-  rfl
-
 @[simp] lemma swapDensity_add {ι : Type*}
     (X Y : MIPStarRE.Quantum.Op (ι × ι)) :
     swapDensity (X + Y) = swapDensity X + swapDensity Y := by
@@ -181,21 +173,6 @@ def DiagonalMeasurementReparamInvariant (params : Parameters)
     (M (ℓ.rebaseAt t)).outcome (DiagonalLinePolynomial.reparamAt f t) =
       (M ℓ).outcome f
 
-/-- Reparametrization invariance for diagonal-line measurements: evaluating a
-rebased line at `zeroCoord` agrees outcome-wise with evaluating the original
-line at the rebasing parameter.
-
-At the answer level, the geometric identity is
-`DiagonalLinePolynomial.reparamAt_apply_zero`. This predicate is stronger: it
-asserts that the *measurement family itself* is covariant under rebasing the
-question index. -/
-def DiagonalEvaluationReparamInvariant (params : Parameters)
-    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (M : IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι) : Prop :=
-  ∀ (ℓ : DiagonalLine params) (t a : Fq params),
-    (postprocess ((M (DiagonalLine.rebaseAt ℓ t)).toSubMeas) (· zeroCoord)).outcome a =
-      (postprocess ((M ℓ).toSubMeas) (fun f => f t)).outcome a
-
 /-- Reparametrization invariance for axis-parallel-line measurements: evaluating a
 rebased line at `zeroCoord` agrees outcome-wise with evaluating the original
 line at the rebasing parameter. -/
@@ -230,8 +207,8 @@ theorem transportMeasurement_postprocess_zero
       (e := AxisLinePolynomial.reparamAtEquiv (params := params) t)
       (A := M.toSubMeas)
       (f := fun g : AxisLinePolynomial params => g zeroCoord)
-  simpa [transportMeasurement, AxisLinePolynomial.reparamAtEquiv,
-    AxisLinePolynomial.reparamAt_apply_zero, addCoord, zeroCoord] using
+  simpa [transportMeasurement, AxisLinePolynomial.reparamAtEquiv, addCoord,
+    zeroCoord] using
     congrArg (fun A => A.outcome a) h
 
 end AxisParallelLine
@@ -245,24 +222,6 @@ noncomputable def transportMeasurement {params : Parameters} [FieldModel params.
     (M : ProjMeas (DiagonalLinePolynomial params) ι) (t : Fq params) :
     ProjMeas (DiagonalLinePolynomial params) ι :=
   ProjMeas.transport (DiagonalLinePolynomial.reparamAtEquiv (params := params) t) M
-
-/-- Evaluating a transported diagonal-line measurement at `zeroCoord` agrees with
-reading the original measurement at the rebasing parameter. -/
-theorem transportMeasurement_postprocess_zero
-    {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (M : ProjMeas (DiagonalLinePolynomial params) ι) (t a : Fq params) :
-    (postprocess (transportMeasurement (params := params) M t).toSubMeas
-        (· zeroCoord)).outcome a =
-      (postprocess M.toSubMeas (fun f => f t)).outcome a := by
-  have h :=
-    SubMeas.postprocess_transport
-      (e := DiagonalLinePolynomial.reparamAtEquiv (params := params) t)
-      (A := M.toSubMeas)
-      (f := fun g : DiagonalLinePolynomial params => g zeroCoord)
-  simpa [transportMeasurement, DiagonalLinePolynomial.reparamAtEquiv,
-    DiagonalLinePolynomial.reparamAt_apply_zero, addCoord, zeroCoord] using
-    congrArg (fun A => A.outcome a) h
 
 end DiagonalLine
 
@@ -285,34 +244,6 @@ def DiagonalMeasurementTransportInvariant (params : Parameters)
   ∀ (ℓ : DiagonalLine params) (t : Fq params),
     M (DiagonalLine.rebaseAt ℓ t) =
       DiagonalLine.transportMeasurement (params := params) (M ℓ) t
-
-/-- Transport-level axis-parallel covariance implies direct outcome covariance. -/
-theorem AxisParallelMeasurementTransportInvariant.toMeasurementReparamInvariant
-    {params : Parameters} [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {M : IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι}
-    (hM : AxisParallelMeasurementTransportInvariant params M) :
-    AxisParallelMeasurementReparamInvariant params M := by
-  intro ℓ t f
-  change (M (ℓ.rebaseAt t)).outcome
-    (AxisLinePolynomial.reparamAtEquiv (params := params) t f) = (M ℓ).outcome f
-  have h := congrArg (fun N => N.outcome
-    (AxisLinePolynomial.reparamAtEquiv (params := params) t f)) (hM ℓ t)
-  simpa only [AxisParallelLine.transportMeasurement, ProjMeas.transport,
-    Measurement.transport, SubMeas.transport, Equiv.symm_apply_apply] using h
-
-/-- Transport-level diagonal covariance implies direct outcome covariance. -/
-theorem DiagonalMeasurementTransportInvariant.toMeasurementReparamInvariant
-    {params : Parameters} [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {M : IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι}
-    (hM : DiagonalMeasurementTransportInvariant params M) :
-    DiagonalMeasurementReparamInvariant params M := by
-  intro ℓ t f
-  change (M (ℓ.rebaseAt t)).outcome
-    (DiagonalLinePolynomial.reparamAtEquiv (params := params) t f) = (M ℓ).outcome f
-  have h := congrArg (fun N => N.outcome
-    (DiagonalLinePolynomial.reparamAtEquiv (params := params) t f)) (hM ℓ t)
-  simpa only [DiagonalLine.transportMeasurement, ProjMeas.transport,
-    Measurement.transport, SubMeas.transport, Equiv.symm_apply_apply] using h
 
 /-- Direct axis-parallel outcome covariance implies transport-level covariance. -/
 theorem AxisParallelMeasurementReparamInvariant.toTransportInvariant
@@ -344,26 +275,6 @@ theorem DiagonalMeasurementReparamInvariant.toTransportInvariant
   simp [DiagonalLine.transportMeasurement, ProjMeas.transport,
     Measurement.transport, SubMeas.transport]
 
-/-- Direct outcome covariance and transport-level covariance are equivalent for
-axis-parallel-line projective measurements. -/
-theorem axisParallelMeasurementReparamInvariant_iff_transportInvariant
-    {params : Parameters} [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {M : IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι} :
-    AxisParallelMeasurementReparamInvariant params M ↔
-      AxisParallelMeasurementTransportInvariant params M :=
-  ⟨AxisParallelMeasurementReparamInvariant.toTransportInvariant,
-    AxisParallelMeasurementTransportInvariant.toMeasurementReparamInvariant⟩
-
-/-- Direct outcome covariance and transport-level covariance are equivalent for
-diagonal-line projective measurements. -/
-theorem diagonalMeasurementReparamInvariant_iff_transportInvariant
-    {params : Parameters} [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {M : IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι} :
-    DiagonalMeasurementReparamInvariant params M ↔
-      DiagonalMeasurementTransportInvariant params M :=
-  ⟨DiagonalMeasurementReparamInvariant.toTransportInvariant,
-    DiagonalMeasurementTransportInvariant.toMeasurementReparamInvariant⟩
-
 /-- The stronger transport-level axis-parallel compatibility implies the older
 outcome-level reparametrization invariant predicate. -/
 theorem AxisParallelMeasurementTransportInvariant.toEvaluationReparamInvariant
@@ -374,18 +285,6 @@ theorem AxisParallelMeasurementTransportInvariant.toEvaluationReparamInvariant
   intro ℓ t a
   rw [hM ℓ t]
   exact AxisParallelLine.transportMeasurement_postprocess_zero
-    (params := params) (M := M ℓ) t a
-
-/-- The stronger transport-level diagonal compatibility implies the older
-outcome-level reparametrization invariant predicate. -/
-theorem DiagonalMeasurementTransportInvariant.toEvaluationReparamInvariant
-    {params : Parameters} [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {M : IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι}
-    (hM : DiagonalMeasurementTransportInvariant params M) :
-    DiagonalEvaluationReparamInvariant params M := by
-  intro ℓ t a
-  rw [hM ℓ t]
-  exact DiagonalLine.transportMeasurement_postprocess_zero
     (params := params) (M := M ℓ) t a
 
 /-- Axis-parallel line measurements bundled with the stronger transport-level
@@ -429,18 +328,6 @@ instance {params : Parameters} [FieldModel params.q] {ι : Type*}
     CoeFun (DiagonalCovariantMeasurement params ι)
       (fun _ => DiagonalLine params → ProjMeas (DiagonalLinePolynomial params) ι) where
   coe M := M.toIdxProjMeas
-
-namespace DiagonalCovariantMeasurement
-
-/-- A covariant wrapper automatically satisfies the older evaluation-level
-rebasing invariant. -/
-theorem reparamInvariant {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (M : DiagonalCovariantMeasurement params ι) :
-    DiagonalEvaluationReparamInvariant params M.toIdxProjMeas :=
-  M.transportInvariant.toEvaluationReparamInvariant
-
-end DiagonalCovariantMeasurement
 
 /-- Transport covariance for diagonal-line measurements whose answers are the
 paper-level line functions. -/
@@ -491,16 +378,15 @@ The line-measurement fields are bundled as transport-covariant wrappers:
 rebasing the question index is required to agree with transporting the
 projective measurement along the corresponding answer reparametrization
 equivalence. This is stronger than the older evaluation-level formulas
-at `zeroCoord`, but those formulas remain available as derived lemmas via
-`AxisParallelCovariantMeasurement.reparamInvariant` and
-`DiagonalCovariantMeasurement.reparamInvariant`.
+at `zeroCoord`; for axis-parallel lines those formulas remain available as
+the derived lemma `AxisParallelCovariantMeasurement.reparamInvariant`.
 
 The `isNormalized` field records that the bipartite state's density
 operator has normalized trace `1`. For pure states, this coincides
 with the usual unit-vector condition (`⟨ψ|ψ⟩ = 1`) used in the paper.
 Bundling normalization with the strategy avoids threading a
 `state.IsNormalized` hypothesis through every downstream consumer
-(pasting cascade, `triangleSub` users, self-improvement helpers). -/
+(pasting, triangle inequalities, self-improvement helpers). -/
 structure SymStrat (params : Parameters) [FieldModel params.q]
     (ι : Type*) [Fintype ι] [DecidableEq ι] where
   state : QuantumState (ι × ι)  -- bipartite state on ℋ ⊗ ℋ
@@ -629,24 +515,9 @@ noncomputable def axisParallelLineAnswerFamily
 
 -- Paper: `not:conditioned-on-last-direction` abbreviates the axis-parallel
 -- line in the last coordinate direction of `F_q^(m+1)` by its base point `u`.
-/-- The axis-parallel line in `F_q^(m+1)` through `(u, 0)` in the last
-coordinate direction. This is the geometric line denoted `B^u` in the paper's
-last-direction notation. -/
-def lastDirectionLine (params : Parameters) [FieldModel params.q]
-    (u : Point params) : AxisParallelLine params.next where
-  base := appendPoint params u zeroCoord
-  direction := lastCoord params
 
 -- Paper: `not:conditioned-on-last-direction` writes `B^u` for the axis-parallel
 -- line measurement conditioned on the last direction choice.
-/-- The axis-parallel line measurement family restricted to the paper's
-last-direction notation `u ↦ B^u`. -/
-noncomputable def lastDirectionMeasurementFamily
-    {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SymStrat params.next ι) :
-    IdxProjMeas (Point params) (AxisLinePolynomial params.next) ι :=
-  fun u => strategy.axisParallelMeasurement (lastDirectionLine params u)
 
 /-- Sampled point answers in the `j`-restricted diagonal test.
 The point player receives `u` and answers at `u`. -/

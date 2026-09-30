@@ -1,7 +1,4 @@
-import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
-import MIPStarRE.LDT.Test.StrategyFailures
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep34AndTransfer.Transfer
-import MIPStarRE.LDT.GlobalVariance.Theorems.MainTheorems
 
 /-!
 # Section 7 — Selection-dependent transfer inequality for `lem:add-in-u`

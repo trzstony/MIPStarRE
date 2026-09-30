@@ -43,36 +43,11 @@ height coordinates of a full-slice question. -/
 abbrev FullSliceOutcome (params : Parameters) [FieldModel params.q] :=
   Polynomial params × Polynomial params
 
-/-- Outcomes for the `G^y` stability step.
-
-We keep the first coordinate evaluated at `u`, but retain the full second
-polynomial `h` because the right-register weight is `√(G_h)`. Postprocessing
-that coordinate down to `h(v)` would sum over the whole fiber
-`{h | h(v) = b}` and introduce a spurious multiplicity. -/
-abbrev StabilityOneOutcome (params : Parameters) [FieldModel params.q] :=
-  Fq params × Polynomial params
-
-/-- Outcomes for the `G^x` stability step.
-
-We retain the full first polynomial `g` because the right-register weight is
-`√(G_g)`, while the second coordinate is already evaluated at `v`. This keeps
-the `.1`/`.2` usage aligned with the paper's `G^x` versus `G^y` roles. -/
-abbrev StabilityTwoOutcome (params : Parameters) [FieldModel params.q] :=
-  Polynomial params × Fq params
-
-
 /-- Ordered product placed on the left tensor factor of the bipartite space `ι × ι`. -/
 noncomputable def leftOrderedProductOpFamily {α β : Type*} [Fintype α] [Fintype β]
     (A : SubMeas α ι) (B : SubMeas β ι) :
     OpFamily (α × β) (ι × ι) :=
   OpFamily.leftPlacedOpFamily (ιB := ι) (orderedProductOpFamily A B)
-
-/-- Append a total operator on the right of every outcome operator. -/
-noncomputable def appendRightTotalOpFamily {α : Type*} [Fintype α] {κ : Type*}
-    [Fintype κ] [DecidableEq κ]
-    (A : OpFamily α κ) (X : MIPStarRE.Quantum.Op κ) : OpFamily α κ where
-  outcome := fun a => A.outcome a * X
-  total := A.total * X
 
 /-- Sandwiched product `A_a B_b A_a`.
 
@@ -177,26 +152,6 @@ noncomputable def evaluatedSliceProductRight (params : Parameters) [FieldModel p
         (evaluatedSliceFirstFactor params family q)
         (evaluatedSliceSecondFactor params family q)
 
-/-- The sandwiched evaluated product `G^x_[g(u)=a] G^y_[h(v)=b] G^x_[g(u)=a]`
-on the single-register space `d`. -/
-noncomputable def evaluatedSliceSandwichRaw (params : Parameters) [FieldModel params.q]
-    (_strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
-    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) ι :=
-  -- strategy retained for API compatibility with the Lean packaging layer
-  fun q =>
-    sandwichByOuterSubMeas
-      (evaluatedSliceFirstFactor params family q)
-      (evaluatedSliceSecondFactor params family q)
-
-/-- The sandwiched evaluated product `(G^x_[g(u)=a] G^y_[h(v)=b] G^x_[g(u)=a]) ⊗ I`
-on the bipartite space `d * d`. -/
-noncomputable def evaluatedSliceSandwichFirstFactor (params : Parameters) [FieldModel params.q]
-    (_strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) :
-    IdxSubMeas (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) (ι × ι) :=
-  fun q =>
-    leftPlacedSubMeas (ιB := ι) <|
-      evaluatedSliceSandwichRaw params _strategy family q
-
 /-- The first full slice measurement `G^x`. -/
 def fullSliceFirstFactor (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
@@ -236,24 +191,5 @@ noncomputable def evaluateFullSliceOutcomeAtQuestion (params : Parameters) [Fiel
     FullSliceOutcome params → EvaluatedSliceOutcome params :=
   fun gh =>
     (gh.1 (truncatePoint params q.1), gh.2 (truncatePoint params q.2))
-
-/-- Evaluate a `G^y`-stability outcome at the sampled second point `v`. -/
-noncomputable def evaluateStabilityOneOutcomeAtQuestion (params : Parameters) [FieldModel params.q]
-    (q : EvaluatedSliceQuestion params) :
-    StabilityOneOutcome params → EvaluatedSliceOutcome params :=
-  fun ah =>
-    (ah.1, ah.2 (truncatePoint params q.2))
-
-/-- Evaluate a `G^x`-stability outcome at the sampled first point `u`.
-
-The first coordinate stays as the full polynomial `g` until this final
-evaluation step, while the second coordinate is already the measured value `b`.
-This matches the one-vs-two indexing used in the paper's two stability steps. -/
-noncomputable def evaluateStabilityTwoOutcomeAtQuestion (params : Parameters) [FieldModel params.q]
-    (q : EvaluatedSliceQuestion params) :
-    StabilityTwoOutcome params → EvaluatedSliceOutcome params :=
-  fun gb =>
-    (gb.1 (truncatePoint params q.1), gb.2)
-
 
 end MIPStarRE.LDT.Commutativity

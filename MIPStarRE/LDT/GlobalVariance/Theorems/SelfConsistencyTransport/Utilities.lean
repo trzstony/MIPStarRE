@@ -16,13 +16,9 @@ Support lemmas for the good-strategy self-consistency transport
 (`SelfConsistencyTransport`):
 
 * `ev_adjoint_sub_swap` — squared-distance invariance under swapping endpoints
-  (used by the reverse `generalize-b` step and by
-  `pointConditionedEventSelfConsistency_weighted_rightEdge`);
+  (used by the reverse `generalize-b` step);
 * `generalizeBReversePointwiseBound` — the reverse `lem:generalize-b` step at
-  `expansion.tex:309`;
-* `avgOver_rerandomizeCoord_fst` / `avgOver_rerandomizeCoord_snd` — both
-  marginals of the hypercube-edge sampling distribution are uniform
-  (`expansion.tex:300–302`).
+  `expansion.tex:309`.
 -/
 
 lemma ev_adjoint_sub_swap
@@ -108,59 +104,6 @@ lemma generalizeBReversePointwiseBound
           let Y := weightedGeneralizeBRightOperatorAtPolynomial params strategy G g qu
           exact ev_adjoint_sub_swap ψbi X Y
     _ ≤ generalizeBError params := hgen.pointwiseNormBound g
-
-/-- The first marginal of the rerandomized hypercube-edge distribution is uniform.
-This is the finite-distribution form of the sampling statement in
-`expansion.tex`, lines 300--302. -/
-lemma avgOver_rerandomizeCoord_fst
-    (params : Parameters) [FieldModel params.q]
-    (f : Point params → Error) :
-    avgOver (rerandomizeCoord params) (fun uv => f uv.1) =
-      avgOver (uniformDistribution (Point params)) f := by
-  rw [avgOver_rerandomizeCoord_eq_uniform_sample]
-  calc
-    avgOver (uniformDistribution (RerandomizeCoordSample params))
-        (fun sample => f (rerandomizeCoordSampleToPair params sample).1)
-      = avgOver (uniformDistribution (Point params × Fin params.m))
-          (fun ui => f ui.1) := by
-          exact avgOver_uniform_fst
-            (α := Point params × Fin params.m) (β := Fq params)
-            (fun ui => f ui.1)
-    _ = avgOver (uniformDistribution (Point params)) f := by
-          exact avgOver_uniform_fst (α := Point params) (β := Fin params.m) f
-
-/-- The second marginal of the rerandomized hypercube-edge distribution is uniform.
-This is the symmetric endpoint form of the sampling statement in `expansion.tex`,
-lines 300--302. -/
-lemma avgOver_rerandomizeCoord_snd
-    (params : Parameters) [FieldModel params.q]
-    (f : Point params → Error) :
-    avgOver (rerandomizeCoord params) (fun uv => f uv.2) =
-      avgOver (uniformDistribution (Point params)) f := by
-  classical
-  rw [avgOver_rerandomizeCoord_eq_weight_sum]
-  rw [Fintype.sum_prod_type]
-  calc
-    (∑ u : Point params, ∑ v : Point params,
-        rerandomizeCoordWeight params u v * f v) =
-        ∑ v : Point params, ∑ u : Point params,
-          rerandomizeCoordWeight params u v * f v := by
-          rw [Finset.sum_comm]
-    _ = ∑ v : Point params, (∑ u : Point params, rerandomizeCoordWeight params u v) * f v := by
-          refine Finset.sum_congr rfl ?_
-          intro v _
-          simpa using
-            (Finset.sum_mul
-              (s := (Finset.univ : Finset (Point params)))
-              (f := fun u : Point params => rerandomizeCoordWeight params u v)
-              (a := f v)).symm
-    _ = ∑ v : Point params, (hypercubeVertexCount params : Error)⁻¹ * f v := by
-          refine Finset.sum_congr rfl ?_
-          intro v _
-          simp [rerandomizeCoordWeight_colSum]
-    _ = avgOver (uniformDistribution (Point params)) f := by
-          rw [avgOver_uniform_eq_pmf_sum]
-          simp [hypercubeVertexCount, PMF.uniformOfFintype_apply]
 
 /-- The right tensor of the square-root polynomial weight is a contraction.
 

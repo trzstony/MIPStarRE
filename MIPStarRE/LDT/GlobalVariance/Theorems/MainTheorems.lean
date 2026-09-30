@@ -19,7 +19,6 @@ expansions, and transport estimates from the preceding modules into the final
 statement records used by downstream consumers.
 -/
 
-
 /-! ## Strategy-state reductions -/
 
 /-- Strict reduction for `lem:local-variance-of-points` on the strategy state.
@@ -208,31 +207,6 @@ lemma globalVarianceDeviation_sum_le_of_localVarianceDeviation_sum_le
 
 -- This theorem applies the post-triangle transport-chain bound to the
 -- strategy-state local-variance record.
-/-- Strategy-state reduction for `lem:local-variance-of-points` from the
-post-triangle six-step transport-chain bound.
-
-This replaces the final displayed edge estimate by the bound produced after
-applying `prop:triangle-inequality-for-approx_delta` with `k = 6` to the six
-paper steps (`2δ + 2ε + md/q + md/q + 2ε + 2δ`). Thus the named estimate is
-`∀ g, localVarianceDeviationAtPolynomial … g ≤ localVarianceTransportChainError …`.
-The absorption into the public `24(ε + δ + md/q)` statement is proved above. -/
-lemma localVarianceOfPointsFromTransportChainBound
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (eps delta gamma : Error)
-    (hgood : strategy.IsGood eps delta gamma)
-    (G : SubMeas (Polynomial params) ι)
-    (hchain :
-      ∀ g : Polynomial params,
-        localVarianceDeviationAtPolynomial params strategy strategy.state G g ≤
-          localVarianceTransportChainError params eps delta) :
-    LocalVarianceOfPointsStatement params strategy strategy.state G eps delta := by
-  refine localVarianceOfPointsFromEdgeDeviation params strategy eps delta G ?_
-  intro g
-  exact le_trans (hchain g)
-    (localVarianceTransportChainError_le_localVarianceOfPointsError
-      params strategy hgood)
 
 -- This theorem composes the transport-chain bound with the global-variance
 -- reduction and therefore checks both record structures.
@@ -258,26 +232,5 @@ lemma globalVarianceOfPointsFromTransportChainBound
 
 -- The paper-facing theorem invokes the transport-chain theorem and the
 -- strategy-state global-variance record constructor.
-/-- Paper origin: `references/ldt-paper/expansion.tex:325-353`
-(`\label{lem:global-variance-of-points}`).
-
-Statement of the global variance lemma for the point measurements.  The paper
-assumes a good projective strategy and a polynomial
-submeasurement `G`, and proves the independent-points comparison with error
-`24m(ε + δ + md/q)`.  In particular, the local and global variance estimates
-are conclusions to be proved, not additional hypotheses of the theorem. -/
-lemma globalVarianceOfPoints
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (eps delta gamma : Error)
-    (hgood : strategy.IsGood eps delta gamma)
-    (G : SubMeas (Polynomial params) ι) :
-    GlobalVarianceOfPointsStatement params strategy strategy.state G eps delta := by
-  refine
-    globalVarianceOfPointsFromTransportChainBound
-      params strategy eps delta gamma hgood G ?_
-  intro g
-  exact localVarianceTransportChainBound params strategy eps delta gamma hgood G g
 
 end MIPStarRE.LDT.GlobalVariance

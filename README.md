@@ -23,15 +23,21 @@ The current active proof-following track is:
 
 - arXiv:2009.12982, *Quantum soundness of the classical low individual degree test* (LDT).
 
-The in-repo paper source mirror lives at `references/ldt-paper/`.
+The in-repo paper source mirror lives at `references/ldt-paper/`.  The
+formalized proof follows the simplified proof in
+`blueprint/src/low_degree_simplified.tex`, which proves the main theorem with
+the error `21000 K_{m,d} (ε^(1/64) + (d/q)^(1/64))` and no sampling parameter.
+The paper's statement with the sampling parameter `k` is derived from it as
+`MIPStarRE.LDT.Test.mainFormalWithK`.
 
 ## Source-of-truth order (LDT)
 
 When working on the active track, consult these locations in this order:
 
-1. **`references/ldt-paper/`** — in-repo TeX source mirror for the paper. This is the mathematical ground truth.
-2. **`blueprint/src/chapter/`** — active, dependency-tracked LaTeX blueprint with Lean cross-references (`\lean{}`, `\leanok`).
-3. **`MIPStarRE/`** — Lean scaffold that matches the blueprint. Declarations in `MIPStarRE.LDT.*` are cross-referenced from the blueprint.
+1. **`references/ldt-paper/`** — in-repo TeX source mirror for the paper. This is the ground truth for the definitions and the original theorem statements.
+2. **`blueprint/src/low_degree_simplified.tex`** — the simplified proof that the formalization follows.
+3. **`blueprint/src/chapter/`** — active, dependency-tracked LaTeX blueprint with Lean cross-references (`\lean{}`, `\leanok`).
+4. **`MIPStarRE/`** — Lean development that matches the blueprint. Declarations in `MIPStarRE.LDT.*` are cross-referenced from the blueprint.
 
 Supporting notes:
 
@@ -61,7 +67,7 @@ MIPStarRE/
     ├── CommutativityPoints/
     ├── Commutativity/
     ├── Pasting/
-    └── Tactic/            # Project-local tactics & simp sets
+    └── Tactic/            # Project-local tactics
 ```
 
 Each LDT submodule typically contains `Defs.lean` and `Theorems.lean` (larger
@@ -76,17 +82,17 @@ Top-level directories:
 - `docs/` — contributor guides, style, naming, proof integrity, CI notes
 - `audits/` — dated chapter-by-chapter dependency-scouting reports
 
-## Recommended proof-filling order
+## Proof dependency order
 
-The source-file order is not the proof-dependency order. The recommended implementation order is:
+The blueprint chapters follow the proof dependency order:
 
-1. Sections 3–4: test setup and preliminaries
-2. Section 5: making measurements projective
-3. Sections 7–8: expansion and global variance
-4. Section 9: self-improvement
-5. Sections 10–11: commutativity
-6. Section 12: pasting
-7. Section 6: main induction wrapper
+1. Chapters 2–3: test setup and preliminaries
+2. Chapter 4: making measurements projective (linear orthogonalization)
+3. Chapters 5–6: expansion and global variance
+4. Chapter 7: self-improvement with simultaneous dilation
+5. Chapter 8: commutativity
+6. Chapter 9: pasting
+7. Chapter 10: main induction and the proof of the main theorem
 
 ## Build
 

@@ -52,10 +52,10 @@ theorem forms.
     100000 k^2m^4\left(\eps^{1/40000}+(d/q)^{1/40000}
       + e^{-k/(2560000m^2)}\right).
   \]
-  \item \textbf{Current checked nonzero form.}  The present formal route proves
-  the corrected two-space source theorem under \(k\ge 400md\) and \(0<k\).  The
-  role-register construction and the subsequent scalar absorption are checked
-  inside the theorem, not supplied as external hypotheses.
+  \item \textbf{Current checked nonzero form.}  The formalization proves the
+  two-space source theorem under the printed hypothesis \(k\ge md\) together
+  with \(0<k\).  It is derived from the simplified theorem, whose error
+  \(21000K_{m,d}(\eps^{1/64}+(d/q)^{1/64})\) has no sampling parameter.
   \item \textbf{Zero-sampling boundary.}  If \(d=0\) and \(k=0\), the printed
   hypothesis \(k\ge md\) is satisfied, but the displayed error is exactly
   \(0\).  The theorem then demands exact consistency with degree-zero
@@ -109,18 +109,15 @@ in the example are not constant as functions of the queried point.
 
 \section{Comparison with the blueprint and formalization}
 
-The formalization now treats this boundary as a source-statement correction.
-The corrected Lean declaration
-\leanid{MIPStarRE.LDT.Test.mainFormal\_sourceStatement} assumes \(0<k\), in
-addition to the separately confirmed large-\(k\) condition recorded in
-\path{docs/paper-gaps/issue-906-main-formal-k-bound.tex}.  Under this corrected
-statement the source-boundary reduction and its small-error branch are proved by
-the two-space role-register route and the scalar-cascade absorption theorem.
-
-The scalar equality \leanid{mainFormalError\_zero\_k} remains as the formal
-calculation explaining why the excluded boundary is singular: the advertised
-error is zero at \(k=0\).  Thus the zero-sampling boundary is not another
-request for a package or bridge input; it is a statement-level correction.
+The formalization treats this boundary as a source-statement correction.  The
+Lean declaration \leanid{MIPStarRE.LDT.Test.mainFormalWithK} assumes
+\(k\ge md\) and \(0<k\).  It is a corollary of
+\leanid{MIPStarRE.LDT.Test.mainFormal}, which states the simplified error
+\(\nu=21000K_{m,d}(\eps^{1/64}+(d/q)^{1/64})\) with \(K_{m,d}=m^4\) for
+\(d=0\) and \(K_{m,d}=d^2m^4\) for \(d\ge1\).  For positive \(k\ge md\) one has
+\(K_{m,d}\le k^2m^4\), so the simplified error is at most the printed error
+whenever the latter is below one.  At \(k=0\) this comparison fails, because
+the printed error vanishes while the simplified error does not.
 
 \section{Conclusion}
 
@@ -131,8 +128,7 @@ with a constant polynomial measurement.  A source-faithful formal theorem must
 therefore either include a justified nonzero sampling condition, such as
 \(0<k\), or replace the zero-boundary conclusion by a statement whose error
 does not vanish at \(k=0\).  The present formalization takes the first route:
-the corrected source theorem assumes \(0<k\), and the former zero-boundary
-obligation has been removed rather than discharged by further packaging.
+the corrected source theorem assumes \(0<k\).
 
 \bibliographystyle{alpha}
 \bibliography{references}

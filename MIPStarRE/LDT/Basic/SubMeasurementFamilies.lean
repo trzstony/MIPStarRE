@@ -1,4 +1,3 @@
-import MIPStarRE.LDT.Basic.Distribution
 import MIPStarRE.LDT.Basic.TensorPlacement
 
 /-!
@@ -281,14 +280,6 @@ end Measurement
 
 namespace ProjSubMeas
 
-/-- Transport a projective submeasurement along an equivalence of outcome types. -/
-noncomputable def transport {α β : Type*} {ι : Type*}
-    [Fintype α] [Fintype β] [Fintype ι] [DecidableEq ι]
-    (e : α ≃ β) (A : ProjSubMeas α ι) :
-    ProjSubMeas β ι where
-  toSubMeas := SubMeas.transport e A.toSubMeas
-  proj := fun b => A.proj (e.symm b)
-
 /-- Postprocessing a projective submeasurement preserves outcome projectivity. -/
 theorem postprocess_outcome_proj {α β : Type*} {ι : Type*}
     [Fintype α] [Fintype β] [Fintype ι] [DecidableEq ι]
@@ -447,7 +438,6 @@ noncomputable def averageIdxSubMeas {Question Outcome : Type*} [Fintype Outcome]
     averageOperatorOverDistribution_le_one_of_weight_sum_le_one 𝒟
       (fun q => (A q).total) h𝒟 (fun q => (A q).total_le_one)
 
-
 /-! ### Tensor-placement constructors -/
 
 private def mkLeftPlacedSubMeas {α : Type*}
@@ -517,14 +507,6 @@ def IdxSubMeas.liftLeft {Question Outcome : Type*} {ι : Type*}
     [Fintype Outcome] [Fintype ι] [DecidableEq ι]
     (A : IdxSubMeas Question Outcome ι) : IdxSubMeas Question Outcome (ι × ι) :=
   fun q => mkLeftPlacedSubMeas (ιB := ι) (A q)
-
-/-- Lift a projective submeasurement to the left tensor factor of a bipartite
-space `ι × ι`. -/
-def ProjSubMeas.liftLeft {α : Type*} {ι : Type*} [Fintype α] [Fintype ι] [DecidableEq ι]
-    (A : ProjSubMeas α ι) : ProjSubMeas α (ι × ι) :=
-  { toSubMeas := A.toSubMeas.liftLeft
-    proj := fun a => (leftTensor_mul_leftTensor (A.outcome a) (A.outcome a)).trans
-      (congrArg (leftTensor (ι₂ := ι)) (A.proj a)) }
 
 /-- Lift a submeasurement to the right tensor factor of a bipartite space `ι × ι`.
 Each outcome operator `A_a : Op ι` becomes `I ⊗ A_a : Op (ι × ι)`. -/

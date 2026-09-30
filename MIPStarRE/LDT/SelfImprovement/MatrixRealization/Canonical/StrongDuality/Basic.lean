@@ -1,5 +1,3 @@
-import MIPStarRE.Quantum.FiniteMatrix.Order
-import MIPStarRE.Quantum.FiniteMatrix.TracePairing
 import MIPStarRE.LDT.SelfImprovement.MatrixRealization.Canonical
 
 /-!

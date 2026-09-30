@@ -2,9 +2,9 @@ import MIPStarRE.LDT.Test.Defs
 import MIPStarRE.LDT.Preliminaries.PolynomialAgreement
 
 /-!
-# `mainFormal` Step 5 — Schwartz--Zippel self-consistency handoff
+# `mainFormal` Step 5 — Schwartz--Zippel self-consistency
 
-This file isolates the paper's Step 5 bridge in
+This file isolates the paper's Step 5 in
 `references/ldt-paper/inductive_step.tex`, lines 119--133.  The algebraic
 expansion/reindexing from evaluated consistency to the full-polynomial
 consistency defect is proved here, and the genuinely Schwartz--Zippel part is
@@ -307,30 +307,6 @@ theorem mainFormalStep5_selfConsistency_ofExpansionBound_heterogeneous
         have hcollision :=
           Preliminaries.polynomialCollisionMass_le_mdq params ψ hnorm Left Right
         linarith [hevaluated.offDiagonalBound, hcollision]
-
-/-- Step 5 packaging for `mainFormal` using the proved algebraic expansion bound.
-
-Given evaluated consistency at error `ζ` (paper line 116) and the exact
-line-122--125 expansion recorded by `MainFormalStep5ExpansionBound`, the
-proved tensor Schwartz--Zippel bound contributes the paper's `md/q` loss and
-returns full-polynomial consistency at error `ζ + md/q` (paper lines 126--133).
-
-This is the source-labelled same-space statement. -/
-theorem mainFormalStep5_selfConsistency_ofExpansionBound
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (params : Parameters) [FieldModel params.q]
-    (ψ : QuantumState (ι × ι)) (hnorm : ψ.IsNormalized)
-    (Left Right : SubMeas (Polynomial params) ι)
-    (ζ : Error)
-    (hevaluated : ConsRel ψ (uniformDistribution (Point params))
-      (polynomialEvaluationFamily params Left)
-      (polynomialEvaluationFamily params Right) ζ) :
-    ConsRel ψ (uniformDistribution Unit)
-      (constSubMeasFamily Left) (constSubMeasFamily Right)
-      (ζ + (params.m * params.d : Error) / params.q) := by
-  exact
-    mainFormalStep5_selfConsistency_ofExpansionBound_heterogeneous params ψ hnorm
-      Left Right ζ hevaluated
 
 end Test
 

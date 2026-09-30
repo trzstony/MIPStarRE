@@ -42,33 +42,35 @@ polynomial.
 
 \section{The formal definition}
 
-The formalization defines a low-individual-degree
-predicate\footnote{The declaration is named
-\leanid{HasLowIndividualDegree} and appears in
-\path{MIPStarRE/LDT/Basic/LinePolynomials.lean}, line~20.} on a
-function $g : \F_q^m \to \F_q$ as
+The formalization indexes measurement outcomes by algebraic
+polynomials of low individual degree.\footnote{The outcome type is the
+structure \leanid{MIPStarRE.LDT.Polynomial} in
+\path{MIPStarRE/LDT/Basic/LowDegreePolynomial.lean}; its evaluation is
+\leanid{MIPStarRE.LDT.Polynomial.toFun}.}  An outcome is a pair
+consisting of
 \[
-  \mathrm{LowDeg}_d(g) := 
-  \exists\, p \in \F_q[x_1,\dots,x_m], 
-    (\forall i,\ \deg_{x_i}(p) \le d)
-    \wedge 
-    g = \mathrm{eval}(p).
+  p \in \F_q[x_1,\dots,x_m]
+  \quad\text{and a proof of}\quad
+  \forall i,\ \deg_{x_i}(p) \le d,
 \]
-Here $p$ ranges over the algebraic polynomial ring over the chosen
+and its associated function $\F_q^m \to \F_q$ is the evaluation of
+$p$.  Here $p$ ranges over the algebraic polynomial ring over the chosen
 finite field,\footnote{This is the abbreviation
 \leanid{PolynomialModel}, which expands to
 \leanid{MvPolynomial (Fin m) (Scalar params)} in
-\path{MIPStarRE/LDT/Basic/ParametersBase.lean}, line~300.}
-and $\mathrm{eval}$ is its coefficient-wise evaluation map to a
-function $\F_q^m \to \F_q$. The predicate therefore asserts exactly
-the paper's condition: $g$ admits an algebraic polynomial
-representative of the right degree.
+\path{MIPStarRE/LDT/Basic/ParametersBase.lean}.}
+and evaluation is coefficient-wise.  A function lies in
+$\polyfunc{m}{q}{d}$ exactly when it is the evaluation of such an outcome.
+When $d<q$, evaluation is injective on polynomials of individual degree at
+most $d$, so the outcome set is in bijection with $\polyfunc{m}{q}{d}$.
+When $d\ge q$ the error parameter of the main theorem is at least one, and
+the theorem holds for trivial reasons.
 
 The earlier blueprint used a function-type representation for
 $\polyfunc{m}{q}{d}$, treating low-degree polynomials as a subtype
 of the function space. That representation has been corrected to
-the $\exists$ predicate above, which matches the paper's definition
-exactly.\footnote{The blueprint correction is visible in
+algebraic representatives, which matches the paper's definition in the
+regime $d<q$.\footnote{The blueprint correction is visible in
 \path{blueprint/src/chapter/ch02_test.tex} and
 \path{blueprint/src/chapter/ch03_preliminaries.tex}, where
 $\polyfunc{m}{q}{d}$ is now the set of functions representable as an
@@ -81,10 +83,8 @@ polynomials for the Schwartz--Zippel lemma.\footnote{Labelled
 \leanid{lem:schwartz-zippel-total-degree} in the paper, and available
 in Mathlib as \leanid{MvPolynomial.schwartzZippel}.}
 The Mathlib statement operates on algebraic polynomials, not on
-arbitrary functions. The low-individual-degree predicate is the
-natural bridge: it takes a function $g$ and extracts the algebraic
-polynomial $p$ that witnesses its low individual degree, which
-enables the application of Schwartz--Zippel.
+arbitrary functions. Indexing outcomes by algebraic representatives makes the
+representative available wherever Schwartz--Zippel is applied.
 
 The measurement families $G$, $A$, $B$, $L$ in the formalization
 carry outcomes indexed by \emph{polynomials}, and the evaluation
@@ -95,13 +95,11 @@ step uses algebraic properties of the polynomials.
 
 \section{Conclusion}
 
-There is no divergence. The paper defines polynomials as functions
-with a polynomial representative; the formalization defines the
-low-individual-degree predicate as the existence of an algebraic
-polynomial representative. The two are mathematically equivalent.
-The earlier blueprint, which used function types directly, has been
-corrected to the $\exists$ predicate, eliminating the only
-discrepancy.
+There is no divergence in the relevant regime. The paper defines
+polynomials as functions with a polynomial representative; the
+formalization indexes outcomes by algebraic representatives of individual
+degree at most $d$. For $d<q$ the two index sets are in bijection, and for
+$d\ge q$ the main theorem is trivial.
 
 \bibliographystyle{alpha}
 \bibliography{references}

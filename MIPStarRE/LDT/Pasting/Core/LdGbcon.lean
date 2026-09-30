@@ -1,11 +1,13 @@
-import MIPStarRE.LDT.Pasting.Statements
+import MIPStarRE.LDT.Commutativity.Scaffold.Core
+import MIPStarRE.LDT.MainInductionStep.Defs
+import MIPStarRE.LDT.Pasting.Sandwich.PastedFamilies
 import MIPStarRE.LDT.Preliminaries.SelfConsistency.Extensions
 import MIPStarRE.LDT.Preliminaries.Triangles.SimEq
 
 /-!
 # Section 12 pasting: vertical-line consistency transfer
 
-The `ldGbcon` transfer compares the slice family `G^x` with the vertical-line
+The transfer `eq:ld-gbcon` compares the slice family `G^x` with the vertical-line
 answers `B^u`.  It combines the conditioned axis-parallel consistency estimate
 with the point-to-vertical-line state-dependent-distance bound.
 -/
@@ -358,23 +360,6 @@ theorem pointVerticalLineSdd_liftedVerticalLine_of_axis_self
     (8 * (params.m : Error) * eps + 4 * delta)
   exact pointVerticalLineSdd_of_axis_self params strategy eps delta haxis hself
 
-/-- `lem:point-vertical-line-sdd`.
-A good strategy induces a state-dependent distance bound between the point
-measurements and the vertical-line (axis-parallel rebased) measurements. -/
-theorem pointVerticalLineSdd
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma : Error)
-    (hgood : strategy.IsGood eps delta gamma) :
-    SDDRel strategy.state
-      (uniformDistribution (Point params.next))
-      (IdxSubMeas.liftRight (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
-      (IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas (ldGbconVerticalLineMeasurement params strategy)))
-      (8 * (params.m : Error) * eps + 4 * delta) := by
-  exact pointVerticalLineSdd_of_axis_self params strategy eps delta
-    hgood.axisParallelTest hgood.selfConsistencyTest
-
 /-- `lem:ld-gbcon`.
 
 This is the direct consistency transfer from the slice family `G^x` to the
@@ -547,79 +532,5 @@ theorem ldGbcon_of_axis_self
     (IdxMeas.toIdxSubMeas (ldGbconVerticalLineMeasurement params strategy))
     (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta))
   simpa [ldGbconAxisLineMeasurement_eq_verticalLineMeasurement params strategy] using htriangle
-
-/-- `lem:ld-gbcon`.
-
-This is the direct consistency transfer from the slice family `G^x` to the
-vertical line answers `B^u`, obtained by composing the hypothesis
-`item:ld-pasting-consistency` with the conditioned axis-parallel test relation. -/
-theorem ldGbcon
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma zeta : Error)
-    (hgood : strategy.IsGood eps delta gamma)
-    (family : IdxPolyFamily params ι)
-    (hcons : family.ConsistentWithPoints strategy zeta) :
-    ConsRel strategy.state
-      (uniformDistribution (Point params.next))
-      (evaluateFiberFamilyAtNextPoint params
-        (IdxProjSubMeas.toIdxSubMeas family.meas))
-      (fun u =>
-        postprocess
-          (verticalLineMeasurementFamily params strategy (truncatePoint params u))
-          (fun f => f (pointHeight params u)))
-      (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta)) := by
-  exact ldGbcon_of_axis_self params strategy eps delta zeta
-    hgood.axisParallelTest hgood.selfConsistencyTest family hcons
-
-/-- Named-family form of `lem:ld-gbcon`.
-
-This is the same consistency transfer as `ldGbcon`, restated with the two
-families used in the degree-zero branch of `thm:ld-pasting`: the evaluated slice
-family `family.evaluatedAtNextPoint` and the lifted vertical-line family
-`liftedVerticalLineAnswerFamily`.  In the degree-zero branch, these are the two
-families whose pointwise invariance properties must be combined to control
-height dependence. -/
-theorem ldGbcon_liftedVerticalLine_of_axis_self
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta zeta : Error)
-    (haxis : strategy.axisParallelFailureProbability ≤ eps)
-    (hself : strategy.selfConsistencyFailureProbability ≤ delta)
-    (family : IdxPolyFamily params ι)
-    (hcons : family.ConsistentWithPoints strategy zeta) :
-    ConsRel strategy.state
-      (uniformDistribution (Point params.next))
-      family.evaluatedAtNextPoint
-      (liftedVerticalLineAnswerFamily params strategy)
-      (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta)) := by
-  change ConsRel strategy.state
-    (uniformDistribution (Point params.next))
-    (evaluateFiberFamilyAtNextPoint params (IdxProjSubMeas.toIdxSubMeas family.meas))
-    (fun u =>
-      postprocess
-        (verticalLineMeasurementFamily params strategy (truncatePoint params u))
-        (fun f => f (pointHeight params u)))
-    (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta))
-  exact ldGbcon_of_axis_self params strategy eps delta zeta haxis hself family hcons
-
-/-- Named-family form of `lem:ld-gbcon`. -/
-theorem ldGbcon_liftedVerticalLine
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma zeta : Error)
-    (hgood : strategy.IsGood eps delta gamma)
-    (family : IdxPolyFamily params ι)
-    (hcons : family.ConsistentWithPoints strategy zeta) :
-    ConsRel strategy.state
-      (uniformDistribution (Point params.next))
-      family.evaluatedAtNextPoint
-      (liftedVerticalLineAnswerFamily params strategy)
-      (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta)) := by
-  exact ldGbcon_liftedVerticalLine_of_axis_self params strategy eps delta zeta
-    hgood.axisParallelTest hgood.selfConsistencyTest family hcons
 
 end MIPStarRE.LDT.Pasting

@@ -6,7 +6,7 @@ import MIPStarRE.LDT.Test.StrategyCore
 
 Auxiliary definitions for the commutativity-at-points argument from Section 10 of the
 low individual degree paper. This file packages the sampled diagonal-line questions,
-point/line bridge families, and the error terms used by `commutativityPoints`.
+point/line bridge families, and the error terms used by `thm:commutativity-points`.
 
 ## References
 
@@ -141,24 +141,6 @@ noncomputable def pointWithDiagonalLineDistribution (params : Parameters)
     Distribution (PointDiagonalLineQuestion params) :=
   uniformDistribution (PointDiagonalLineQuestion params)
 
-/-- The diagonal-line/parameter question distribution is a probability
-distribution. -/
-theorem pointWithDiagonalLineDistribution_isProbability (params : Parameters)
-    [FieldModel params.q] :
-    (pointWithDiagonalLineDistribution params).IsProbability := by
-  simpa [pointWithDiagonalLineDistribution] using
-    uniformDistribution_isProbability (PointDiagonalLineQuestion params)
-
-/-- The diagonal-line/parameter question distribution is Mathlib's uniform PMF
-on its finite question type. -/
-theorem pointWithDiagonalLineDistribution_toPMF (params : Parameters)
-    [FieldModel params.q] :
-    (pointWithDiagonalLineDistribution params).toPMF
-      (pointWithDiagonalLineDistribution_isProbability params) =
-        PMF.uniformOfFintype (PointDiagonalLineQuestion params) := by
-  simpa [pointWithDiagonalLineDistribution] using
-    uniformDistribution_toPMF (PointDiagonalLineQuestion params)
-
 /-- Realize a shared-line sample from a uniformly random point pair and parameter.
 
 The resulting line is parameterized so that the first point is visited at `t` and the
@@ -182,121 +164,6 @@ noncomputable def pointPairSharedDiagonalLineDistribution (params : Parameters)
     Distribution (PointPairDiagonalLineQuestion params) :=
   (uniformDistribution (PointPairQuestion params × Fq params)).map
     (sharedDiagonalLineQuestionOfPointPair params)
-
-/-- The shared diagonal-line question distribution is a probability
-distribution. -/
-theorem pointPairSharedDiagonalLineDistribution_isProbability (params : Parameters)
-    [FieldModel params.q] :
-    (pointPairSharedDiagonalLineDistribution params).IsProbability := by
-  simpa [pointPairSharedDiagonalLineDistribution] using
-    (uniformDistribution_isProbability (PointPairQuestion params × Fq params)).map
-      (sharedDiagonalLineQuestionOfPointPair params)
-
-/-- The shared diagonal-line question distribution is the Mathlib push-forward
-of the uniform PMF on point pairs and the auxiliary line parameter. -/
-theorem pointPairSharedDiagonalLineDistribution_toPMF (params : Parameters)
-    [FieldModel params.q] :
-    (pointPairSharedDiagonalLineDistribution params).toPMF
-      (pointPairSharedDiagonalLineDistribution_isProbability params) =
-        (PMF.uniformOfFintype (PointPairQuestion params × Fq params)).map
-          (sharedDiagonalLineQuestionOfPointPair params) := by
-  simpa [pointPairSharedDiagonalLineDistribution, uniformDistribution_toPMF] using
-    Distribution.toPMF_map
-      (uniformDistribution (PointPairQuestion params × Fq params))
-      (uniformDistribution_isProbability (PointPairQuestion params × Fq params))
-      (sharedDiagonalLineQuestionOfPointPair params)
-
-/-- The point measurement, reindexed by a sampled diagonal line and a parameter on it. -/
-def sampledPointMeasurement (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι) :
-    IdxSubMeas (PointDiagonalLineQuestion params) (Fq params) ι :=
-  fun q =>
-    (strategy.pointMeasurement (sampledPointFromDiagonalQuestion params q)).toSubMeas
-
-/-- Evaluate the diagonal-line measurement at the sampled parameter. -/
-noncomputable def sampledDiagonalLineEvaluation (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι) :
-    IdxSubMeas (PointDiagonalLineQuestion params) (Fq params) ι :=
-  fun q =>
-    postprocess ((strategy.diagonalMeasurement q.1).toSubMeas) (fun f => f q.2)
-
-/-- The ordered point product `(A^u_a A^v_b) ⊗ I`, indexed by a shared sampled line. -/
-noncomputable def pointMeasurementProductAlongSharedLine (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι) :
-    IdxOpFamily (PointPairDiagonalLineQuestion params) (PointPairOutcome params) (ι × ι) :=
-  fun q =>
-    pointMeasurementProductLeft params strategy
-      (sampledPointPairFromSharedDiagonalQuestion params q)
-
-/-- The reversed point product `(A^v_b A^u_a) ⊗ I`, indexed by a shared sampled line. -/
-noncomputable def pointMeasurementProductAlongSharedLineReversed (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι) :
-    IdxOpFamily (PointPairDiagonalLineQuestion params) (PointPairOutcome params) (ι × ι) :=
-  fun q =>
-    pointMeasurementProductRight params strategy
-      (sampledPointPairFromSharedDiagonalQuestion params q)
-
-/-- The mixed bridge `A^u_a ⊗ L^ℓ_[f(v)=b]` on the bipartite space `d * d`. -/
-noncomputable def pointDiagonalLineMixedProductLeft (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι) :
-    IdxSubMeas (PointPairDiagonalLineQuestion params) (PointPairOutcome params) (ι × ι) :=
-  fun q =>
-    let ℓ := q.1
-    let tu := q.2.1
-    let tv := q.2.2
-    let Au := (strategy.pointMeasurement (ℓ.pointAt tu)).toSubMeas
-    let Lv := sampledDiagonalLineEvaluation params strategy (ℓ, tv)
-    tensorProductSubMeas Au Lv
-
-/-- The bridge `I ⊗ (L^ℓ_[f(v)=b] · L^ℓ_[f(u)=a])` on the bipartite space.
-Paper's "ordered" step: `Lv * Lu` (line measurement at v times line measurement at u). -/
-noncomputable def diagonalLineProductOrdered (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι) :
-    IdxOpFamily (PointPairDiagonalLineQuestion params) (PointPairOutcome params) (ι × ι) :=
-  fun q =>
-    let ℓ := q.1
-    let tu := q.2.1
-    let tv := q.2.2
-    let Lu := sampledDiagonalLineEvaluation params strategy (ℓ, tu)
-    let Lv := sampledDiagonalLineEvaluation params strategy (ℓ, tv)
-    OpFamily.rightPlacedOpFamily (ιA := ι) <|
-      reversedProductOpFamily Lu Lv
-
-/-- The swapped bridge `I ⊗ (L^ℓ_[f(u)=a] · L^ℓ_[f(v)=b])` on the bipartite space.
-Paper's "reversed" step: `Lu * Lv` (projectively swapped from ordered). -/
-noncomputable def diagonalLineProductReversed (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι) :
-    IdxOpFamily (PointPairDiagonalLineQuestion params) (PointPairOutcome params) (ι × ι) :=
-  fun q =>
-    let ℓ := q.1
-    let tu := q.2.1
-    let tv := q.2.2
-    let Lu := sampledDiagonalLineEvaluation params strategy (ℓ, tu)
-    let Lv := sampledDiagonalLineEvaluation params strategy (ℓ, tv)
-    OpFamily.rightPlacedOpFamily (ιA := ι) <|
-      orderedProductOpFamily Lu Lv
-
-/-- The mixed bridge `A^v_b ⊗ L^ℓ_[f(u)=a]` on the bipartite space `ι × ι`.
-Outcome `(a, b)` maps to `leftTensor(A^v_b) * rightTensor(L^ℓ_[f(u)=a])`,
-i.e. `a` indexes the line evaluation and `b` indexes the point measurement. -/
-noncomputable def pointDiagonalLineMixedProductRight (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι) :
-    IdxSubMeas (PointPairDiagonalLineQuestion params) (PointPairOutcome params) (ι × ι) :=
-  fun q =>
-    let ℓ := q.1
-    let tu := q.2.1
-    let tv := q.2.2
-    let Av := (strategy.pointMeasurement (ℓ.pointAt tv)).toSubMeas
-    let Lu := sampledDiagonalLineEvaluation params strategy (ℓ, tu)
-    postprocess (tensorProductSubMeas Av Lu) Prod.swap
 
 /-- The intermediate consistency loss coming from the `m`-restricted diagonal-lines test. -/
 def restrictedDiagonalLinesConsistencyError (params : Parameters) (gamma : Error) : Error :=

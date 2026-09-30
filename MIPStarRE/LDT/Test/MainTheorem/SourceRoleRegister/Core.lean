@@ -1,15 +1,21 @@
-import MIPStarRE.LDT.MainInductionStep.Theorems.MainTheorems.Successor
-import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
+import MIPStarRE.LDT.MainInductionStep.Theorems.PastingAssembly.AnswerFields
 import MIPStarRE.LDT.Test.SchwartzZippelStep
-import MIPStarRE.LDT.Test.MainTheorem.ProjectiveConsistency.Evaluation
-import MIPStarRE.LDT.Test.StrategyBiProjRoleAverage.Final
+import MIPStarRE.LDT.Preliminaries.ComparisonProjective
 import MIPStarRE.LDT.Test.StrategyBiProjUnsymmetrization
 
 /-!
-# Source-Boundary Role-Register Handoff: Core Reductions
+# Role-register reduction for the final theorem
 
-This module contains the main-induction handoff, unsymmetrization, and the first
-two-space projectivization outputs for the source route toward `thm:main-formal`.
+For a general two-space projective strategy, the role-register symmetrization
+produces a symmetric strategy on `{A, B} × (H_A ⊕ H_B)`.  This module
+unsymmetrizes a polynomial measurement consistent with the symmetrized point
+measurements into two point-consistency estimates on the original strategy, and
+derives the consistency of the two extracted polynomial measurements from these
+estimates by the Schwartz--Zippel bound.
+
+## References
+
+- `blueprint/src/low_degree_simplified.tex`, proof of `thm:main-formal`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -19,47 +25,6 @@ namespace MIPStarRE.LDT
 open MIPStarRE.LDT.MakingMeasurementsProjective
 
 namespace ProjStrat
-
-/-- Apply the source-shaped main-induction theorem to the heterogeneous
-role-register symmetrization of a two-space strategy.
-
-Paper origin: `references/ldt-paper/inductive_step.tex:26-83`, where the
-general projective strategy of `thm:main-formal` is symmetrized by adding role
-registers and `thm:main-induction` is applied to the resulting symmetric
-strategy.
-
-This theorem is not a proof of `thm:main-formal`: it stops at the polynomial
-measurement produced by corrected large-`k` main induction on the role-register
-space.  It does, however, discharge the Step 1 handoff for the two-space
-strategy container under the confirmed `400md` correction.  The downstream
-unsymmetrization and two-sided projective-submeasurement construction are
-formalized later in this file; completion, line-169 transport, and scalar
-absorption remain separate. -/
-theorem roleRegisterSymmStrategy_sourceMainInduction
-    (params : Parameters)
-    [FieldModel params.q]
-    {ιA ιB : Type*}
-    [Fintype ιA] [DecidableEq ιA]
-    [Fintype ιB] [DecidableEq ιB]
-    (strategy : ProjStrat params ιA ιB)
-    (eps : Error)
-    (hpass : strategy.PassesLowIndividualDegreeTest eps)
-    (k : ℕ)
-    (hk : 400 * params.m * params.d ≤ k) :
-    ∃ G : Measurement (Polynomial params) (RoleRegisterLocal ιA ιB),
-      ConsRel (strategy.roleRegisterSymmStrategy).state
-        (uniformDistribution (Point params))
-        (IdxProjMeas.toIdxSubMeas (strategy.roleRegisterSymmStrategy).pointMeasurement)
-        (polynomialEvaluationFamily params G.toSubMeas)
-        (MainInductionStep.mainInductionError params k
-          (3 * eps) (3 * eps) (3 * eps)) := by
-  exact
-    MainInductionStep.mainInduction params
-      (strategy := strategy.roleRegisterSymmStrategy)
-      (eps := 3 * eps) (delta := 3 * eps) (gamma := 3 * eps) (k := k)
-      (roleRegisterSymmStrategy_is_good_three_mul
-        (strategy := strategy) (eps := eps) hpass)
-      hk
 
 -- The proof compares two averaged consistency defects after expanding the
 -- role-register symmetrization and polynomial-evaluation extraction maps.
@@ -342,196 +307,6 @@ theorem sourceRoleRegisterFullPolynomialSelfConsistency_ofPointConsistency
     Test.mainFormalStep5_selfConsistency_ofExpansionBound_heterogeneous params strategy.state
       strategy.isNormalized G_A.toSubMeas G_B.toSubMeas
       (σ + 2 * Real.sqrt (3 * eps + σ)) hevaluated
-
-/-- The two unsymmetrized polynomial measurements obtained from the
-source-shaped role-register main-induction call.
-
-Paper origin: `references/ldt-paper/inductive_step.tex:68-109`.
-
-This theorem packages the first two quantitative conclusions of the
-role-register reduction in the proof of `thm:main-formal`: after applying
-source main induction to the heterogeneous role-register symmetrization, the
-occupied principal blocks of the resulting polynomial measurement are
-consistent with the original two-space point measurements, with the expected
-factor-two loss.
-
-It is not the final theorem.  The outputs here are complete polynomial
-measurements, not projective measurements, and no self-consistency conclusion is
-claimed.  Those are the later projectivization, completion, and scalar
-absorption steps in `references/ldt-paper/inductive_step.tex:111-185`.
-
-It uses the corrected large-`k` main-induction handoff; no additional bridge,
-package, residual, repair, producer, input, or generic hypothesis is introduced
-at the theorem boundary. -/
-theorem sourceRoleRegisterUnsymmetrizedPointConsistency
-    (params : Parameters)
-    [FieldModel params.q]
-    {ιA ιB : Type*}
-    [Fintype ιA] [DecidableEq ιA]
-    [Fintype ιB] [DecidableEq ιB]
-    (strategy : ProjStrat params ιA ιB)
-    (eps : Error)
-    (hpass : strategy.PassesLowIndividualDegreeTest eps)
-    (k : ℕ)
-    (hk : 400 * params.m * params.d ≤ k) :
-    ∃ G_A : Measurement (Polynomial params) ιA,
-      ∃ G_B : Measurement (Polynomial params) ιB,
-        ConsRel strategy.state (uniformDistribution (Point params))
-            (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-            (polynomialEvaluationFamily params G_B.toSubMeas)
-            (2 * MainInductionStep.mainInductionError params k
-              (3 * eps) (3 * eps) (3 * eps)) ∧
-          ConsRel strategy.state (uniformDistribution (Point params))
-            (polynomialEvaluationFamily params G_A.toSubMeas)
-            (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
-            (2 * MainInductionStep.mainInductionError params k
-              (3 * eps) (3 * eps) (3 * eps)) := by
-  rcases roleRegisterSymmStrategy_sourceMainInduction
-      params strategy eps hpass k hk with ⟨G, hG⟩
-  refine
-    ⟨Measurement.extractRoleRegisterAlice G, Measurement.extractRoleRegisterBob G, ?_⟩
-  exact
-    sourceRoleRegisterPointConsistency_ofSymConsistency params strategy G
-      (MainInductionStep.mainInductionError params k (3 * eps) (3 * eps) (3 * eps)) hG
-
-/-- Complete polynomial measurements obtained from the two-space source
-role-register route, including full-polynomial self-consistency.
-
-Paper origin: `references/ldt-paper/inductive_step.tex:68-133`.
-
-This is the source-boundary route through the end of the paper's
-Schwartz--Zippel Step 5 calculation.  It applies source main induction to the
-heterogeneous role-register symmetrization, extracts the occupied principal
-blocks, proves the two factor-two point-consistency estimates, and then applies
-the heterogeneous triangle and Schwartz--Zippel calculation to obtain
-full-polynomial consistency.
-
-It is still not `thm:main-formal`: the measurements are complete POVMs, not
-projective measurements, and the scalar cascade has not yet been absorbed into
-`mainFormalError`.
-
-It uses the corrected large-`k` role-register handoff and remains an
-intermediate construction, not the final theorem. -/
-theorem sourceRoleRegisterCompletePolynomialSelfConsistency
-    (params : Parameters)
-    [FieldModel params.q]
-    {ιA ιB : Type*}
-    [Fintype ιA] [DecidableEq ιA]
-    [Fintype ιB] [DecidableEq ιB]
-    (strategy : ProjStrat params ιA ιB)
-    (eps : Error)
-    (hpass : strategy.PassesLowIndividualDegreeTest eps)
-    (k : ℕ)
-    (hk : 400 * params.m * params.d ≤ k) :
-    ∃ G_A : Measurement (Polynomial params) ιA,
-      ∃ G_B : Measurement (Polynomial params) ιB,
-        ConsRel strategy.state (uniformDistribution (Point params))
-            (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-            (polynomialEvaluationFamily params G_B.toSubMeas)
-            (2 * MainInductionStep.mainInductionError params k
-              (3 * eps) (3 * eps) (3 * eps)) ∧
-          ConsRel strategy.state (uniformDistribution (Point params))
-            (polynomialEvaluationFamily params G_A.toSubMeas)
-            (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
-            (2 * MainInductionStep.mainInductionError params k
-              (3 * eps) (3 * eps) (3 * eps)) ∧
-          ConsRel strategy.state (uniformDistribution Unit)
-            (constSubMeasFamily G_A.toSubMeas)
-            (constSubMeasFamily G_B.toSubMeas)
-            (2 * MainInductionStep.mainInductionError params k
-                (3 * eps) (3 * eps) (3 * eps) +
-              2 * Real.sqrt (3 * eps +
-                2 * MainInductionStep.mainInductionError params k
-                  (3 * eps) (3 * eps) (3 * eps)) +
-              (params.m * params.d : Error) / params.q) := by
-  rcases sourceRoleRegisterUnsymmetrizedPointConsistency
-      params strategy eps hpass k hk with ⟨G_A, G_B, hpointAGB, hGApointB⟩
-  refine ⟨G_A, G_B, hpointAGB, hGApointB, ?_⟩
-  exact
-    sourceRoleRegisterFullPolynomialSelfConsistency_ofPointConsistency
-      params strategy eps
-      (2 * MainInductionStep.mainInductionError params k (3 * eps) (3 * eps) (3 * eps))
-      hpass G_A G_B hpointAGB hGApointB
-
-/-- Alice-side projective submeasurement obtained from a two-space
-complete-measurement Step 5 output.
-
-Paper origin: `references/ldt-paper/inductive_step.tex:135-143`, applying
-`lem:orthonormalization-main-lemma` to the complete polynomial measurements
-whose full-polynomial consistency has just been proved.
-
-This is a genuine two-space consequence of the source-facing orthonormalization
-lemma.  It constructs the Alice-side projective submeasurement from the
-complete measurement `G_A` and the cross-consistency relation with `G_B`, without
-assuming permutation-invariance or identifying the two local Hilbert spaces. -/
-theorem sourceRoleRegisterLeftProjectiveSubmeasurement_ofFullConsistency
-    (params : Parameters)
-    [FieldModel params.q]
-    {ιA ιB : Type*}
-    [Fintype ιA] [DecidableEq ιA]
-    [Fintype ιB] [DecidableEq ιB]
-    (strategy : ProjStrat params ιA ιB)
-    (G_A : Measurement (Polynomial params) ιA)
-    (G_B : Measurement (Polynomial params) ιB)
-    (ζ : Error)
-    (hfull : ConsRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily G_A.toSubMeas)
-      (constSubMeasFamily G_B.toSubMeas) ζ) :
-    ∃ P_A : ProjSubMeas (Polynomial params) ιA,
-      SDDRel strategy.state (uniformDistribution Unit)
-        (constSubMeasFamily (leftPlacedSubMeas (ιB := ιB) G_A.toSubMeas))
-        (constSubMeasFamily (leftPlacedSubMeas (ιB := ιB) P_A.toSubMeas))
-        (MakingMeasurementsProjective.orthonormalizationError ζ) := by
-  have hζ : 0 ≤ ζ := by
-    have hq : qBipartiteConsDefect strategy.state G_A.toSubMeas G_B.toSubMeas ≤ ζ := by
-      simpa [bipartiteConsError, avgOver, uniformDistribution, constSubMeasFamily] using
-        hfull.offDiagonalBound
-    exact le_trans (qBipartiteConsDefect_nonneg strategy.state G_A.toSubMeas G_B.toSubMeas)
-      hq
-  exact
-    orthonormalizationMeasurement_of_consistency_from_projectivizationRepair_heterogeneous
-      strategy.state strategy.isNormalized G_A G_B ζ hζ hfull
-
-/-- Bob-side projective submeasurement obtained from a two-space
-complete-measurement Step 5 output.
-
-Paper origin: `references/ldt-paper/inductive_step.tex:135-143`, applying
-`lem:orthonormalization-main-lemma` to the complete polynomial measurements
-whose full-polynomial consistency has just been proved.
-
-This is the right-register counterpart of
-`sourceRoleRegisterLeftProjectiveSubmeasurement_ofFullConsistency`.  It
-constructs the Bob-side projective submeasurement from the complete measurement
-`G_B` and the cross-consistency relation with `G_A`, without assuming
-permutation-invariance or identifying the two local Hilbert spaces. -/
-theorem sourceRoleRegisterRightProjectiveSubmeasurement_ofFullConsistency
-    (params : Parameters)
-    [FieldModel params.q]
-    {ιA ιB : Type*}
-    [Fintype ιA] [DecidableEq ιA]
-    [Fintype ιB] [DecidableEq ιB]
-    (strategy : ProjStrat params ιA ιB)
-    (G_A : Measurement (Polynomial params) ιA)
-    (G_B : Measurement (Polynomial params) ιB)
-    (ζ : Error)
-    (hfull : ConsRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily G_A.toSubMeas)
-      (constSubMeasFamily G_B.toSubMeas) ζ) :
-    ∃ P_B : ProjSubMeas (Polynomial params) ιB,
-      SDDRel strategy.state (uniformDistribution Unit)
-        (constSubMeasFamily (rightPlacedSubMeas (ιA := ιA) G_B.toSubMeas))
-        (constSubMeasFamily (rightPlacedSubMeas (ιA := ιA) P_B.toSubMeas))
-        (MakingMeasurementsProjective.orthonormalizationError ζ) := by
-  have hζ : 0 ≤ ζ := by
-    have hq : qBipartiteConsDefect strategy.state G_A.toSubMeas G_B.toSubMeas ≤ ζ := by
-      simpa [bipartiteConsError, avgOver, uniformDistribution, constSubMeasFamily] using
-        hfull.offDiagonalBound
-    exact le_trans (qBipartiteConsDefect_nonneg strategy.state G_A.toSubMeas G_B.toSubMeas)
-      hq
-  exact
-    orthonormalizationMeasurement_right_of_consistency_from_projectivizationRepair_heterogeneous
-      strategy.state strategy.isNormalized G_A G_B ζ hζ hfull
-
 
 end ProjStrat
 

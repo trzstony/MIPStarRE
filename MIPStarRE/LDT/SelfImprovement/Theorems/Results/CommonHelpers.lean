@@ -1,7 +1,6 @@
-import MIPStarRE.LDT.Basic.SubMeasurementFamilies
-import MIPStarRE.LDT.GlobalVariance.Defs.Families
-import MIPStarRE.LDT.Preliminaries.SelfConsistency.DataProcessing
-import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds.Final
+import MIPStarRE.LDT.Preliminaries.Triangles.SimEq
+import MIPStarRE.LDT.Preliminaries.SelfConsistency.Extensions
+import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds.Helper
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 
 /-!
@@ -12,12 +11,6 @@ so they can be reused across the split result-module leaves.
 
 ## Contents
 
-- **averagedPointOperator_le_one** — the averaged point operator for any
-  polynomial is bounded by 1; used by self-improvement fallback estimates.
-- **bipartiteSSCRel_uniform_const** — lift a bipartite SSC from `Unit` to
-  any nonempty question type (used by `selfImprovement`).
-- **sddRel_uniform_const** — lift an SDD from `Unit` to any nonempty
-  question type (used by `selfImprovement`).
 - **cons_rel_uniform_full_total_match_mass_lower_bound** — from `ConsRel`
   with total-1 families, derive `1 - δ ≤ avgOver matchMass`; used by
   `input_consistency_match_mass_lower_bound`.
@@ -27,7 +20,6 @@ so they can be reused across the split result-module leaves.
 - `references/ldt-paper/self_improvement.tex`
 - `blueprint/src/chapter/ch07_self_improvement.tex`
 -/
-
 
 namespace MIPStarRE.LDT.SelfImprovement
 
@@ -40,50 +32,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-! ## Shared scalar bounds -/
-
-/-- Internal helper: the averaged point operator for any polynomial is bounded by `1`. -/
-lemma averagedPointOperator_le_one
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (g : Polynomial params) :
-    averagedPointOperator params strategy g ≤ 1 := by
-  unfold averagedPointOperator
-  exact averageOperatorOverDistribution_uniform_le_one
-    (pointConditionedOutcomeOperatorAtPolynomial params strategy g)
-    (fun u => by
-      simpa [pointConditionedOutcomeOperatorAtPolynomial] using
-        Measurement.outcome_le_one (strategy.pointMeasurement u).toMeasurement (g u))
-
-/-- Internal helper: lift bipartite SSC from `Unit` to any nonempty question type. -/
-lemma bipartiteSSCRel_uniform_const
-    {Question Outcome : Type*}
-    [Fintype Question] [DecidableEq Question] [Nonempty Question]
-    [Fintype Outcome]
-    (ψ : QuantumState (ι × ι))
-    (A : SubMeas Outcome ι) (δ : Error) :
-    BipartiteSSCRel ψ (uniformDistribution Unit) (constSubMeasFamily A) δ →
-      BipartiteSSCRel ψ (uniformDistribution Question) (fun _ : Question => A) δ := by
-  intro hssc
-  rcases hssc with ⟨hssc⟩
-  constructor
-  simpa [bipartiteSSCError, avgOver, uniformDistribution, constSubMeasFamily] using hssc
-
-/-- Internal helper: lift SDD from `Unit` to any nonempty question type. -/
-lemma sddRel_uniform_const
-    {κ Question Outcome : Type*}
-    [Fintype κ] [DecidableEq κ]
-    [Fintype Question] [DecidableEq Question] [Nonempty Question]
-    [Fintype Outcome]
-    (ψ : QuantumState κ)
-    (A B : SubMeas Outcome κ) (δ : Error) :
-    SDDRel ψ (uniformDistribution Unit) (constSubMeasFamily A) (constSubMeasFamily B) δ →
-      SDDRel ψ (uniformDistribution Question) (fun _ : Question => A)
-        (fun _ : Question => B) δ := by
-  intro hsdd
-  rcases hsdd with ⟨hsdd⟩
-  constructor
-  simpa [sddError, avgOver, uniformDistribution, constSubMeasFamily] using hsdd
 
 /-- Internal helper: from `ConsRel` with total-1 families,
 derive `1 - δ ≤ avgOver matchMass`. Used by `input_consistency_match_mass_lower_bound`. -/
@@ -144,6 +92,5 @@ lemma cons_rel_uniform_full_total_match_mass_lower_bound
             ring
   rw [hsplit] at havg_defect
   linarith
-
 
 end MIPStarRE.LDT.SelfImprovement

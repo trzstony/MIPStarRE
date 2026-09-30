@@ -60,15 +60,6 @@ theorem submatrixLinearMap_apply (R : Type*) {m n m' n' α : Type*}
     Matrix.submatrixLinearMap R row col A = Matrix.submatrix A row col :=
   rfl
 
-/-- The trace pairing of two block-diagonal matrices is the sum of the trace
-pairings of the corresponding diagonal blocks. -/
-theorem trace_blockDiagonal_mul {o m R : Type*}
-    [Fintype o] [DecidableEq o] [Fintype m] [NonUnitalNonAssocSemiring R]
-    (B D : o → Matrix m m R) :
-    Matrix.trace (Matrix.blockDiagonal B * Matrix.blockDiagonal D) =
-      ∑ b : o, Matrix.trace (B b * D b) := by
-  rw [← Matrix.blockDiagonal_mul B D, Matrix.trace_blockDiagonal]
-
 end Matrix
 
 namespace MIPStarRE.Quantum

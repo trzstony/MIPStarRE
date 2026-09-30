@@ -1,5 +1,7 @@
 import MIPStarRE.LDT.Basic.DistributionUniform
-import MIPStarRE.LDT.Pasting.Statements
+import MIPStarRE.LDT.Commutativity.Scaffold.Core
+import MIPStarRE.LDT.MainInductionStep.Defs
+import MIPStarRE.LDT.Pasting.Sandwich.PastedFamilies
 
 /-!
 # Section 12 pasting: distinct tuple distribution bound

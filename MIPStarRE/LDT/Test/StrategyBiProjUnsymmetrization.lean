@@ -312,8 +312,6 @@ end Measurement
 
 namespace ProjStrat
 
-/-! ### Extraction on the constructed role-register measurements -/
-
 /-! ### Trace compression for occupied role-register sectors -/
 
 private lemma trace_single_tensor_mul_eq_trace_submatrix {β α : Type*}
@@ -371,20 +369,6 @@ private def rolePairSectorEmbedding {ιA ιB : Type*} (rL rR : Role) :
     LocalCarrierSum ιA ιB × LocalCarrierSum ιA ιB →
       RoleRegisterLocal ιA ιB × RoleRegisterLocal ιA ιB :=
   fun z => ((rL, z.1), (rR, z.2))
-
-/-- Submatrices of a tensor product along product embeddings are tensor products
-of the corresponding submatrices. -/
-private lemma opTensor_submatrix_prod {ιL ιR κL κR : Type*}
-    [Fintype ιL] [DecidableEq ιL] [Fintype ιR] [DecidableEq ιR]
-    [Fintype κL] [DecidableEq κL] [Fintype κR] [DecidableEq κR]
-    (A : MIPStarRE.Quantum.Op ιL) (B : MIPStarRE.Quantum.Op ιR)
-    (fL : κL → ιL) (fR : κR → ιR) :
-    (opTensor A B).submatrix
-      (fun z : κL × κR => (fL z.1, fR z.2))
-      (fun z : κL × κR => (fL z.1, fR z.2)) =
-      opTensor (A.submatrix fL fL) (B.submatrix fR fR) := by
-  ext x y
-  rfl
 
 private lemma trace_rolePairDirectSumCond_mul {ιA ιB : Type*}
     [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]

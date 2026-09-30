@@ -22,11 +22,11 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-lemma axisLinePolynomial_ne_gives_support_eval_ne
+lemma axisLinePolynomial_ne_gives_support_eval_ne_injOn
     (params : Parameters) [FieldModel params.q]
     {k : ℕ} (xs : PointTuple params k)
-    (hxs : Function.Injective xs)
     (σ : Finset (Fin k))
+    (hxs : Set.InjOn xs σ)
     (hσcard : σ.card = params.d + 1)
     {f g : AxisLinePolynomial params.next}
     (hne : f ≠ g) :
@@ -36,11 +36,12 @@ lemma axisLinePolynomial_ne_gives_support_eval_ne
   push Not at hcontra
   let s : Finset (Scalar params.next) := σ.image (fun i => decodeScalar (xs i))
   have hs_card : s.card = params.d + 1 := by
-    rw [Finset.card_image_of_injective]
+    dsimp [s]
+    rw [Finset.card_image_of_injOn]
     · exact hσcard
-    · exact fun i j hij => by
-        exact hxs ((FieldModel.equiv (q := params.q)).symm.injective
-          (by simpa [decodeScalar, Parameters.next] using hij))
+    · intro i hi j hj hij
+      exact hxs hi hj ((FieldModel.equiv (q := params.q)).symm.injective
+        (by simpa [decodeScalar, Parameters.next] using hij))
   have hs_eval : ∀ y ∈ s, _root_.Polynomial.eval y f.poly = _root_.Polynomial.eval y g.poly := by
     intro y hy
     rcases Finset.mem_image.mp hy with ⟨i, hiσ, rfl⟩
@@ -61,48 +62,6 @@ lemma axisLinePolynomial_ne_gives_support_eval_ne
   cases g
   cases hpoly
   rfl
-
-lemma nonglobal_gives_slice_mismatch_against_interpolant
-    (params : Parameters) [FieldModel params.q]
-    {k : ℕ}
-    (xs : PointTuple params k)
-    (gs : GHatTupleOutcome params k)
-    (hNGlobal : ¬ IsGloballyConsistent params xs gs) :
-    ∃ i : Fin k, ∃ hiSome : (gs i).isSome = true,
-      Polynomial.restrictAtHeight params
-        (interpolateCompletedSlices params k xs gs) (xs i) ≠
-      (gs i).get hiSome := by
-  classical
-  let hStar := interpolateCompletedSlices params k xs gs
-  by_contra hcontra
-  push Not at hcontra
-  apply hNGlobal
-  refine ⟨hStar, ?_⟩
-  intro i hiSome
-  exact congrArg Polynomial.poly (hcontra i hiSome)
-
-/-- The chosen `d+1` interpolation support inside `gHatTupleSupport`. -/
-noncomputable def interpolationSupportSubset
-    {params : Parameters} [FieldModel params.q]
-    {k : ℕ} (gs : GHatTupleOutcome params k)
-    (hEligible : InterpolationEligible params gs) : Finset (Fin k) :=
-  (interpolationSupportWitness gs hEligible).support
-
-lemma interpolationSupportSubset_subset
-    {params : Parameters} [FieldModel params.q]
-    {k : ℕ} (gs : GHatTupleOutcome params k)
-    (hEligible : InterpolationEligible params gs) :
-    interpolationSupportSubset gs hEligible ⊆ gHatTupleSupport gs := by
-  simpa [interpolationSupportSubset] using
-    (interpolationSupportWitness gs hEligible).subset_support
-
-lemma interpolationSupportSubset_card
-    {params : Parameters} [FieldModel params.q]
-    {k : ℕ} (gs : GHatTupleOutcome params k)
-    (hEligible : InterpolationEligible params gs) :
-    (interpolationSupportSubset gs hEligible).card = params.d + 1 := by
-  simpa [interpolationSupportSubset] using
-    (interpolationSupportWitness gs hEligible).card_eq
 
 lemma restrictToAxisParallelLine_apply
     (params : Parameters) [FieldModel params.q]
@@ -175,14 +134,14 @@ lemma restrictToVerticalLine_eval_eq_restrictAtHeight_eval
              _ = h (appendPoint params u x) := by
                    rfl
 
-lemma interpolateCompletedSlicesFromSupport_restrictAtHeight_poly_eq_get_of_mem
+lemma interpolateCompletedSlicesFromSupport_restrictAtHeight_poly_eq_get_of_mem_injOn
     (params : Parameters) [FieldModel params.q]
     {k : ℕ} (xs : PointTuple params k)
-    (hxs : Function.Injective xs)
     (gs : GHatTupleOutcome params k)
     (σ : Finset (Fin k))
     (hσsubset : σ ⊆ gHatTupleSupport gs)
     (hσcard : σ.card = params.d + 1)
+    (hxs : Set.InjOn xs σ)
     {i : Fin k} (hi : i ∈ σ) :
     MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
       (interpolateCompletedSlicesFromSupport params xs gs σ hσsubset hσcard).poly =
@@ -190,7 +149,7 @@ lemma interpolateCompletedSlicesFromSupport_restrictAtHeight_poly_eq_get_of_mem
   let v : Fin k → Scalar params := fun j => decodeScalar (xs j)
   have hvinj : Set.InjOn v (↑σ : Set (Fin k)) := by
     intro a ha b hb hab
-    exact hxs (by simpa [v] using congrArg (encodeScalar (params := params)) hab)
+    exact hxs ha hb (by simpa [v] using congrArg (encodeScalar (params := params)) hab)
   have hcomp :
       ((MvPolynomial.eval₂Hom MvPolynomial.C
           (Polynomial.restrictAtHeightCoordinateMap params (xs i))).comp
@@ -404,30 +363,5 @@ lemma interpolateCompletedSlicesFromSupport_restrictAtHeight_poly_eq_get_of_mem
     simp
   · intro hnot
     exact (hnot (by simp : ((⟨i, hi⟩ : {x // x ∈ σ}) ∈ σ.attach))).elim
-
-lemma interpolateCompletedSlices_restrictAtHeight_eq_get_of_mem_supportSubset
-    (params : Parameters) [FieldModel params.q]
-    {k : ℕ} (xs : PointTuple params k)
-    (hxs : Function.Injective xs)
-    (gs : GHatTupleOutcome params k)
-    (hEligible : InterpolationEligible params gs)
-    {i : Fin k} (hi : i ∈ interpolationSupportSubset gs hEligible) :
-    (Polynomial.restrictAtHeight params
-      (interpolateCompletedSlices params k xs gs) (xs i)).poly =
-      ((gs i).get (by
-        have hisup : i ∈ gHatTupleSupport gs :=
-          interpolationSupportSubset_subset gs hEligible hi
-        simpa [gHatTupleSupport] using hisup)).poly := by
-  classical
-  let σ := interpolationSupportSubset gs hEligible
-  have hσcard : σ.card = params.d + 1 := interpolationSupportSubset_card gs hEligible
-  cases k with
-  | zero => cases i.2
-  | succ k =>
-      simpa [interpolateCompletedSlices, hEligible, σ, interpolationSupportSubset, hσcard,
-        Polynomial.restrictAtHeight] using
-        interpolateCompletedSlicesFromSupport_restrictAtHeight_poly_eq_get_of_mem
-          params xs hxs gs σ
-          (interpolationSupportSubset_subset gs hEligible) hσcard hi
 
 end MIPStarRE.LDT.Pasting

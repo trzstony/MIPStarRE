@@ -1,8 +1,5 @@
-import MIPStarRE.LDT.Commutativity.ScalarApproximation.Core
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainReverse
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainTail
-import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation.Consequences
-import MIPStarRE.LDT.Commutativity.GCommStability.Scalar.RawSecond
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.ProcessedG.PhaseTwo
 
 /-!
@@ -150,7 +147,7 @@ Starting from `E[∑ ABAB]`, the proof applies ten approximation steps:
 3. `≈_{2√ζ}`: insert Bob's second measurement via `closenessOfIP` +
    `eq:add-an-a`
 4. `≈_{6√(γ(m+1))}`: swap Bob's measurements via `closenessOfIP` +
-   `commutativityPoints`
+   `thm:commutativity-points`
 5a. `≈_{6√(γ(m+1))}`: the point-measurement swap contribution internal
     to the paper's `clm:g-comm-stability2` accounting
 5b. `≈_{√ζ}`: remove trailing `G^x` by the boundedness part of
@@ -447,7 +444,7 @@ lemma evaluatedSlice_scalar_chain_bound
             rw [Real.sqrt_mul (show 0 ≤ (4 : Error) by positivity)]
             norm_num
   -- Paper line 87: commute the two right-register point measurements.
-  -- The `6√(γ(m+1))` bound comes from `commutativityPoints` via `closenessOfIP`:
+  -- The `6√(γ(m+1))` bound comes from `thm:commutativity-points` via `closenessOfIP`:
   -- the SDDOpRel error is `32·γ·(m+1)`, applying `closenessOfIP` gives
   -- `√(32·γ·(m+1))`, and `√32 ≤ 6` rounds up to match the paper's constant.
   have hphase4paper :
@@ -534,7 +531,7 @@ lemma evaluatedSlice_scalar_chain_bound
   --   - `√ζ` from `gCommStabilityTwo_raw_scalar` (the boundedness part of
   --     `clm:g-comm-stability2`, corresponding to the paper's line 93 `≈_{√ζ}`)
   --   - `6√(γ(m+1))` from swapping the right-register point measurements
-  --     inside the phase-5 defect (same `commutativityPoints` →
+  --     inside the phase-5 defect (same `thm:commutativity-points` →
   --     `closenessOfIP` → `√32 ≤ 6` chain as Phase 4).
   -- The ordered defect is first swapped on the right register, then reindexed to
   -- `gCommStabilityTwoRawScalarDefect`, whose average is controlled by the new

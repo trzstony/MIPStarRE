@@ -121,60 +121,7 @@ theorem dual_positive {params : Parameters} [FieldModel params.q]
     0 ≤ Z :=
   h.toSdpOptimalPair.dualPositive
 
-/-- The dual slack operators in a slackness-carrying SDP pair are positive
-semidefinite. -/
-theorem dual_feasible {params : Parameters} [FieldModel params.q]
-    {strategy : SymStrat params ι}
-    {T : SubMeas (Polynomial params) ι}
-    {Z : MIPStarRE.Quantum.Op ι}
-    (h : SdpOptimalPairWithSlackness params strategy T Z) :
-    ∀ g : Polynomial params,
-      0 ≤ sdpDualSlackOperator params strategy Z g :=
-  h.toSdpOptimalPair.dualFeasible
-
-/-- The primal submeasurement in a slackness-carrying SDP pair is a
-measurement. -/
-def primalMeasurement {params : Parameters} [FieldModel params.q]
-    {strategy : SymStrat params ι}
-    {T : SubMeas (Polynomial params) ι}
-    {Z : MIPStarRE.Quantum.Op ι}
-    (h : SdpOptimalPairWithSlackness params strategy T Z) :
-    Measurement (Polynomial params) ι where
-  toSubMeas := T
-  total_eq_one := h.toSdpOptimalPair.primalTotalOperator
-
-@[simp] theorem primalMeasurement_toSubMeas {params : Parameters} [FieldModel params.q]
-    {strategy : SymStrat params ι}
-    {T : SubMeas (Polynomial params) ι}
-    {Z : MIPStarRE.Quantum.Op ι}
-    (h : SdpOptimalPairWithSlackness params strategy T Z) :
-    h.primalMeasurement.toSubMeas = T :=
-  rfl
-
 end SdpOptimalPairWithSlackness
-
-namespace SdpStatementWithSlackness
-
-/-- A slackness-carrying SDP statement gives the displayed paper-form
-measurement and dual witness.
-
-This is the abstract analogue of the matrix-level witness extractors: the
-existential SDP statement contains a complete primal measurement, a positive
-dual operator dominating every averaged point operator, and the
-complementary-slackness equations. -/
-theorem exists_measurement_witness {params : Parameters} [FieldModel params.q]
-    {strategy : SymStrat params ι}
-    (h : SdpStatementWithSlackness params strategy) :
-    ∃ T : Measurement (Polynomial params) ι,
-      ∃ Z : MIPStarRE.Quantum.Op ι,
-        0 ≤ Z ∧
-        (∀ g : Polynomial params, 0 ≤ sdpDualSlackOperator params strategy Z g) ∧
-        ∀ g : Polynomial params,
-          sdpComplementarySlacknessEquation params strategy T.toSubMeas Z g := by
-  obtain ⟨T, Z, hpair⟩ := h.witness
-  exact ⟨T, Z, hpair.dual_positive, hpair.dual_feasible, hpair.complementarySlackness⟩
-
-end SdpStatementWithSlackness
 
 /-- The operator inside the left-hand side of `lem:add-in-u` at a fixed point `u`.
 Returns a bipartite operator `(M u).outcome o ⊗ H.outcome h`. -/
@@ -273,25 +220,6 @@ noncomputable def helperBoundednessGap (params : Parameters)
     (Z : MIPStarRE.Quantum.Op ι) : Error :=
   ev strategy.state
     (helperBoundednessOperator params strategy H Z)
-
-/-- The projective-stage residual operator `Z ⊗ (I - H)`
-on the bipartite space `ι × ι`. -/
-noncomputable def projectiveResidualOperator (params : Parameters)
-    [FieldModel params.q]
-    (H : ProjSubMeas (Polynomial params) ι)
-    (Z : MIPStarRE.Quantum.Op ι) :
-    MIPStarRE.Quantum.Op (ι × ι) :=
-  leftTensor (ι₂ := ι) Z *
-    rightTensor (ι₁ := ι) (1 - H.toSubMeas.total)
-
-/-- The projective-stage boundedness defect. -/
-noncomputable def projectiveBoundednessGap (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (H : ProjSubMeas (Polynomial params) ι)
-    (Z : MIPStarRE.Quantum.Op ι) : Error :=
-  ev strategy.state
-    (projectiveResidualOperator params H Z)
 
 /-- Paper origin: `references/ldt-paper/self_improvement.tex:238-455`
 (`\label{lem:add-in-u}`).
@@ -401,76 +329,5 @@ structure SelfImprovementHelperConclusionWithSlackness (params : Parameters)
   complementarySlackness :
     ∀ g : Polynomial params,
       sdpComplementarySlacknessEquation params strategy T.toSubMeas Z g
-
-/-- Paper origin: `references/ldt-paper/self_improvement.tex:635-671`
-(`\label{thm:self-improvement}`).
-
-Conclusion of `thm:self-improvement`.
-
-The paper's boundedness output is the projective residual estimate
-`⟨ψ, Z ⊗ (I - H)⟩ ≤ ζ`, recorded here as `projectiveResidualBound`.  This
-structure is the conjunction of the paper's displayed conclusions for the
-already-quantified witnesses `H` and `Z`; it does not store an internal helper
-form or an SDP connection input. -/
-structure SelfImprovementConclusion (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (G : Measurement (Polynomial params) ι)
-    (H : ProjSubMeas (Polynomial params) ι)
-    (Z : MIPStarRE.Quantum.Op ι) (eps delta gamma nu : Error) : Prop where
-  completeness :
-    CompletenessAtLeast strategy.state H.toSubMeas.liftLeft
-      ((1 - nu) - selfImprovementError params eps delta)
-  pointConsistency :
-    ConsRel strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-      (polynomialEvaluationFamily params H.toSubMeas)
-      (selfImprovementError params eps delta)
-  selfCloseness :
-    SDDRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily
-        (leftPlacedSubMeas (ιB := ι) H.toSubMeas))
-      (constSubMeasFamily
-        (rightPlacedSubMeas (ιA := ι) H.toSubMeas))
-      (selfImprovementError params eps delta)
-  positiveSemidefiniteWitness :
-    0 ≤ Z
-  dualDominatesAveragedPoint :
-    ∀ g : Polynomial params,
-      0 ≤ sdpDualSlackOperator params strategy Z g
-  projectiveResidualBound :
-    projectiveBoundednessGap params strategy H Z ≤
-      selfImprovementError params eps delta
-
-/-- Final fields for the Section 9 transport stage.
-
-The final fields are the Section 9 outputs that remain after combining:
-`SelfImprovementHelper`, orthonormalization, data-processing, and the
-monotone-total transport used in the projective-output step.
-
-This record contains completeness, point-consistency, self-closeness, and the
-projective-residual estimate. This projective residual is already the
-paper-facing boundedness quantity carried into `SelfImprovementConclusion`. -/
-structure SelfImprovementFinalFields (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (H : ProjSubMeas (Polynomial params) ι)
-    (Z : MIPStarRE.Quantum.Op ι) (eps delta nu : Error) : Prop where
-  completeness :
-    CompletenessAtLeast strategy.state H.toSubMeas.liftLeft
-      ((1 - nu) - selfImprovementError params eps delta)
-  pointConsistency :
-    ConsRel strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-      (polynomialEvaluationFamily params H.toSubMeas)
-      (selfImprovementError params eps delta)
-  selfCloseness :
-    SDDRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily
-        (leftPlacedSubMeas (ιB := ι) H.toSubMeas))
-      (constSubMeasFamily
-        (rightPlacedSubMeas (ιA := ι) H.toSubMeas))
-      (selfImprovementError params eps delta)
-  projectiveResidualBound :
-    projectiveBoundednessGap params strategy H Z ≤
-      selfImprovementError params eps delta
 
 end MIPStarRE.LDT.SelfImprovement

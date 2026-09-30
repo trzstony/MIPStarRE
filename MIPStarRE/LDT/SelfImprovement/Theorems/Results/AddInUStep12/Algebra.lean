@@ -1,8 +1,3 @@
-import MIPStarRE.LDT.Basic.SubMeasurementFamilies
-import MIPStarRE.LDT.Preliminaries.SelfConsistency.DataProcessing
-import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds.Final
-import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.CommonHelpers
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUDiagonalAndDefs.Residual
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUDiagonalAndDefs.ScalarChain
 
@@ -30,7 +25,6 @@ The contraction and raw `√(2δ)` estimates using these identities live in
 - `references/ldt-paper/self_improvement.tex` lines 255–297
 - `blueprint/src/chapter/ch07_self_improvement.tex`
 -/
-
 
 namespace MIPStarRE.LDT.SelfImprovement
 
@@ -213,45 +207,6 @@ lemma addInU_cs_chain_step2_diff_eq
   congr 1
   exact addInU_step2_pointwise_op_eq Mh Av (T.outcome h)
 
-/-- Reverse-orientation form of `addInU_cs_chain_step1_diff_eq`.
-
-This is the same algebraic identity as the `Q₀ → Q₁` rewrite, stated in the
-`Q₀ - Q₁` orientation used by the later absolute-value chain. -/
-lemma addInU_cs_chain_step1_reverse_diff_eq
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (T : SubMeas (Polynomial params) ι) :
-    addInUCSChainQ0 params strategy T - addInUCSChainQ1 params strategy T =
-      -avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
-        ∑ h : Polynomial params,
-          let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.2
-          let Mh := (sandwichedPolynomialSubMeasAt params strategy T uv.1).outcome h
-          ev strategy.state
-            ((leftTensor (ι₂ := ι) Av - rightTensor (ι₁ := ι) Av) *
-              (opTensor Mh (T.outcome h) * rightTensor (ι₁ := ι) Av))) := by
-  rw [← addInU_cs_chain_step1_diff_eq params strategy T]
-  ring
-
-/-- Reverse-orientation form of `addInU_cs_chain_step2_diff_eq`.
-
-This is the same algebraic identity as the `Q₁ → Q₂` rewrite, stated in the
-`Q₁ - Q₂` orientation used by the later absolute-value chain. -/
-lemma addInU_cs_chain_step2_reverse_diff_eq
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (T : SubMeas (Polynomial params) ι) :
-    addInUCSChainQ1 params strategy T - addInUCSChainQ2 params strategy T =
-      -avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
-        ∑ h : Polynomial params,
-          let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy h uv.2
-          let Mh := (sandwichedPolynomialSubMeasAt params strategy T uv.1).outcome h
-          ev strategy.state
-            (leftTensor (ι₂ := ι) Av *
-              (opTensor Mh (T.outcome h) *
-                (leftTensor (ι₂ := ι) Av - rightTensor (ι₁ := ι) Av)))) := by
-  rw [← addInU_cs_chain_step2_diff_eq params strategy T]
-  ring
-
 /-- Algebraic CS-alignment for the `Q₂ → Q₃` step.
 
 Rewrites the difference `addInUCSChainQ2 - addInUCSChainQ3` in the exact form
@@ -367,47 +322,6 @@ lemma addInU_selected_cs_chain_step2_diff_eq
   congr 1
   exact addInU_step2_pointwise_op_eq Moh Av (T.outcome ah.2)
 
-/-- Reverse-orientation selected form of `addInU_selected_cs_chain_step1_diff_eq`. -/
-lemma addInU_selected_cs_chain_step1_reverse_diff_eq
-    {Outcome : Type*} [Fintype Outcome]
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (M : IdxSubMeas (Point params) Outcome ι)
-    (T : SubMeas (Polynomial params) ι)
-    (S : AddInUSelection params Outcome) :
-    addInUSelectedCSChainQ0 params strategy M T S -
-        addInUSelectedCSChainQ1 params strategy M T S =
-      -avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
-        ∑ ah ∈ addInUSelectionPairs params S uv.1,
-          let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2
-          let Moh := (M uv.1).outcome ah.1
-          ev strategy.state
-            ((leftTensor (ι₂ := ι) Av - rightTensor (ι₁ := ι) Av) *
-              (opTensor Moh (T.outcome ah.2) * rightTensor (ι₁ := ι) Av))) := by
-  rw [← addInU_selected_cs_chain_step1_diff_eq params strategy M T S]
-  ring
-
-/-- Reverse-orientation selected form of `addInU_selected_cs_chain_step2_diff_eq`. -/
-lemma addInU_selected_cs_chain_step2_reverse_diff_eq
-    {Outcome : Type*} [Fintype Outcome]
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (M : IdxSubMeas (Point params) Outcome ι)
-    (T : SubMeas (Polynomial params) ι)
-    (S : AddInUSelection params Outcome) :
-    addInUSelectedCSChainQ1 params strategy M T S -
-        addInUSelectedCSChainQ2 params strategy M T S =
-      -avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
-        ∑ ah ∈ addInUSelectionPairs params S uv.1,
-          let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2
-          let Moh := (M uv.1).outcome ah.1
-          ev strategy.state
-            (leftTensor (ι₂ := ι) Av *
-              (opTensor Moh (T.outcome ah.2) *
-                (leftTensor (ι₂ := ι) Av - rightTensor (ι₁ := ι) Av)))) := by
-  rw [← addInU_selected_cs_chain_step2_diff_eq params strategy M T S]
-  ring
-
 /-- Algebraic CS-alignment for the selected `Q₂ → Q₃` step.
 
 This rewrites the first point-replacement move for an arbitrary selected
@@ -479,46 +393,6 @@ lemma addInU_selected_cs_chain_step4_diff_eq
   rw [← ev_sub]
   congr 1
   exact addInU_step4_pointwise_op_eq Au Av Moh (T.outcome ah.2)
-
-/-- Reverse-orientation selected form of `addInU_selected_cs_chain_step3_diff_eq`. -/
-lemma addInU_selected_cs_chain_step3_reverse_diff_eq
-    {Outcome : Type*} [Fintype Outcome]
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (M : IdxSubMeas (Point params) Outcome ι)
-    (T : SubMeas (Polynomial params) ι)
-    (S : AddInUSelection params Outcome) :
-    addInUSelectedCSChainQ3 params strategy M T S -
-        addInUSelectedCSChainQ2 params strategy M T S =
-      -avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
-        ∑ ah ∈ addInUSelectionPairs params S uv.1,
-          let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.1
-          let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2
-          let Moh := (M uv.1).outcome ah.1
-          ev strategy.state
-            (opTensor ((Av - Au) * Moh * Av) (T.outcome ah.2))) := by
-  rw [← addInU_selected_cs_chain_step3_diff_eq params strategy M T S]
-  ring
-
-/-- Reverse-orientation selected form of `addInU_selected_cs_chain_step4_diff_eq`. -/
-lemma addInU_selected_cs_chain_step4_reverse_diff_eq
-    {Outcome : Type*} [Fintype Outcome]
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (M : IdxSubMeas (Point params) Outcome ι)
-    (T : SubMeas (Polynomial params) ι)
-    (S : AddInUSelection params Outcome) :
-    addInUSelectedCSChainQ4 params strategy M T S -
-        addInUSelectedCSChainQ3 params strategy M T S =
-      -avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
-        ∑ ah ∈ addInUSelectionPairs params S uv.1,
-          let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.1
-          let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2
-          let Moh := (M uv.1).outcome ah.1
-          ev strategy.state
-            (opTensor (Au * Moh * (Av - Au)) (T.outcome ah.2))) := by
-  rw [← addInU_selected_cs_chain_step4_diff_eq params strategy M T S]
-  ring
 
 /-- Algebraic CS-alignment for the `Q₃ → Q₄` step.
 

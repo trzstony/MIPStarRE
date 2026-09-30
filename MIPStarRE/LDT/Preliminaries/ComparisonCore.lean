@@ -31,32 +31,6 @@ namespace MIPStarRE.LDT.Preliminaries
 
 open MIPStarRE.LDT
 
-/-- `prop:post-processing-preserves`.
-
-Postprocessing preserves the total operator, so it preserves both the
-submeasurement and measurement conditions. -/
-theorem postprocessPreservesMeasurements {α β : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype α] [Fintype β]
-    (A : SubMeas α ι) (f : α → β) :
-    (postprocess A f).total = A.total := by
-  exact postprocess_total A f
-
-/-- `prop:simeq-for-measurements`. -/
-theorem simeqForMeasurements {Question Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
-    (A B : IdxMeas Question Outcome ι) (δ : Error) :
-    ConsRel ψ 𝒟 (IdxMeas.toIdxSubMeas A)
-        (IdxMeas.toIdxSubMeas B) δ ↔
-      ConsAgreement ψ 𝒟 A B δ := by
-  constructor
-  · intro ⟨h⟩
-    exact ⟨by unfold agreementProbability; linarith⟩
-  · intro ⟨h⟩
-    exact ⟨by unfold agreementProbability at h; linarith⟩
-
 /-- Atomic mathematical fact: for a full measurement, the squared-distance defect
 is at most `2 * qConsDefect`. -/
 private lemma questionSDD_le_two_questionConsistency {Outcome : Type*}
@@ -338,82 +312,6 @@ lemma qMatchMass_leftRight_postprocess_ge {α β : Type*}
                       (Finset.univ.filter (fun a => f a = b)) (fun a => B.outcome a)]
             _ = fiberPair b := hfiber_expand b
 
-/-- Postprocessing can only decrease the bipartite strong self-consistency
-defect: the total mass is preserved while the diagonal overlap term can only
-increase. -/
-lemma qBipartiteSSCDefect_postprocess_le {α β : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype α] [Fintype β]
-    (ψ : QuantumState (ι × ι)) (M : SubMeas α ι) (f : α → β) :
-    qBipartiteSSCDefect ψ (postprocess M f) ≤ qBipartiteSSCDefect ψ M := by
-  have hmatch :
-      qMatchMass ψ
-          (leftPlacedSubMeas (ιB := ι) (postprocess M f))
-          (rightPlacedSubMeas (ιA := ι) (postprocess M f)) ≥
-        qMatchMass ψ
-          (leftPlacedSubMeas (ιB := ι) M)
-          (rightPlacedSubMeas (ιA := ι) M) :=
-    qMatchMass_leftRight_postprocess_ge ψ M M f
-  have hsub :
-      ev ψ (leftTensor (ι₂ := ι) M.total) -
-          qMatchMass ψ
-            (leftPlacedSubMeas (ιB := ι) (postprocess M f))
-            (rightPlacedSubMeas (ιA := ι) (postprocess M f))
-        ≤
-      ev ψ (leftTensor (ι₂ := ι) M.total) -
-          qMatchMass ψ
-            (leftPlacedSubMeas (ιB := ι) M)
-            (rightPlacedSubMeas (ιA := ι) M) := by
-    linarith
-  have hmass_post :
-      ev ψ (leftTensor (ι₂ := ι) (postprocess M f).total) =
-        ev ψ (leftTensor (ι₂ := ι) M.total) := by
-    simp [postprocess_total]
-  have hmatch_post :
-      qMatchMass ψ
-          (leftPlacedSubMeas (ιB := ι) (postprocess M f))
-          (rightPlacedSubMeas (ιA := ι) (postprocess M f)) =
-        ∑ b : β,
-          ev ψ
-            (opTensor
-              ((postprocess M f).outcome b)
-              ((postprocess M f).outcome b)) := by
-    simp [qMatchMass, leftPlacedSubMeas, rightPlacedSubMeas,
-      leftTensor_mul_rightTensor_eq_opTensor]
-  have hmatch_orig :
-      qMatchMass ψ
-          (leftPlacedSubMeas (ιB := ι) M)
-          (rightPlacedSubMeas (ιA := ι) M) =
-        ∑ a : α, ev ψ (opTensor (M.outcome a) (M.outcome a)) := by
-    simp [qMatchMass, leftPlacedSubMeas, rightPlacedSubMeas,
-      leftTensor_mul_rightTensor_eq_opTensor]
-  have hsub' :
-      ev ψ (leftTensor (ι₂ := ι) M.total) -
-          ∑ b : β,
-            ev ψ
-              (opTensor
-                ((postprocess M f).outcome b)
-                ((postprocess M f).outcome b))
-        ≤
-      ev ψ (leftTensor (ι₂ := ι) M.total) -
-          ∑ a : α, ev ψ (opTensor (M.outcome a) (M.outcome a)) := by
-    rw [← hmatch_post, ← hmatch_orig]
-    exact hsub
-  change
-      max 0
-          (ev ψ (leftTensor (ι₂ := ι) (postprocess M f).total) -
-            ∑ b : β,
-              ev ψ
-                (opTensor
-                  ((postprocess M f).outcome b)
-                  ((postprocess M f).outcome b)))
-        ≤
-      max 0
-          (ev ψ (leftTensor (ι₂ := ι) M.total) -
-            ∑ a : α, ev ψ (opTensor (M.outcome a) (M.outcome a)))
-  rw [hmass_post]
-  exact max_le_max le_rfl hsub'
-
 private lemma qConsDefect_leftRight_postprocess_le {α β : Type*}
     {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     [Fintype α] [Fintype β]
@@ -454,63 +352,6 @@ private lemma qConsDefect_leftRight_postprocess_le {α β : Type*}
     simp [leftPlacedSubMeas, rightPlacedSubMeas, postprocess_total]
   rw [htotal]
   exact max_le_max le_rfl hsub
-
-/-- Heterogeneous form of `prop:simeq-data-processing`.
-
-This is the paper-faithful opposite-side statement: the two families are first
-placed on opposite tensor factors of a bipartite state, and only then
-postprocessed. The generic same-side `qConsDefect` monotonicity statement is
-false for arbitrary noncommuting submeasurements. -/
-theorem simeqDataProcessing_heterogeneous {Question α β : Type*}
-    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    [Fintype α] [Fintype β]
-    (ψ : QuantumState (ιA × ιB)) (𝒟 : Distribution Question)
-    (A : IdxMeas Question α ιA) (B : IdxMeas Question α ιB) (δ : Error)
-    (f : α → β) :
-    ConsRel ψ 𝒟
-      (IdxMeas.toIdxSubMeas A)
-      (IdxMeas.toIdxSubMeas B) δ →
-      ConsRel ψ 𝒟
-        (fun q => postprocess ((A q).toSubMeas) f)
-        (fun q => postprocess ((B q).toSubMeas) f) δ := by
-  intro ⟨hcons⟩
-  constructor
-  rw [bipartiteConsError_eq_consError_placed] at hcons ⊢
-  unfold consError at *
-  calc
-    avgOver 𝒟
-        (fun q =>
-          qConsDefect ψ
-            (leftPlacedSubMeas (ιB := ιB) (postprocess ((A q).toSubMeas) f))
-            (rightPlacedSubMeas (ιA := ιA) (postprocess ((B q).toSubMeas) f)))
-      ≤ avgOver 𝒟
-          (fun q =>
-            qConsDefect ψ
-              (leftPlacedSubMeas (ιB := ιB) ((A q).toSubMeas))
-              (rightPlacedSubMeas (ιA := ιA) ((B q).toSubMeas))) := by
-          apply avgOver_mono
-          intro q
-          exact qConsDefect_leftRight_postprocess_le ψ (A q).toSubMeas (B q).toSubMeas f
-    _ ≤ δ := hcons
-
-/-- `prop:simeq-data-processing`.
-
-This is the source-labelled same-space statement.  The proof is the
-heterogeneous opposite-side data-processing theorem specialized to equal local
-spaces. -/
-theorem simeqDataProcessing {Question α β : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype α] [Fintype β]
-    (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
-    (A B : IdxMeas Question α ι) (δ : Error)
-    (f : α → β) :
-    ConsRel ψ 𝒟
-      (IdxMeas.toIdxSubMeas A)
-      (IdxMeas.toIdxSubMeas B) δ →
-      ConsRel ψ 𝒟
-        (fun q => postprocess ((A q).toSubMeas) f)
-        (fun q => postprocess ((B q).toSubMeas) f) δ := by
-  exact simeqDataProcessing_heterogeneous ψ 𝒟 A B δ f
 
 /-- Question-dependent postprocessing preserves bipartite consistency. -/
 theorem consRelDataProcessing_questionDependent {Question α β : Type*}
@@ -654,6 +495,5 @@ lemma conjTranspose_mul_mono
     simpa [Matrix.star_eq_conjTranspose] using
       star_left_conjugate_nonneg (sub_nonneg.mpr hXY) Z
   simpa [mul_sub, sub_mul, Matrix.conjTranspose_conjTranspose, mul_assoc] using hnonneg
-
 
 end MIPStarRE.LDT.Preliminaries
