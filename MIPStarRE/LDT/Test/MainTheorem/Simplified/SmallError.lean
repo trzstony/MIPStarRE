@@ -30,7 +30,7 @@ theorem simplifiedMainFormal_smallError
     (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (hsmall : ¬ 1 ≤ simplifiedMainFormalError params eps) :
-    SimplifiedMainFormalConclusion params strategy eps := by
+    MainFormalConclusion params strategy (simplifiedMainFormalError params eps) := by
   let σ : Error := 2 * MainInductionStep.simplifiedMainInductionError params
     (3 * eps) (3 * eps) (3 * eps)
   let ζ : Error := σ + 2 * Real.sqrt (3 * eps + σ) +
